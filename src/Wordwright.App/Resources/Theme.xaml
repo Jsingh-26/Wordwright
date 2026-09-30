@@ -1,0 +1,47 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Brand palette (docs/DESIGN.md). No other colours may be used. -->
+    <Color x:Key="ForgeInkColor">#FF23408E</Color>
+    <Color x:Key="InkLightColor">#FFA4B6F0</Color>
+    <Color x:Key="SteelColor">#FFE9ECF3</Color>
+    <Color x:Key="AnvilColor">#FF1A2030</Color>
+    <Color x:Key="EmberColor">#FFC7621E</Color>
+    <Color x:Key="OchreColor">#FF9A5B00</Color>
+    <Color x:Key="OchreDarkThemeColor">#FFE8B45A</Color>
+
+    <SolidColorBrush x:Key="ForgeInkBrush" Color="{StaticResource ForgeInkColor}" />
+    <SolidColorBrush x:Key="InkLightBrush" Color="{StaticResource InkLightColor}" />
+    <SolidColorBrush x:Key="SteelBrush" Color="{StaticResource SteelColor}" />
+    <SolidColorBrush x:Key="AnvilBrush" Color="{StaticResource AnvilColor}" />
+    <SolidColorBrush x:Key="EmberBrush" Color="{StaticResource EmberColor}" />
+    <SolidColorBrush x:Key="OchreBrush" Color="{StaticResource OchreColor}" />
+
+    <!-- Type (docs/DESIGN.md): Zodiak for display, Segoe UI Variable Text for
+         everything the user reads or clicks. Windows 10 falls back to Segoe UI. -->
+    <FontFamily x:Key="Zodiak">/Wordwright.App;component/Resources/Fonts/Zodiak-Bold.otf#Zodiak</FontFamily>
+    <FontFamily x:Key="ZodiakRegular">/Wordwright.App;component/Resources/Fonts/Zodiak-Regular.otf#Zodiak</FontFamily>
+    <FontFamily x:Key="AppText">Segoe UI Variable Text, Segoe UI</FontFamily>
+
+    <!-- Type scale (px): 32 wordmark / 26 page title / 14 body / 12 secondary. -->
+    <Style x:Key="PageTitle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource Zodiak}" />
+        <Setter Property="FontSize" Value="26" />
+        <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+    </Style>
+
+    <Style x:Key="BodyText" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource AppText}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="SecondaryText" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource AppText}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+</ResourceDictionary>

@@ -2,6 +2,9 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Media;
+using Wpf.Ui.Appearance;
+using Wpf.Ui.Controls;
 using Wordwright.App.Tray;
 
 namespace Wordwright.App;
@@ -11,6 +14,9 @@ public partial class App : Application
     private const string MutexName = @"Local\Wordwright.SingleInstance";
     private const string ShowWindowEventName = @"Local\Wordwright.ShowMainWindow";
     private const int WM_SETTINGCHANGE = 0x001A;
+
+    private static readonly Color ForgeInk = Color.FromRgb(0x23, 0x40, 0x8E);
+    private static readonly Color InkLight = Color.FromRgb(0xA4, 0xB6, 0xF0);
 
     private Mutex? _mutex;
     private EventWaitHandle? _showWindowEvent;
@@ -43,9 +49,21 @@ public partial class App : Application
 
         _trayIcon = new TrayIconController(this);
 
+        // Theme follows the system. SystemThemeWatcher applies the theme, and
+        // Changed fires after every apply, which is where we re-assert the brand
+        // accent (DESIGN.md: Forge ink in light theme, Ink light in dark).
+        ApplicationThemeManager.Changed += OnApplicationThemeChanged;
+        SystemThemeWatcher.Watch(_mainWindow, WindowBackdropType.Mica, updateAccents: false);
+
         // Refresh the tray glyph when Windows switches between light and dark.
         var handle = new WindowInteropHelper(_mainWindow).EnsureHandle();
         HwndSource.FromHwnd(handle)!.AddHook(OnWindowMessage);
+    }
+
+    private static void OnApplicationThemeChanged(ApplicationTheme currentTheme, Color systemAccent)
+    {
+        var accent = currentTheme == ApplicationTheme.Dark ? InkLight : ForgeInk;
+        ApplicationAccentColorManager.Apply(accent, currentTheme);
     }
 
     internal void ShowMainWindow()

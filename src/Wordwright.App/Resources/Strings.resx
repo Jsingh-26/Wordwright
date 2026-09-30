@@ -17,4 +17,22 @@
   <data name="Tray.Quit" xml:space="preserve"><value>Quit Wordwright</value></data>
   <data name="Tray.Tooltip" xml:space="preserve"><value>Wordwright: type {Prefix} + a shortcut, or select text and press {PaletteHotkey}</value></data>
   <data name="Tray.TooltipBetterModel" xml:space="preserve"><value>Wordwright: a better AI model is available for your PC</value></data>
+
+  <!-- Navigation -->
+  <data name="Nav.Snippets" xml:space="preserve"><value>Snippets</value></data>
+  <data name="Nav.Actions" xml:space="preserve"><value>AI actions</value></data>
+  <data name="Nav.OfflineAi" xml:space="preserve"><value>Offline AI</value></data>
+  <data name="Nav.Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="Nav.About" xml:space="preserve"><value>About</value></data>
+
+  <!-- Page titles -->
+  <data name="Snippets.Title" xml:space="preserve"><value>Snippets</value></data>
+  <data name="Actions.Title" xml:space="preserve"><value>AI actions</value></data>
+  <data name="Ai.Off.Title" xml:space="preserve"><value>Offline AI</value></data>
+  <data name="Settings.Title" xml:space="preserve"><value>Settings</value></data>
+
+  <!-- About -->
+  <data name="About.Body" xml:space="preserve"><value>Wordwright is free and open source (MIT). Snippets and AI rewriting run entirely on this PC.</value></data>
+  <data name="About.Privacy" xml:space="preserve"><value>Wordwright has no telemetry. It uses the internet only to download a model you chose, or to check for updates if you turned that on.</value></data>
+  <data name="About.Source" xml:space="preserve"><value>View source on GitHub</value></data>
 </root>

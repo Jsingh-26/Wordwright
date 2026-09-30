@@ -1,0 +1,18 @@
+<Page x:Class="Wordwright.App.Pages.AboutPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:res="clr-namespace:Wordwright.App.Resources">
+    <StackPanel Margin="32,24" MaxWidth="560">
+        <TextBlock Style="{StaticResource PageTitle}" Text="Wordwright" />
+        <TextBlock Style="{StaticResource BodyText}" Margin="0,16,0,0"
+                   Text="{res:Str About.Body}" />
+        <TextBlock Style="{StaticResource BodyText}" Margin="0,8,0,0"
+                   Text="{res:Str About.Privacy}" />
+        <TextBlock Style="{StaticResource BodyText}" Margin="0,8,0,0">
+            <Hyperlink NavigateUri="https://github.com/Jsingh-26/Wordwright"
+                       RequestNavigate="OnSourceLinkClicked">
+                <Run Text="{res:Str About.Source}" />
+            </Hyperlink>
+        </TextBlock>
+    </StackPanel>
+</Page>

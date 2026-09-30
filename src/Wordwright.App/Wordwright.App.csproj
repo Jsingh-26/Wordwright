@@ -20,4 +20,10 @@
     <ProjectReference Include="..\Wordwright.Platform\Wordwright.Platform.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Zodiak (ITF Free Font License), embedded as app resources. -->
+    <Resource Include="Resources\Fonts\*.otf" />
+    <Resource Include="Resources\Fonts\LICENSE-Zodiak.txt" />
+  </ItemGroup>
+
 </Project>

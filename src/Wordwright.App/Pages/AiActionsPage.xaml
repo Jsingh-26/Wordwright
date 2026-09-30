@@ -1,0 +1,9 @@
+<Page x:Class="Wordwright.App.Pages.AiActionsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:res="clr-namespace:Wordwright.App.Resources">
+    <!-- Placeholder until P4. -->
+    <StackPanel Margin="32,24">
+        <TextBlock Style="{StaticResource PageTitle}" Text="{res:Str Actions.Title}" />
+    </StackPanel>
+</Page>
