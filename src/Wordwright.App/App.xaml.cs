@@ -4,6 +4,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using Wordwright.App.Tray;
@@ -76,7 +77,17 @@ public partial class App : Application
     private static void OnApplicationThemeChanged(ApplicationTheme currentTheme, Color systemAccent)
     {
         var accent = currentTheme == ApplicationTheme.Dark ? InkLight : ForgeInk;
-        ApplicationAccentColorManager.Apply(accent, currentTheme);
+
+        // WPF-UI raises this event while it is still swapping theme dictionaries,
+        // and the watcher's own accent pass lands after it, so apply the brand
+        // accent once the current pass has finished.
+        Current.Dispatcher.BeginInvoke(
+            () =>
+            {
+                ApplicationAccentColorManager.Apply(accent, currentTheme);
+                Current.Resources["BrandAccentBrush"] = new SolidColorBrush(accent);
+            },
+            DispatcherPriority.Loaded);
     }
 
     /// <summary>Persists new settings and applies anything with an external
@@ -95,6 +106,13 @@ public partial class App : Application
     internal void ShowMainWindow()
     {
         _mainWindow ??= new MainWindow();
+
+        // Show() alone leaves a minimized window minimized, so restore it first.
+        if (_mainWindow.WindowState == WindowState.Minimized)
+        {
+            _mainWindow.WindowState = WindowState.Normal;
+        }
+
         _mainWindow.Show();
         _mainWindow.Activate();
     }
