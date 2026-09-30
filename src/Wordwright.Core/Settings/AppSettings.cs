@@ -1,0 +1,36 @@
+namespace Wordwright.Core.Settings;
+
+/// <summary>
+/// The user's settings, persisted as <c>settings.json</c>
+/// (docs/ARCHITECTURE.md → settings.json). <see cref="SchemaVersion"/> records
+/// the file format; today only 1 exists, so there is no migration to do.
+/// </summary>
+public sealed record AppSettings
+{
+    public int SchemaVersion { get; init; } = SettingsStore.SchemaVersion;
+
+    public string PaletteHotkey { get; init; } = "Ctrl+Alt+Space";
+
+    public bool SnippetsEnabled { get; init; } = true;
+
+    public bool StartWithWindows { get; init; } = true;
+
+    public bool AiEnabled { get; init; }
+
+    public string? ActiveModelId { get; init; }
+
+    public int UnloadAfterIdleMinutes { get; init; } = 10;
+
+    public bool CheckForBetterModelsWeekly { get; init; }
+
+    public bool CheckForAppUpdatesWeekly { get; init; }
+
+    public DateTimeOffset? LastCatalogCheckUtc { get; init; }
+
+    /// <summary>Processes (by exe file name) where Wordwright stays quiet.</summary>
+    public IReadOnlyList<string> ExcludedApps { get; init; } =
+        ["KeePass.exe", "KeePassXC.exe", "1Password.exe", "Bitwarden.exe"];
+
+    /// <summary>"system", or a fixed theme name once the settings UI allows one.</summary>
+    public string Theme { get; init; } = "system";
+}
