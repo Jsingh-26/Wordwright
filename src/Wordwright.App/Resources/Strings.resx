@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    User-facing strings, copied from docs/UX_COPY.md. Do not add strings here
+    that are not listed there. Placeholders look like {Name}.
+  -->
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <!-- Tray -->
+  <data name="Tray.Open" xml:space="preserve"><value>Open Wordwright</value></data>
+  <data name="Tray.SnippetsOn" xml:space="preserve"><value>Snippets on</value></data>
+  <data name="Tray.AiOn" xml:space="preserve"><value>Offline AI on</value></data>
+  <data name="Tray.TurnOnAi" xml:space="preserve"><value>Turn on offline AI…</value></data>
+  <data name="Tray.Quit" xml:space="preserve"><value>Quit Wordwright</value></data>
+  <data name="Tray.Tooltip" xml:space="preserve"><value>Wordwright: type {Prefix} + a shortcut, or select text and press {PaletteHotkey}</value></data>
+  <data name="Tray.TooltipBetterModel" xml:space="preserve"><value>Wordwright: a better AI model is available for your PC</value></data>
+</root>

@@ -1,5 +1,8 @@
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
+using System.Windows.Interop;
+using Wordwright.App.Tray;
 
 namespace Wordwright.App;
 
@@ -7,10 +10,12 @@ public partial class App : Application
 {
     private const string MutexName = @"Local\Wordwright.SingleInstance";
     private const string ShowWindowEventName = @"Local\Wordwright.ShowMainWindow";
+    private const int WM_SETTINGCHANGE = 0x001A;
 
     private Mutex? _mutex;
     private EventWaitHandle? _showWindowEvent;
     private MainWindow? _mainWindow;
+    private TrayIconController? _trayIcon;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -33,9 +38,14 @@ public partial class App : Application
             millisecondsTimeOutInterval: Timeout.Infinite,
             executeOnlyOnce: false);
 
-        // The app runs from the tray; the window is created hidden and shown on demand.
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
         _mainWindow = new MainWindow { Visibility = Visibility.Hidden };
+
+        _trayIcon = new TrayIconController(this);
+
+        // Refresh the tray glyph when Windows switches between light and dark.
+        var handle = new WindowInteropHelper(_mainWindow).EnsureHandle();
+        HwndSource.FromHwnd(handle)!.AddHook(OnWindowMessage);
     }
 
     internal void ShowMainWindow()
@@ -50,8 +60,21 @@ public partial class App : Application
         Shutdown();
     }
 
+    private IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg == WM_SETTINGCHANGE
+            && Marshal.PtrToStringUni(lParam) == "ImmersiveColorSet")
+        {
+            Dispatcher.Invoke(_trayIcon!.RefreshIcon);
+        }
+
+        return IntPtr.Zero;
+    }
+
     protected override void OnExit(ExitEventArgs e)
     {
+        _trayIcon?.Dispose();
+
         if (_mutex is not null)
         {
             // Only the instance that owns the mutex may release it.
