@@ -199,3 +199,8 @@ Placeholders use `{Name}`.
 | About.Body | Wordwright is free and open source (MIT). Snippets and AI rewriting run entirely on this PC. |
 | About.Privacy | Wordwright has no telemetry. It uses the internet only to download a model you chose, or to check for updates if you turned that on. |
 | About.Source | View source on GitHub |
+
+## Shared
+| ID | Text |
+|---|---|
+| Dialog.Cancel | Cancel |

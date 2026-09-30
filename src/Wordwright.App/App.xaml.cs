@@ -25,6 +25,8 @@ public partial class App : Application
 
     private static readonly Color ForgeInk = Color.FromRgb(0x23, 0x40, 0x8E);
     private static readonly Color InkLight = Color.FromRgb(0xA4, 0xB6, 0xF0);
+    private static readonly Color Ochre = Color.FromRgb(0x9A, 0x5B, 0x00);
+    private static readonly Color OchreDarkTheme = Color.FromRgb(0xE8, 0xB4, 0x5A);
 
     private Mutex? _mutex;
     private EventWaitHandle? _showWindowEvent;
@@ -104,6 +106,8 @@ public partial class App : Application
             {
                 ApplicationAccentColorManager.Apply(accent, currentTheme);
                 Current.Resources["BrandAccentBrush"] = new SolidColorBrush(accent);
+                Current.Resources["CautionBrush"] = new SolidColorBrush(
+                    currentTheme == ApplicationTheme.Dark ? OchreDarkTheme : Ochre);
             },
             DispatcherPriority.Loaded);
     }

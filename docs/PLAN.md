@@ -39,7 +39,7 @@ Repository: https://github.com/Jsingh-26/Wordwright (local folder: `C:\Users\get
   *Human check:* expansion works in Notepad, Word, Outlook, Chrome (Gmail), Slack or Teams, VS Code, and the Windows search box; clipboard is restored afterwards; nothing appears in Win+V history; a 10,000-character snippet inserts in under 1 s; typing speed does not lag.
 
 ## Phase P3: Snippet manager UI (day 4–5)
-- [ ] **P3.1** Snippets page: searchable list + editor (DESIGN.md §2), auto-save, "Saved" indicator, validation messages, delete with confirmation.
+- [x] **P3.1** Snippets page: searchable list + editor (DESIGN.md §2), auto-save, "Saved" indicator, validation messages, delete with confirmation.
 - [ ] **P3.2** Insert buttons (Date, Time, Clipboard, Cursor position) insert variables at the caret.
 - [ ] **P3.3** Settings page: snippet prefix, excluded apps, export/import snippets (JSON), open data folder.
 - [ ] **P3.4** First-run welcome (UX_COPY "First run").

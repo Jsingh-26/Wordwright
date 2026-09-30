@@ -35,4 +35,21 @@
   <data name="About.Body" xml:space="preserve"><value>Wordwright is free and open source (MIT). Snippets and AI rewriting run entirely on this PC.</value></data>
   <data name="About.Privacy" xml:space="preserve"><value>Wordwright has no telemetry. It uses the internet only to download a model you chose, or to check for updates if you turned that on.</value></data>
   <data name="About.Source" xml:space="preserve"><value>View source on GitHub</value></data>
+  <!-- Snippets page -->
+  <data name="Snippets.New" xml:space="preserve"><value>New snippet</value></data>
+  <data name="Snippets.Search" xml:space="preserve"><value>Search snippets</value></data>
+  <data name="Snippets.Empty" xml:space="preserve"><value>No snippets yet. Create one, then type {Prefix} and its shortcut in any app.</value></data>
+  <data name="Snippets.Field.Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Snippets.Field.Shortcut" xml:space="preserve"><value>Shortcut</value></data>
+  <data name="Snippets.Field.ShortcutHelp" xml:space="preserve"><value>Type {Prefix}{Shortcut} in any app to insert this text.</value></data>
+  <data name="Snippets.Field.Text" xml:space="preserve"><value>Text</value></data>
+  <data name="Snippets.Saved" xml:space="preserve"><value>Saved</value></data>
+  <data name="Snippets.Delete" xml:space="preserve"><value>Delete snippet</value></data>
+  <data name="Snippets.DeleteConfirm" xml:space="preserve"><value>Delete "{Name}"? You can't undo this.</value></data>
+  <data name="Snippets.Error.ShortcutTaken" xml:space="preserve"><value>{Prefix}{Shortcut} is already used by "{Name}".</value></data>
+  <data name="Snippets.Error.ShortcutInvalid" xml:space="preserve"><value>Use letters, numbers, - or _ only, up to 32 characters.</value></data>
+  <data name="Snippets.Warn.VeryLong" xml:space="preserve"><value>This snippet is very long. It will still work, but may take a moment to insert.</value></data>
+
+  <!-- Shared -->
+  <data name="Dialog.Cancel" xml:space="preserve"><value>Cancel</value></data>
 </root>
