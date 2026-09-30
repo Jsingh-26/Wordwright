@@ -169,6 +169,26 @@ public partial class App : Application
         _snippetEngine?.Apply(document);
     }
 
+    /// <summary>The user's data folder, for "Open data folder" and the stores.</summary>
+    internal string UserDataFolder => _settingsStore.DirectoryPath;
+
+    /// <summary>Rebuilds the keystroke watching after the excluded apps change:
+    /// the hook takes its list once, when it is built.</summary>
+    internal void ApplyExcludedApps()
+    {
+        if (_keyboardHook is null)
+        {
+            return;
+        }
+
+        _snippetEngine?.Dispose();
+        _keyboardHook.Dispose();
+        _keyboardHook = null;
+        _snippetEngine = null;
+
+        StartSnippetEngine();
+    }
+
     internal void ShowMainWindow()
     {
         _mainWindow ??= new MainWindow();

@@ -190,8 +190,13 @@ Placeholders use `{Name}`.
 | Settings.ExcludedAppsHelp | Wordwright can't always tell when you're typing a password. List apps where it should stay quiet, such as password managers. |
 | Settings.AppUpdates | Check weekly for Wordwright updates |
 | Settings.OpenDataFolder | Open data folder |
+| Settings.ExcludedApps.Add | Add app |
+| Settings.ExcludedApps.Remove | Remove |
 | Settings.Export | Export snippets |
 | Settings.Import | Import snippets |
+| Settings.ImportDone | Added {Count} snippets. |
+| Settings.ImportSkipped | Skipped {Count} whose shortcut is already in use. |
+| Settings.ImportFailed | That file isn't a snippets export. |
 
 ## About
 | ID | Text |

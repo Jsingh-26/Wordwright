@@ -3,12 +3,78 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:res="clr-namespace:Wordwright.App.Resources">
-    <StackPanel Margin="32,24" MaxWidth="560">
-        <TextBlock Style="{StaticResource PageTitle}" Text="{res:Str Settings.Title}" />
-        <ui:ToggleSwitch x:Name="StartWithWindowsToggle"
-                         Content="{res:Str Settings.StartWithWindows}"
-                         Margin="0,16,0,0"
-                         Checked="OnStartWithWindowsChanged"
-                         Unchecked="OnStartWithWindowsChanged" />
-    </StackPanel>
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    </Page.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="32,24" MaxWidth="620" HorizontalAlignment="Left">
+            <TextBlock Style="{StaticResource PageTitle}" Text="{res:Str Settings.Title}" />
+
+            <!-- Snippet prefix -->
+            <TextBlock Style="{StaticResource SecondaryText}"
+                       Margin="0,24,0,0"
+                       Text="{res:Str Settings.Prefix}" />
+            <ui:TextBox x:Name="PrefixBox"
+                        Width="120"
+                        Margin="0,4,0,0"
+                        HorizontalAlignment="Left"
+                        Text="{Binding SnippetPrefix, UpdateSourceTrigger=PropertyChanged}" />
+
+            <!-- Apps Wordwright stays quiet in -->
+            <TextBlock Style="{StaticResource SecondaryText}"
+                       Margin="0,24,0,0"
+                       Text="{res:Str Settings.ExcludedApps}" />
+            <TextBlock Style="{StaticResource SecondaryText}"
+                       Margin="0,2,0,0"
+                       Text="{res:Str Settings.ExcludedAppsHelp}" />
+            <ItemsControl ItemsSource="{Binding ExcludedApps}" Margin="0,8,0,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding}" />
+                            <ui:Button Grid.Column="1"
+                                       Padding="10,2"
+                                       Content="{res:Str Settings.ExcludedApps.Remove}"
+                                       Tag="{Binding}"
+                                       Click="OnRemoveExcludedAppClicked" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <ui:Button Margin="0,4,0,0"
+                       HorizontalAlignment="Left"
+                       Padding="10,4"
+                       Content="{res:Str Settings.ExcludedApps.Add}"
+                       Click="OnAddExcludedAppClicked" />
+
+            <!-- Snippets in and out -->
+            <StackPanel Orientation="Horizontal" Margin="0,24,0,0">
+                <ui:Button Margin="0,0,8,0"
+                           Content="{res:Str Settings.Export}"
+                           Click="OnExportClicked" />
+                <ui:Button Margin="0,0,8,0"
+                           Content="{res:Str Settings.Import}"
+                           Click="OnImportClicked" />
+                <ui:Button Content="{res:Str Settings.OpenDataFolder}"
+                           Click="OnOpenDataFolderClicked" />
+            </StackPanel>
+            <TextBlock Margin="2,6,0,0"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource CautionBrush}"
+                       Text="{Binding Message}"
+                       Visibility="{Binding HasMessage, Converter={StaticResource BoolToVisibility}}" />
+
+            <!-- Start with Windows -->
+            <ui:ToggleSwitch Margin="0,24,0,0"
+                             Content="{res:Str Settings.StartWithWindows}"
+                             IsChecked="{Binding StartWithWindows}" />
+        </StackPanel>
+    </ScrollViewer>
 </Page>
