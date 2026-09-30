@@ -43,6 +43,11 @@
   <data name="Snippets.Field.Shortcut" xml:space="preserve"><value>Shortcut</value></data>
   <data name="Snippets.Field.ShortcutHelp" xml:space="preserve"><value>Type {Prefix}{Shortcut} in any app to insert this text.</value></data>
   <data name="Snippets.Field.Text" xml:space="preserve"><value>Text</value></data>
+  <data name="Snippets.Insert" xml:space="preserve"><value>Insert</value></data>
+  <data name="Snippets.Insert.Date" xml:space="preserve"><value>Date</value></data>
+  <data name="Snippets.Insert.Time" xml:space="preserve"><value>Time</value></data>
+  <data name="Snippets.Insert.Clipboard" xml:space="preserve"><value>Clipboard</value></data>
+  <data name="Snippets.Insert.Cursor" xml:space="preserve"><value>Cursor position</value></data>
   <data name="Snippets.Saved" xml:space="preserve"><value>Saved</value></data>
   <data name="Snippets.Delete" xml:space="preserve"><value>Delete snippet</value></data>
   <data name="Snippets.DeleteConfirm" xml:space="preserve"><value>Delete "{Name}"? You can't undo this.</value></data>

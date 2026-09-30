@@ -141,3 +141,31 @@ public class VariableExpanderTests
         result.CharactersAfterCursor.Should().Be(0);
     }
 }
+/// <summary>The Insert buttons and the expander must agree on every token.</summary>
+public class SnippetVariablesTests
+{
+    private static readonly DateTimeOffset FixedNow =
+        new(2026, 10, 1, 13, 45, 0, TimeSpan.FromHours(2));
+
+    [Fact]
+    public void EachTokenIsOneTheExpanderUnderstands()
+    {
+        var expander = new VariableExpander(() => FixedNow, () => "copied");
+
+        expander.Expand(SnippetVariables.Date).Text.Should().NotBe(SnippetVariables.Date);
+        expander.Expand(SnippetVariables.Time).Text.Should().NotBe(SnippetVariables.Time);
+        expander.Expand(SnippetVariables.Clipboard).Text.Should().Be("copied");
+        expander.Expand(SnippetVariables.Cursor).Text.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void TheCursorTokenIsRecognisedAsACursorMarker()
+    {
+        var expander = new VariableExpander(() => FixedNow, () => null);
+
+        var result = expander.Expand(SnippetVariables.Cursor + "abc");
+
+        result.Text.Should().Be("abc");
+        result.CharactersAfterCursor.Should().Be(3);
+    }
+}

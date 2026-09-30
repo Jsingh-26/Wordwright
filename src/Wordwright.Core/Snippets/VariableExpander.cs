@@ -66,22 +66,23 @@ public sealed class VariableExpander
                 continue;
             }
 
+            // Compared without the braces: "{date}" carries the name "date".
             var token = body[(index + 1)..closing];
             switch (token)
             {
-                case "date":
+                case SnippetVariables.DateName:
                     text.Append(_clock().ToString("d", CultureInfo.CurrentCulture));
                     break;
 
-                case "time":
+                case SnippetVariables.TimeName:
                     text.Append(_clock().ToString("t", CultureInfo.CurrentCulture));
                     break;
 
-                case "clipboard":
+                case SnippetVariables.ClipboardName:
                     text.Append(_readClipboard() ?? "");
                     break;
 
-                case "cursor":
+                case SnippetVariables.CursorName:
                     // The first marker wins; any later one only disappears.
                     cursorIndex ??= text.Length;
                     break;
