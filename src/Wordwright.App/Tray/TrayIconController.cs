@@ -13,17 +13,12 @@ namespace Wordwright.App.Tray;
 /// </summary>
 internal sealed class TrayIconController : IDisposable
 {
-    // Defaults from docs/ARCHITECTURE.md settings.json; SettingsStore owns them from P1.4.
-    private const string DefaultSnippetPrefix = ";";
-    private const string DefaultPaletteHotkey = "Ctrl+Alt+Space";
-
     private readonly App _app;
     private readonly TaskbarIcon _trayIcon;
     private readonly MenuItem _aiItem;
     private Icon? _currentIcon;
 
-    // Display state for the menu checkmarks; both persist via SettingsStore from P1.4.
-    internal bool SnippetsOn { get; set; } = true;
+    /// <summary>Offline AI is not built yet (phase P5), so this stays false.</summary>
     internal bool AiOn { get; private set; }
 
     public TrayIconController(App app)
@@ -37,9 +32,10 @@ internal sealed class TrayIconController : IDisposable
         {
             Header = Strings.Get("Tray.SnippetsOn"),
             IsCheckable = true,
-            IsChecked = SnippetsOn,
+            IsChecked = _app.Settings.SnippetsEnabled,
         };
-        snippetsItem.Click += (_, _) => SnippetsOn = snippetsItem.IsChecked;
+        snippetsItem.Click += (_, _) => _app.UpdateSettings(
+            _app.Settings with { SnippetsEnabled = snippetsItem.IsChecked });
 
         _aiItem = new MenuItem
         {
@@ -63,15 +59,15 @@ internal sealed class TrayIconController : IDisposable
         {
             ToolTipText = Strings.Get(
                 "Tray.Tooltip",
-                ("Prefix", DefaultSnippetPrefix),
-                ("PaletteHotkey", DefaultPaletteHotkey)),
+                ("Prefix", _app.Snippets.TriggerPrefix),
+                ("PaletteHotkey", _app.Settings.PaletteHotkey)),
             ContextMenu = menu,
             LeftClickCommand = new RelayCommand(() => _app.ShowMainWindow()),
         };
 
         RefreshIcon();
-        // Efficiency mode (the bool argument) stays off: the keyboard hook (phase P2)
-        // must stay responsive, and EcoQoS would slow it down.
+        // Efficiency mode (the bool argument) stays off: the keyboard hook must
+        // stay responsive, and EcoQoS would slow it down.
         _trayIcon.ForceCreate(false);
     }
 

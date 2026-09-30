@@ -7,8 +7,12 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
+using Wordwright.App.Snippets;
 using Wordwright.App.Tray;
 using Wordwright.Core.Settings;
+using Wordwright.Core.Snippets;
+using Wordwright.Platform.Input;
+using Wordwright.Platform.Keyboard;
 using Wordwright.Platform.Startup;
 
 namespace Wordwright.App;
@@ -27,9 +31,16 @@ public partial class App : Application
     private MainWindow? _mainWindow;
     private TrayIconController? _trayIcon;
     private SettingsStore _settingsStore = null!;
+    private SnippetStore _snippetStore = null!;
+    private ClipboardService? _clipboard;
+    private KeyboardHook? _keyboardHook;
+    private SnippetEngine? _snippetEngine;
 
     /// <summary>The user's settings; changes go through <see cref="UpdateSettings"/>.</summary>
     internal AppSettings Settings { get; private set; } = null!;
+
+    /// <summary>The user's snippets, as last loaded or saved.</summary>
+    internal SnippetDocument Snippets { get; private set; } = null!;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -54,14 +65,21 @@ public partial class App : Application
 
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-        _settingsStore = new SettingsStore(Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Wordwright"));
+        var userData = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Wordwright");
+
+        _settingsStore = new SettingsStore(userData);
         Settings = _settingsStore.Load();
         StartWithWindows.Apply(Settings.StartWithWindows, Environment.ProcessPath!);
+
+        _snippetStore = new SnippetStore(userData);
+        Snippets = _snippetStore.LoadOrSeed();
 
         _mainWindow = new MainWindow { Visibility = Visibility.Hidden };
 
         _trayIcon = new TrayIconController(this);
+
+        StartSnippetEngine();
 
         // Theme follows the system. SystemThemeWatcher applies the theme, and
         // Changed fires after every apply, which is where we re-assert the brand
@@ -91,7 +109,7 @@ public partial class App : Application
     }
 
     /// <summary>Persists new settings and applies anything with an external
-    /// side effect (today: the Windows Run entry).</summary>
+    /// side effect (the Windows Run entry, and turning snippets on or off).</summary>
     internal void UpdateSettings(AppSettings settings)
     {
         if (settings.StartWithWindows != Settings.StartWithWindows)
@@ -99,8 +117,52 @@ public partial class App : Application
             StartWithWindows.Apply(settings.StartWithWindows, Environment.ProcessPath!);
         }
 
+        var snippetsToggled = settings.SnippetsEnabled != Settings.SnippetsEnabled;
         Settings = settings;
+
+        if (snippetsToggled)
+        {
+            ApplySnippetsEnabled();
+        }
+
         _settingsStore.Save(settings);
+    }
+
+    /// <summary>Starts the keystroke watching that expands snippets, unless the
+    /// user has switched snippets off.</summary>
+    private void StartSnippetEngine()
+    {
+        _clipboard = new ClipboardService();
+        _keyboardHook = new KeyboardHook(Settings.ExcludedApps);
+        _snippetEngine = new SnippetEngine(_keyboardHook, _clipboard, Dispatcher);
+        _snippetEngine.Apply(Snippets);
+
+        ApplySnippetsEnabled();
+    }
+
+    private void ApplySnippetsEnabled()
+    {
+        if (_keyboardHook is null)
+        {
+            return;
+        }
+
+        if (Settings.SnippetsEnabled)
+        {
+            _keyboardHook.Start();
+        }
+        else
+        {
+            _keyboardHook.Stop();
+        }
+    }
+
+    /// <summary>Replaces the snippets the engine matches against.</summary>
+    internal void UpdateSnippets(SnippetDocument document)
+    {
+        Snippets = document;
+        _snippetStore.Save(document);
+        _snippetEngine?.Apply(document);
     }
 
     internal void ShowMainWindow()
@@ -135,6 +197,8 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _snippetEngine?.Dispose();
+        _keyboardHook?.Dispose();
         _trayIcon?.Dispose();
 
         if (_mutex is not null)

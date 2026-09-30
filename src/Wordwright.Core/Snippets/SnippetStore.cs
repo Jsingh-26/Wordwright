@@ -32,6 +32,21 @@ public sealed class SnippetStore
         return JsonFile.Read<SnippetDocument>(_filePath) ?? new SnippetDocument();
     }
 
+    /// <summary>Loads the snippets, writing the example set first when there is no
+    /// file yet — the first-run seeding of docs/PLAN.md P2.6. A file that exists is
+    /// never overwritten, so deleting the examples keeps them deleted.</summary>
+    public SnippetDocument LoadOrSeed()
+    {
+        if (File.Exists(_filePath))
+        {
+            return Load();
+        }
+
+        var seeded = SnippetSeeds.Default();
+        Save(seeded);
+        return seeded;
+    }
+
     public void Save(SnippetDocument document)
     {
         JsonFile.Write(_filePath, document, keepBackup: true);
