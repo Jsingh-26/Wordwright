@@ -1,6 +1,5 @@
 using System.IO;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using Wordwright.Core.Storage;
 
 namespace Wordwright.Core.Settings;
 
@@ -16,54 +15,25 @@ public sealed class SettingsStore
 
     internal const string FileName = "settings.json";
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        WriteIndented = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        DefaultIgnoreCondition = JsonIgnoreCondition.Never,
-    };
-
     private readonly string _filePath;
-    private readonly string _corruptPath;
-    private readonly string _tempPath;
 
     /// <param name="directory">The directory that holds the settings file
     /// (in the app: <c>%AppData%\Wordwright</c>; in tests: a temp folder).</param>
     public SettingsStore(string directory)
     {
-        _filePath = Path.Combine(directory, FileName);
-        _corruptPath = _filePath + ".corrupt";
-        _tempPath = _filePath + ".tmp";
         DirectoryPath = directory;
+        _filePath = Path.Combine(directory, FileName);
     }
 
     public string DirectoryPath { get; }
 
     public AppSettings Load()
     {
-        if (!File.Exists(_filePath))
-        {
-            return new AppSettings();
-        }
-
-        try
-        {
-            return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(_filePath), JsonOptions)
-                ?? new AppSettings();
-        }
-        catch (JsonException)
-        {
-            File.Move(_filePath, _corruptPath, overwrite: true);
-            return new AppSettings();
-        }
+        return JsonFile.Read<AppSettings>(_filePath) ?? new AppSettings();
     }
 
     public void Save(AppSettings settings)
     {
-        Directory.CreateDirectory(DirectoryPath);
-
-        // Atomic on NTFS: write a sibling temp file, then replace in one move.
-        File.WriteAllText(_tempPath, JsonSerializer.Serialize(settings, JsonOptions));
-        File.Move(_tempPath, _filePath, overwrite: true);
+        JsonFile.Write(_filePath, settings, keepBackup: false);
     }
 }
