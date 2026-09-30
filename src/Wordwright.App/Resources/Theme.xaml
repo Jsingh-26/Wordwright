@@ -14,6 +14,7 @@
          theme (docs/DESIGN.md: Forge ink / Ink light, Ochre / lighter Ochre). -->
     <SolidColorBrush x:Key="BrandAccentBrush" Color="{StaticResource ForgeInkColor}" />
     <SolidColorBrush x:Key="CautionBrush" Color="{StaticResource OchreColor}" />
+    <SolidColorBrush x:Key="SelectionBrush" Color="{StaticResource SteelColor}" />
 
     <SolidColorBrush x:Key="ForgeInkBrush" Color="{StaticResource ForgeInkColor}" />
     <SolidColorBrush x:Key="InkLightBrush" Color="{StaticResource InkLightColor}" />

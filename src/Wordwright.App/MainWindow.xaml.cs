@@ -20,10 +20,17 @@ public partial class MainWindow : FluentWindow
         Loaded += OnLoaded;
     }
 
+    /// <summary>Which page the window opens on; the welcome can ask for another
+    /// one. It has to wait for Loaded — navigating before then throws.</summary>
+    private Type _startPage = typeof(SnippetsPage);
+
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
-        RootNavigation.Navigate(typeof(SnippetsPage));
+        RootNavigation.Navigate(_startPage);
     }
+
+    /// <summary>Open on a particular page the next time the window appears.</summary>
+    internal void ShowPage(Type pageType) => _startPage = pageType;
 
     // Closing hides to the tray; the app keeps running. The tray menu's Quit exits.
     protected override void OnClosing(CancelEventArgs e)

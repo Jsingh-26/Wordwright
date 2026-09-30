@@ -26,6 +26,7 @@ public partial class App : Application
     private static readonly Color ForgeInk = Color.FromRgb(0x23, 0x40, 0x8E);
     private static readonly Color InkLight = Color.FromRgb(0xA4, 0xB6, 0xF0);
     private static readonly Color Ochre = Color.FromRgb(0x9A, 0x5B, 0x00);
+    private static readonly Color Steel = Color.FromRgb(0xE9, 0xEC, 0xF3);
     private static readonly Color OchreDarkTheme = Color.FromRgb(0xE8, 0xB4, 0x5A);
 
     private Mutex? _mutex;
@@ -60,7 +61,7 @@ public partial class App : Application
 
         _ = ThreadPool.RegisterWaitForSingleObject(
             _showWindowEvent,
-            callBack: (_, _) => Dispatcher.Invoke(ShowMainWindow),
+            callBack: (_, _) => Dispatcher.Invoke(() => ShowMainWindow()),
             state: null,
             millisecondsTimeOutInterval: Timeout.Infinite,
             executeOnlyOnce: false);
@@ -75,6 +76,7 @@ public partial class App : Application
         StartWithWindows.Apply(Settings.StartWithWindows, Environment.ProcessPath!);
 
         _snippetStore = new SnippetStore(userData);
+        var firstRun = !File.Exists(Path.Combine(userData, "snippets.json"));
         Snippets = _snippetStore.LoadOrSeed();
 
         _mainWindow = new MainWindow { Visibility = Visibility.Hidden };
@@ -82,6 +84,12 @@ public partial class App : Application
         _trayIcon = new TrayIconController(this);
 
         StartSnippetEngine();
+
+        if (firstRun)
+        {
+            // The welcome replaces the empty tray on the very first launch.
+            new WelcomeWindow().Show();
+        }
 
         // Theme follows the system. SystemThemeWatcher applies the theme, and
         // Changed fires after every apply, which is where we re-assert the brand
@@ -99,17 +107,37 @@ public partial class App : Application
         var accent = currentTheme == ApplicationTheme.Dark ? InkLight : ForgeInk;
 
         // WPF-UI raises this event while it is still swapping theme dictionaries,
-        // and the watcher's own accent pass lands after it, so apply the brand
-        // accent once the current pass has finished.
+        // and its own accent pass (the user's Windows accent) lands after that, so
+        // wait for the dispatcher to go quiet before claiming the accent.
         Current.Dispatcher.BeginInvoke(
             () =>
             {
                 ApplicationAccentColorManager.Apply(accent, currentTheme);
+
+                // WPF-UI rewrites its accent *colours* from the user's Windows accent
+                // whenever it applies a theme, and that pass lands after this event.
+                // Its accent-filled buttons read these brushes, which WPF-UI never
+                // rewrites, so the brand accent wins whatever the Windows accent is.
+                Current.Resources["AccentFillColorDefault"] = accent;
+                Current.Resources["AccentButtonBackground"] = new SolidColorBrush(accent);
+                Current.Resources["AccentButtonBackgroundPointerOver"] =
+                    new SolidColorBrush(Color.FromArgb(0xE6, accent.R, accent.G, accent.B));
+                Current.Resources["AccentButtonBackgroundPressed"] =
+                    new SolidColorBrush(Color.FromArgb(0xCC, accent.R, accent.G, accent.B));
+
+                // List selection is a painted surface, not the accent: docs/DESIGN.md
+                // gives Steel for it in light theme, and the same tint reads well in
+                // dark theme at low opacity.
+                Current.Resources["SelectionBrush"] = new SolidColorBrush(
+                    currentTheme == ApplicationTheme.Dark
+                        ? Color.FromArgb(0x1F, Steel.R, Steel.G, Steel.B)
+                        : Steel);
+
                 Current.Resources["BrandAccentBrush"] = new SolidColorBrush(accent);
                 Current.Resources["CautionBrush"] = new SolidColorBrush(
                     currentTheme == ApplicationTheme.Dark ? OchreDarkTheme : Ochre);
             },
-            DispatcherPriority.Loaded);
+            DispatcherPriority.ContextIdle);
     }
 
     /// <summary>Persists new settings and applies anything with an external
@@ -189,9 +217,14 @@ public partial class App : Application
         StartSnippetEngine();
     }
 
-    internal void ShowMainWindow()
+    internal void ShowMainWindow(Type? pageType = null)
     {
         _mainWindow ??= new MainWindow();
+
+        if (pageType is not null)
+        {
+            _mainWindow.ShowPage(pageType);
+        }
 
         // Show() alone leaves a minimized window minimized, so restore it first.
         if (_mainWindow.WindowState == WindowState.Minimized)
