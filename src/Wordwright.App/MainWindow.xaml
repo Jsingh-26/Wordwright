@@ -1,0 +1,9 @@
+<Window x:Class="Wordwright.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Wordwright"
+        Height="720" Width="1040"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+    </Grid>
+</Window>

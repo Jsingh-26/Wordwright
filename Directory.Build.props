@@ -1,0 +1,18 @@
+<Project>
+
+  <!-- Common build settings for every project in the solution. -->
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <!-- Wordwright.Core must build with zero warnings so it stays clean and unit-testable. -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Wordwright.Core'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "2026-10-01",
+  "notes": "DRAFT. All entries are candidates. Fill url, sizeBytes and sha256 from the real files and replace provisional speeds with measured ones before approving (see docs/MODELS.md and docs/EVAL.md). Verify every repo and licence on Hugging Face first.",
+  "models": [
+    {
+      "id": "qwen3.5-0.8b-q4km",
+      "displayName": "Qwen3.5 0.8B",
+      "publisher": "Alibaba Qwen",
+      "parameters": "0.8B",
+      "quantization": "Q4_K_M",
+      "license": "Apache-2.0 (verify)",
+      "licenseUrl": "TODO",
+      "source": { "repo": "TODO: official GGUF repo", "file": "TODO", "url": "TODO" },
+      "sizeBytes": 0,
+      "sha256": "",
+      "ramRequiredGB": 1.5,
+      "tiers": ["minimal"],
+      "strengths": ["Spelling and simple grammar", "Very fast"],
+      "weaknesses": ["Tone changes", "Longer text", "Languages other than English"],
+      "promptHints": { "disableThinking": "TODO: check chat template" },
+      "speed": {
+        "minimal": { "promptTps": [60, 150], "genTps": [15, 35], "provisional": true },
+        "cpu8":    { "promptTps": [150, 300], "genTps": [35, 60], "provisional": true }
+      },
+      "evalScores": null,
+      "status": "candidate"
+    },
+    {
+      "id": "qwen3.5-2b-q4km",
+      "displayName": "Qwen3.5 2B",
+      "publisher": "Alibaba Qwen",
+      "parameters": "2B",
+      "quantization": "Q4_K_M",
+      "license": "Apache-2.0 (verify)",
+      "licenseUrl": "TODO",
+      "source": { "repo": "TODO", "file": "TODO", "url": "TODO" },
+      "sizeBytes": 0,
+      "sha256": "",
+      "ramRequiredGB": 2.5,
+      "tiers": ["cpu8", "cpu16"],
+      "strengths": ["Grammar and spelling", "Shortening", "Formal and friendly tone"],
+      "weaknesses": ["Nuanced rewrites of long paragraphs", "Translation"],
+      "promptHints": { "disableThinking": "TODO" },
+      "speed": {
+        "cpu8":  { "promptTps": [60, 150], "genTps": [15, 30], "provisional": true },
+        "cpu16": { "promptTps": [80, 200], "genTps": [20, 40], "provisional": true },
+        "gpu":   { "promptTps": [800, 2500], "genTps": [70, 150], "provisional": true }
+      },
+      "evalScores": null,
+      "status": "candidate"
+    },
+    {
+      "id": "qwen3.5-4b-q4km",
+      "displayName": "Qwen3.5 4B",
+      "publisher": "Alibaba Qwen",
+      "parameters": "4B",
+      "quantization": "Q4_K_M",
+      "license": "Apache-2.0 (verify)",
+      "licenseUrl": "TODO",
+      "source": { "repo": "TODO", "file": "TODO", "url": "TODO" },
+      "sizeBytes": 0,
+      "sha256": "",
+      "ramRequiredGB": 4.0,
+      "tiers": ["cpu16", "gpu"],
+      "strengths": ["All rewrite actions", "Keeps meaning well", "Custom instructions"],
+      "weaknesses": ["Slower on older CPUs"],
+      "promptHints": { "disableThinking": "TODO" },
+      "speed": {
+        "cpu16": { "promptTps": [30, 80], "genTps": [8, 18], "provisional": true },
+        "gpu":   { "promptTps": [400, 1500], "genTps": [40, 90], "provisional": true }
+      },
+      "evalScores": null,
+      "status": "candidate"
+    },
+    {
+      "id": "phi-4-mini-instruct-q4km",
+      "displayName": "Phi-4 mini",
+      "publisher": "Microsoft",
+      "parameters": "3.8B",
+      "quantization": "Q4_K_M",
+      "license": "MIT (verify)",
+      "licenseUrl": "TODO",
+      "source": { "repo": "TODO", "file": "TODO", "url": "TODO" },
+      "sizeBytes": 0,
+      "sha256": "",
+      "ramRequiredGB": 3.5,
+      "tiers": ["cpu16", "gpu"],
+      "strengths": ["English grammar and clarity"],
+      "weaknesses": ["Languages other than English"],
+      "promptHints": { "disableThinking": null },
+      "speed": {
+        "cpu16": { "promptTps": [30, 90], "genTps": [8, 20], "provisional": true },
+        "gpu":   { "promptTps": [400, 1500], "genTps": [40, 90], "provisional": true }
+      },
+      "evalScores": null,
+      "status": "candidate"
+    },
+    {
+      "id": "smollm3-3b-q4km",
+      "displayName": "SmolLM3 3B",
+      "publisher": "Hugging Face",
+      "parameters": "3B",
+      "quantization": "Q4_K_M",
+      "license": "Apache-2.0 (verify)",
+      "licenseUrl": "TODO",
+      "source": { "repo": "TODO", "file": "TODO", "url": "TODO" },
+      "sizeBytes": 0,
+      "sha256": "",
+      "ramRequiredGB": 3.0,
+      "tiers": ["cpu8", "cpu16"],
+      "strengths": ["Fully open training data", "Balanced size"],
+      "weaknesses": ["To be measured"],
+      "promptHints": { "disableThinking": "TODO" },
+      "speed": {
+        "cpu8":  { "promptTps": [40, 110], "genTps": [10, 24], "provisional": true },
+        "cpu16": { "promptTps": [50, 140], "genTps": [12, 28], "provisional": true }
+      },
+      "evalScores": null,
+      "status": "candidate"
+    }
+  ]
+}

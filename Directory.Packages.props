@@ -1,0 +1,29 @@
+<Project>
+
+  <!-- Pinned versions of the allowed dependencies (docs/ARCHITECTURE.md). No other packages. -->
+  <ItemGroup>
+    <!-- Wordwright.App -->
+    <PackageVersion Include="WPF-UI" Version="4.3.0" />
+    <PackageVersion Include="H.NotifyIcon.Wpf" Version="2.4.1" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageVersion Include="Velopack" Version="1.2.161" />
+
+    <!-- Wordwright.Inference -->
+    <PackageVersion Include="LLamaSharp" Version="0.27.0" />
+    <PackageVersion Include="LLamaSharp.Backend.Cpu" Version="0.27.0" />
+    <PackageVersion Include="LLamaSharp.Backend.Vulkan" Version="0.27.0" />
+
+    <!-- Wordwright.Platform -->
+    <PackageVersion Include="Vortice.DXGI" Version="3.8.3" />
+    <PackageVersion Include="System.Management" Version="10.0.12" />
+
+    <!-- tests/Wordwright.Core.Tests -->
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <!-- FluentAssertions pinned to 7.x: the last version under the MIT licence. -->
+    <PackageVersion Include="FluentAssertions" Version="7.2.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
+  </ItemGroup>
+
+</Project>

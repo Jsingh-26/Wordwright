@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon Condition="Exists('..\..\brand\icon.ico')">..\..\brand\icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="H.NotifyIcon.Wpf" />
+    <PackageReference Include="Velopack" />
+    <PackageReference Include="WPF-UI" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wordwright.Core\Wordwright.Core.csproj" />
+    <ProjectReference Include="..\Wordwright.Inference\Wordwright.Inference.csproj" />
+    <ProjectReference Include="..\Wordwright.Platform\Wordwright.Platform.csproj" />
+  </ItemGroup>
+
+</Project>

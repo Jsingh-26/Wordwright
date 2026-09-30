@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management" />
+    <PackageReference Include="Vortice.DXGI" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Wordwright.Core\Wordwright.Core.csproj" />
+  </ItemGroup>
+
+</Project>
