@@ -76,6 +76,45 @@ public class KeystrokeBufferTests
     }
 
     [Fact]
+    public void RemoveLast_dropsTheCharactersJustTyped()
+    {
+        var buffer = new KeystrokeBuffer();
+        foreach (var character in "hello ;sig")
+        {
+            buffer.Append(character);
+        }
+
+        buffer.RemoveLast(4);          // the trigger that was just replaced
+
+        buffer.Text.Should().Be("hello ");
+    }
+
+    [Fact]
+    public void RemoveLast_neverGoesBelowEmpty()
+    {
+        var buffer = new KeystrokeBuffer();
+        buffer.Append('a');
+
+        buffer.RemoveLast(10);
+
+        buffer.Text.Should().BeEmpty();
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-3)]
+    public void RemoveLast_withNothingToRemove_leavesTheBufferAlone(int count)
+    {
+        var buffer = new KeystrokeBuffer();
+        buffer.Append('a');
+        buffer.Append('b');
+
+        buffer.RemoveLast(count);
+
+        buffer.Text.Should().Be("ab");
+    }
+
+    [Fact]
     public void Clear_forgetsEverything()
     {
         var buffer = new KeystrokeBuffer();

@@ -39,6 +39,16 @@ public sealed class KeystrokeBuffer
         }
     }
 
+    /// <summary>Drops the last <paramref name="count"/> characters, which is what
+    /// the screen shows after a trigger's characters have been deleted.</summary>
+    public void RemoveLast(int count)
+    {
+        if (count > 0 && _text.Length > 0)
+        {
+            _text.Length = Math.Max(0, _text.Length - count);
+        }
+    }
+
     /// <summary>Forgets everything, e.g. after Enter, a click, or an expansion.</summary>
     public void Clear()
     {

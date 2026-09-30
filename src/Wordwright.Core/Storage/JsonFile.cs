@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -15,6 +16,11 @@ internal static class JsonFile
         WriteIndented = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+
+        // The user can open and edit these files, so keep apostrophes and accented
+        // letters readable rather than escaping them. The "unsafe" encoder only
+        // matters for text embedded in HTML, which these files never are.
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
     /// <summary>
