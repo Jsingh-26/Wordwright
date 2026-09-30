@@ -1,3 +1,4 @@
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
@@ -6,6 +7,8 @@ using System.Windows.Media;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using Wordwright.App.Tray;
+using Wordwright.Core.Settings;
+using Wordwright.Platform.Startup;
 
 namespace Wordwright.App;
 
@@ -22,6 +25,10 @@ public partial class App : Application
     private EventWaitHandle? _showWindowEvent;
     private MainWindow? _mainWindow;
     private TrayIconController? _trayIcon;
+    private SettingsStore _settingsStore = null!;
+
+    /// <summary>The user's settings; changes go through <see cref="UpdateSettings"/>.</summary>
+    internal AppSettings Settings { get; private set; } = null!;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -45,6 +52,12 @@ public partial class App : Application
             executeOnlyOnce: false);
 
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+        _settingsStore = new SettingsStore(Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Wordwright"));
+        Settings = _settingsStore.Load();
+        StartWithWindows.Apply(Settings.StartWithWindows, Environment.ProcessPath!);
+
         _mainWindow = new MainWindow { Visibility = Visibility.Hidden };
 
         _trayIcon = new TrayIconController(this);
@@ -64,6 +77,19 @@ public partial class App : Application
     {
         var accent = currentTheme == ApplicationTheme.Dark ? InkLight : ForgeInk;
         ApplicationAccentColorManager.Apply(accent, currentTheme);
+    }
+
+    /// <summary>Persists new settings and applies anything with an external
+    /// side effect (today: the Windows Run entry).</summary>
+    internal void UpdateSettings(AppSettings settings)
+    {
+        if (settings.StartWithWindows != Settings.StartWithWindows)
+        {
+            StartWithWindows.Apply(settings.StartWithWindows, Environment.ProcessPath!);
+        }
+
+        Settings = settings;
+        _settingsStore.Save(settings);
     }
 
     internal void ShowMainWindow()
