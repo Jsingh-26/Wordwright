@@ -55,6 +55,20 @@
   <data name="Snippets.Error.ShortcutInvalid" xml:space="preserve"><value>Use letters, numbers, - or _ only, up to 32 characters.</value></data>
   <data name="Snippets.Warn.VeryLong" xml:space="preserve"><value>This snippet is very long. It will still work, but may take a moment to insert.</value></data>
 
+  <!-- Settings page -->
+  <data name="Settings.Prefix" xml:space="preserve"><value>Snippet prefix</value></data>
+  <data name="Settings.ExcludedApps" xml:space="preserve"><value>Turn Wordwright off in these apps</value></data>
+  <data name="Settings.ExcludedAppsHelp" xml:space="preserve"><value>Wordwright can't always tell when you're typing a password. List apps where it should stay quiet, such as password managers.</value></data>
+  <data name="Settings.ExcludedApps.Add" xml:space="preserve"><value>Add app</value></data>
+  <data name="Settings.ExcludedApps.Remove" xml:space="preserve"><value>Remove</value></data>
+  <data name="Settings.StartWithWindows" xml:space="preserve"><value>Start Wordwright when I sign in</value></data>
+  <data name="Settings.OpenDataFolder" xml:space="preserve"><value>Open data folder</value></data>
+  <data name="Settings.Export" xml:space="preserve"><value>Export snippets</value></data>
+  <data name="Settings.Import" xml:space="preserve"><value>Import snippets</value></data>
+  <data name="Settings.ImportDone" xml:space="preserve"><value>Added {Count} snippets.</value></data>
+  <data name="Settings.ImportSkipped" xml:space="preserve"><value>Skipped {Count} whose shortcut is already in use.</value></data>
+  <data name="Settings.ImportFailed" xml:space="preserve"><value>That file isn't a snippets export.</value></data>
+
   <!-- Shared -->
   <data name="Dialog.Cancel" xml:space="preserve"><value>Cancel</value></data>
 </root>

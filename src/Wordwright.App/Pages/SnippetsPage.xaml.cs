@@ -15,6 +15,10 @@ public partial class SnippetsPage : Page
 
         ViewModel = new SnippetsViewModel((App)Application.Current);
         DataContext = ViewModel;
+
+        // The prefix lives on the Settings page, so read the library again
+        // whenever this page comes back into view.
+        Loaded += (_, _) => ViewModel.Reload();
     }
 
     internal SnippetsViewModel ViewModel { get; }
