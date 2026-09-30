@@ -2,7 +2,8 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-      xmlns:res="clr-namespace:Wordwright.App.Resources">
+      xmlns:res="clr-namespace:Wordwright.App.Resources"
+      xmlns:core="clr-namespace:Wordwright.Core.Snippets;assembly=Wordwright.Core">
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
 
@@ -137,13 +138,37 @@
 
                 <StackPanel Grid.Row="2" Margin="0,16,0,0">
                     <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Snippets.Field.Text}" />
-                    <ui:TextBox Margin="0,4,0,0"
+                    <ui:TextBox x:Name="BodyBox"
+                                Margin="0,4,0,0"
                                 MinHeight="180"
                                 AcceptsReturn="True"
                                 TextWrapping="Wrap"
                                 VerticalContentAlignment="Top"
                                 VerticalScrollBarVisibility="Auto"
                                 Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}" />
+                    <!-- Insert a variable where the caret is (docs/DESIGN.md §2). -->
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <TextBlock Style="{StaticResource SecondaryText}"
+                                   VerticalAlignment="Center"
+                                   Margin="2,0,8,0"
+                                   Text="{res:Str Snippets.Insert}" />
+                        <ui:Button Margin="0,0,6,0" Padding="10,4"
+                                   Content="{res:Str Snippets.Insert.Date}"
+                                   Tag="{x:Static core:SnippetVariables.Date}"
+                                   Click="OnInsertClicked" />
+                        <ui:Button Margin="0,0,6,0" Padding="10,4"
+                                   Content="{res:Str Snippets.Insert.Time}"
+                                   Tag="{x:Static core:SnippetVariables.Time}"
+                                   Click="OnInsertClicked" />
+                        <ui:Button Margin="0,0,6,0" Padding="10,4"
+                                   Content="{res:Str Snippets.Insert.Clipboard}"
+                                   Tag="{x:Static core:SnippetVariables.Clipboard}"
+                                   Click="OnInsertClicked" />
+                        <ui:Button Padding="10,4"
+                                   Content="{res:Str Snippets.Insert.Cursor}"
+                                   Tag="{x:Static core:SnippetVariables.Cursor}"
+                                   Click="OnInsertClicked" />
+                    </StackPanel>
                     <TextBlock Margin="2,8,0,0"
                                TextWrapping="Wrap"
                                Foreground="{DynamicResource CautionBrush}"

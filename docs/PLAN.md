@@ -40,7 +40,7 @@ Repository: https://github.com/Jsingh-26/Wordwright (local folder: `C:\Users\get
 
 ## Phase P3: Snippet manager UI (day 4–5)
 - [x] **P3.1** Snippets page: searchable list + editor (DESIGN.md §2), auto-save, "Saved" indicator, validation messages, delete with confirmation.
-- [ ] **P3.2** Insert buttons (Date, Time, Clipboard, Cursor position) insert variables at the caret.
+- [x] **P3.2** Insert buttons (Date, Time, Clipboard, Cursor position) insert variables at the caret.
 - [ ] **P3.3** Settings page: snippet prefix, excluded apps, export/import snippets (JSON), open data folder.
 - [ ] **P3.4** First-run welcome (UX_COPY "First run").
 - [ ] **P3.5** Packaging: Velopack installer published to GitHub Releases as **v0.1.0 (snippets only)**. App-update checking stays off by default.
