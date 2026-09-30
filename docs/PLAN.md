@@ -42,7 +42,7 @@ Repository: https://github.com/Jsingh-26/Wordwright (local folder: `C:\Users\get
 - [x] **P3.1** Snippets page: searchable list + editor (DESIGN.md §2), auto-save, "Saved" indicator, validation messages, delete with confirmation.
 - [x] **P3.2** Insert buttons (Date, Time, Clipboard, Cursor position) insert variables at the caret.
 - [x] **P3.3** Settings page: snippet prefix, excluded apps, export/import snippets (JSON), open data folder.
-- [ ] **P3.4** First-run welcome (UX_COPY "First run").
+- [x] **P3.4** First-run welcome (UX_COPY "First run").
 - [ ] **P3.5** Packaging: Velopack installer published to GitHub Releases as **v0.1.0 (snippets only)**. App-update checking stays off by default.
 - [ ] **P3.6** Packaging: MSIX package for the Microsoft Store (added at the maintainer's request on 2026-10-01). Full-trust package manifest, visual assets from `brand/`, a Store-ready bundle, and the Start-with-Windows setting using the manifest's `windows.startupTask` extension when the app runs from the package (the `HKCU\...\Run` key stays for the installer build, which Store policy does not allow).
   *Human check:* install from the release on a clean user account; create, edit, delete snippets; everything persists after restart; then the same from the MSIX package, plus Start with Windows working through the packaged startup task.

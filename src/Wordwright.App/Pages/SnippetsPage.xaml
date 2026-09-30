@@ -28,7 +28,7 @@
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="Row" Property="Background"
-                                        Value="{DynamicResource SystemAccentColorSecondaryBrush}" />
+                                        Value="{DynamicResource SelectionBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

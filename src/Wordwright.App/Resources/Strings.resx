@@ -18,6 +18,13 @@
   <data name="Tray.Tooltip" xml:space="preserve"><value>Wordwright: type {Prefix} + a shortcut, or select text and press {PaletteHotkey}</value></data>
   <data name="Tray.TooltipBetterModel" xml:space="preserve"><value>Wordwright: a better AI model is available for your PC</value></data>
 
+  <!-- First run (welcome, shown once) -->
+  <data name="Welcome.Title" xml:space="preserve"><value>Wordwright is running</value></data>
+  <data name="Welcome.Body" xml:space="preserve"><value>Type {Prefix}date anywhere to try it. Your snippets live in the tray icon.</value></data>
+  <data name="Welcome.AiHint" xml:space="preserve"><value>Want AI rewriting too? It runs on this PC, with no account and no cloud. You can turn it on any time.</value></data>
+  <data name="Welcome.Primary" xml:space="preserve"><value>Show my snippets</value></data>
+  <data name="Welcome.Secondary" xml:space="preserve"><value>Turn on offline AI</value></data>
+
   <!-- Navigation -->
   <data name="Nav.Snippets" xml:space="preserve"><value>Snippets</value></data>
   <data name="Nav.Actions" xml:space="preserve"><value>AI actions</value></data>
