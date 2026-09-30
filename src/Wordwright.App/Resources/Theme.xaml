@@ -10,8 +10,10 @@
     <Color x:Key="OchreColor">#FF9A5B00</Color>
     <Color x:Key="OchreDarkThemeColor">#FFE8B45A</Color>
 
-    <!-- Accent for our own XAML; App.xaml.cs swaps it with the theme. -->
+    <!-- Accent and caution for our own XAML; App.xaml.cs swaps both with the
+         theme (docs/DESIGN.md: Forge ink / Ink light, Ochre / lighter Ochre). -->
     <SolidColorBrush x:Key="BrandAccentBrush" Color="{StaticResource ForgeInkColor}" />
+    <SolidColorBrush x:Key="CautionBrush" Color="{StaticResource OchreColor}" />
 
     <SolidColorBrush x:Key="ForgeInkBrush" Color="{StaticResource ForgeInkColor}" />
     <SolidColorBrush x:Key="InkLightBrush" Color="{StaticResource InkLightColor}" />

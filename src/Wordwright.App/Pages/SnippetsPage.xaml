@@ -1,9 +1,165 @@
 <Page x:Class="Wordwright.App.Pages.SnippetsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:res="clr-namespace:Wordwright.App.Resources">
-    <!-- Placeholder until P2. -->
-    <StackPanel Margin="32,24">
-        <TextBlock Style="{StaticResource PageTitle}" Text="{res:Str Snippets.Title}" />
-    </StackPanel>
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+
+        <!-- WPF-UI has no list control, so the rows are styled here to match the
+             rail: accent tint for the chosen row, no white system highlight. -->
+        <Style TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Row"
+                                Background="Transparent"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Row" Property="Background"
+                                        Value="{DynamicResource ControlFillColorSecondaryBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Row" Property="Background"
+                                        Value="{DynamicResource SystemAccentColorSecondaryBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Page title, the quiet "Saved", and the primary action. -->
+        <Grid Grid.Row="0" Margin="32,24,32,16">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Style="{StaticResource PageTitle}" Text="{res:Str Snippets.Title}" />
+                <TextBlock Style="{StaticResource SecondaryText}"
+                           Margin="12,0,0,4"
+                           VerticalAlignment="Bottom"
+                           Text="{res:Str Snippets.Saved}"
+                           Visibility="{Binding ShowSaved, Converter={StaticResource BoolToVisibility}}" />
+            </StackPanel>
+            <ui:Button Appearance="Primary"
+                       Content="{res:Str Snippets.New}"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"
+                       Click="OnNewSnippetClicked" />
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="32,0,32,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="264" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- The list -->
+            <DockPanel Grid.Column="0">
+                <ui:TextBox DockPanel.Dock="Top"
+                            Margin="0,0,0,8"
+                            PlaceholderText="{res:Str Snippets.Search}"
+                            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock DockPanel.Dock="Top"
+                           Style="{StaticResource SecondaryText}"
+                           Margin="2,0,2,0"
+                           Text="{Binding EmptyMessage}"
+                           Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}" />
+                <ListBox ItemsSource="{Binding Snippets}"
+                         SelectedItem="{Binding SelectedSnippet}"
+                         Background="Transparent"
+                         BorderThickness="0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="4,6">
+                                <TextBlock Text="{Binding Shortcut}" />
+                                <TextBlock Text="{Binding Name}" Style="{StaticResource SecondaryText}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+
+            <!-- The editor -->
+            <Grid Grid.Column="1"
+                  Margin="24,0,0,0"
+                  IsEnabled="{Binding HasSelection}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0">
+                    <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Snippets.Field.Name}" />
+                    <ui:TextBox x:Name="NameBox"
+                                Margin="0,4,0,0"
+                                Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Margin="0,16,0,0">
+                    <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Snippets.Field.Shortcut}" />
+                    <Grid Margin="0,4,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   Margin="12,0,0,0"
+                                   VerticalAlignment="Center"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   Text="{Binding Prefix}" />
+                        <ui:TextBox Grid.Column="1"
+                                    Margin="4,0,0,0"
+                                    Text="{Binding Shortcut, UpdateSourceTrigger=PropertyChanged}" />
+                    </Grid>
+                    <TextBlock Style="{StaticResource SecondaryText}"
+                               Margin="2,4,0,0"
+                               Text="{Binding ShortcutHelp}" />
+                    <TextBlock Margin="2,4,0,0"
+                               TextWrapping="Wrap"
+                               Foreground="{DynamicResource CautionBrush}"
+                               Text="{Binding ShortcutMessage}"
+                               Visibility="{Binding HasShortcutMessage, Converter={StaticResource BoolToVisibility}}" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" Margin="0,16,0,0">
+                    <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Snippets.Field.Text}" />
+                    <ui:TextBox Margin="0,4,0,0"
+                                MinHeight="180"
+                                AcceptsReturn="True"
+                                TextWrapping="Wrap"
+                                VerticalContentAlignment="Top"
+                                VerticalScrollBarVisibility="Auto"
+                                Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}" />
+                    <TextBlock Margin="2,8,0,0"
+                               TextWrapping="Wrap"
+                               Foreground="{DynamicResource CautionBrush}"
+                               Text="{Binding BodyMessage}"
+                               Visibility="{Binding HasBodyMessage, Converter={StaticResource BoolToVisibility}}" />
+                </StackPanel>
+
+                <ui:Button Grid.Row="3"
+                           Margin="0,16,0,0"
+                           HorizontalAlignment="Left"
+                           Content="{res:Str Snippets.Delete}"
+                           Click="OnDeleteSnippetClicked" />
+            </Grid>
+        </Grid>
+
+        <!-- Hosts the delete confirmation over the whole page. -->
+        <ui:ContentDialogHost x:Name="DialogHost" Grid.RowSpan="2" />
+    </Grid>
 </Page>
