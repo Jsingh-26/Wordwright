@@ -18,7 +18,7 @@ Repository: https://github.com/Jsingh-26/Wordwright (local folder: `C:\Users\get
 ## Phase P0: Repository and solution (day 1)
 - [x] **P0.1** Create `Wordwright.sln` with `src/Wordwright.Core`, `src/Wordwright.Platform`, `src/Wordwright.Inference`, `src/Wordwright.App` (WPF), `tests/Wordwright.Core.Tests` (xUnit), project references as in ARCHITECTURE.md. Add `Directory.Build.props` (nullable enabled, warnings as errors in Core, x64) and `Directory.Packages.props` with pinned versions of the allowed dependencies.
   *Done when:* `dotnet build` and `dotnet test` pass on a clean clone; the app launches and shows an empty window.
-- [ ] **P0.2** Push to `https://github.com/Jsingh-26/Wordwright` (remote `origin`, branch `main`) and add `.github/workflows/ci.yml`: build + test on `windows-latest` for every push and PR.
+- [x] **P0.2** Push to `https://github.com/Jsingh-26/Wordwright` (remote `origin`, branch `main`) and add `.github/workflows/ci.yml`: build + test on `windows-latest` for every push and PR.
   *Done when:* CI is green on GitHub.
 
 ## Phase P1: Tray app shell (day 1–2)
