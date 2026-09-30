@@ -10,54 +10,67 @@
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="Mica">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- The title bar gets its own row (the arrangement WPF-UI's own project
+             template uses); nesting it in NavigationView.ContentOverlay pushes the
+             window buttons past the window's right edge. -->
+        <ui:TitleBar Grid.Row="0"
+                     Title="Wordwright"
+                     CloseWindowByDoubleClickOnIcon="True" />
+
         <ui:NavigationView x:Name="RootNavigation"
+                           Grid.Row="1"
                            IsBackButtonVisible="Collapsed"
                            IsPaneToggleVisible="True"
                            OpenPaneLength="240">
             <ui:NavigationView.PaneHeader>
-                <!-- Wordmark (DESIGN.md: Zodiak, the mark at cap height, accent colour). -->
+                <!-- Wordmark (DESIGN.md: the mark at cap height, Zodiak, accent
+                     colour, wrapped over two lines as in the DESIGN.md sketch). -->
                 <StackPanel Orientation="Horizontal" Margin="16,4,16,16">
                     <Path Data="{StaticResource WordwrightMarkGeometry}"
-                          Fill="{DynamicResource SystemAccentColorBrush}"
+                          Fill="{DynamicResource BrandAccentBrush}"
                           Stretch="Uniform" Width="22" Height="22"
                           VerticalAlignment="Center" Margin="0,0,8,0" />
-                    <TextBlock Text="Wordwright"
-                               FontFamily="{StaticResource Zodiak}"
+                    <TextBlock FontFamily="{StaticResource Zodiak}"
                                FontSize="32"
-                               Foreground="{DynamicResource SystemAccentColorBrush}"
-                               VerticalAlignment="Center" />
+                               LineHeight="34"
+                               Foreground="{DynamicResource BrandAccentBrush}"
+                               VerticalAlignment="Center">
+                        <Run Text="Word" /><LineBreak /><Run Text="wright" />
+                    </TextBlock>
                 </StackPanel>
             </ui:NavigationView.PaneHeader>
             <ui:NavigationView.MenuItems>
                 <ui:NavigationViewItem Content="{res:Str Nav.Snippets}" TargetPageType="{x:Type pages:SnippetsPage}">
                     <ui:NavigationViewItem.Icon>
-                        <ui:ImageIcon Source="{StaticResource IconKeyboard}" />
+                        <ui:ImageIcon Width="16" Height="16" Source="{StaticResource IconKeyboard}" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
                 <ui:NavigationViewItem Content="{res:Str Nav.Actions}" TargetPageType="{x:Type pages:AiActionsPage}">
                     <ui:NavigationViewItem.Icon>
-                        <ui:ImageIcon Source="{StaticResource IconMagicWand}" />
+                        <ui:ImageIcon Width="16" Height="16" Source="{StaticResource IconMagicWand}" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
                 <ui:NavigationViewItem Content="{res:Str Nav.OfflineAi}" TargetPageType="{x:Type pages:OfflineAiPage}">
                     <ui:NavigationViewItem.Icon>
-                        <ui:ImageIcon Source="{StaticResource IconCpu}" />
+                        <ui:ImageIcon Width="16" Height="16" Source="{StaticResource IconCpu}" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
                 <ui:NavigationViewItem Content="{res:Str Nav.Settings}" TargetPageType="{x:Type pages:SettingsPage}">
                     <ui:NavigationViewItem.Icon>
-                        <ui:ImageIcon Source="{StaticResource IconGear}" />
+                        <ui:ImageIcon Width="16" Height="16" Source="{StaticResource IconGear}" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
                 <ui:NavigationViewItem Content="{res:Str Nav.About}" TargetPageType="{x:Type pages:AboutPage}">
                     <ui:NavigationViewItem.Icon>
-                        <ui:ImageIcon Source="{StaticResource IconInfo}" />
+                        <ui:ImageIcon Width="16" Height="16" Source="{StaticResource IconInfo}" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>
-            <ui:NavigationView.ContentOverlay>
-                <ui:TitleBar Title="Wordwright" Grid.Row="0" />
-            </ui:NavigationView.ContentOverlay>
         </ui:NavigationView>
     </Grid>
 </ui:FluentWindow>
