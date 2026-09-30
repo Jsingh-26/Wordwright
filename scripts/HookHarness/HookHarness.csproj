@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Diagnostics harness for Wordwright.Platform.Keyboard.KeyboardHook, not part
+    of the solution and never shipped. Real typing cannot be synthesised, and the
+    production hook ignores synthesised input, so the harness turns that filter
+    off and feeds the hook with SendInput, reporting which events arrived (never
+    the text itself).
+
+    Run it with:  dotnet run project=scripts/HookHarness
+    With the argument "production-filter" it keeps the filter on, and with
+    "exclude-foreground" it also treats the window in front as excluded.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Wordwright.Platform\Wordwright.Platform.csproj" />
+  </ItemGroup>
+
+</Project>
