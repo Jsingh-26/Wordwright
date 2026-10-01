@@ -1,0 +1,31 @@
+<Page x:Class="Wordwright.App.Pages.HardwarePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:res="clr-namespace:Wordwright.App.Resources">
+    <!-- The raw values behind the tier, for a debug build only
+         (docs/PLAN.md P4.1). Two columns: label left, value right. -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="32,24" MaxWidth="620" HorizontalAlignment="Left">
+            <TextBlock Style="{StaticResource PageTitle}" Text="{res:Str Debug.Title}" />
+
+            <ItemsControl x:Name="Values" Margin="0,16,0,0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="170" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Style="{StaticResource SecondaryText}"
+                                       Text="{Binding Label}" />
+                            <TextBlock Grid.Column="1"
+                                       Style="{StaticResource BodyText}"
+                                       Text="{Binding Value}" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

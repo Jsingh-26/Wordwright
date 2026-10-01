@@ -94,6 +94,21 @@
   <!-- Shared -->
   <data name="Dialog.Cancel" xml:space="preserve"><value>Cancel</value></data>
 
+  <!-- Debug page (debug builds only) -->
+  <data name="Debug.Title" xml:space="preserve"><value>Hardware</value></data>
+  <data name="Debug.Tier" xml:space="preserve"><value>Tier</value></data>
+  <data name="Debug.Cpu" xml:space="preserve"><value>Processor</value></data>
+  <data name="Debug.Cores" xml:space="preserve"><value>Physical cores</value></data>
+  <data name="Debug.Memory" xml:space="preserve"><value>Memory</value></data>
+  <data name="Debug.MemoryFree" xml:space="preserve"><value>Memory free now</value></data>
+  <data name="Debug.Avx2" xml:space="preserve"><value>AVX2</value></data>
+  <data name="Debug.Avx512" xml:space="preserve"><value>AVX-512</value></data>
+  <data name="Debug.Gpus" xml:space="preserve"><value>Graphics</value></data>
+  <data name="Debug.Disk" xml:space="preserve"><value>Free disk</value></data>
+  <data name="Debug.OsBuild" xml:space="preserve"><value>Windows build</value></data>
+  <data name="Debug.Yes" xml:space="preserve"><value>Yes</value></data>
+  <data name="Debug.No" xml:space="preserve"><value>No</value></data>
+
   <!-- Accessibility: names for controls that have no visible label -->
   <data name="A11y.Minimize" xml:space="preserve"><value>Minimise</value></data>
   <data name="A11y.Maximize" xml:space="preserve"><value>Maximise</value></data>

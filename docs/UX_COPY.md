@@ -230,6 +230,23 @@ Group headings sit above their rows (docs/DESIGN.md §8).
 |---|---|
 | Dialog.Cancel | Cancel |
 
+## Debug page (debug builds only, docs/PLAN.md P4.1)
+| ID | Text |
+|---|---|
+| Debug.Title | Hardware |
+| Debug.Tier | Tier |
+| Debug.Cpu | Processor |
+| Debug.Cores | Physical cores |
+| Debug.Memory | Memory |
+| Debug.MemoryFree | Memory free now |
+| Debug.Avx2 | AVX2 |
+| Debug.Avx512 | AVX-512 |
+| Debug.Gpus | Graphics |
+| Debug.Disk | Free disk |
+| Debug.OsBuild | Windows build |
+| Debug.Yes | Yes |
+| Debug.No | No |
+
 ## Accessibility (automation names for controls that have no visible label)
 | ID | Text |
 |---|---|

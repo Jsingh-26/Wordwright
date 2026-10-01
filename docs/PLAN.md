@@ -63,10 +63,10 @@ Two product changes the study recommended. Both approved by the maintainer on 20
   *Human check:* install from the release on a clean user account; create, edit, delete snippets; everything persists after restart; then the same from the MSIX package, plus Start with Windows working through the packaged startup task.
 
 ## Phase P4: Hardware check and recommendation (day 6)
-- [ ] **P4.1** Platform: `HardwareProbe` returning `HardwareProfile` (ARCHITECTURE.md). A debug page shows the raw values.
-- [ ] **P4.2** Core: `TierClassifier` per MODELS.md. Tests for every tier boundary.
-- [ ] **P4.3** Core: `CatalogParser` (schema checks, ignore unknown fields, reject newer major schema) with the embedded `models.json`. Tests with valid, invalid and future-schema files.
-- [ ] **P4.4** Core: `Recommender` and `SpeedEstimator` per MODELS.md, including the step-down rules. Tests: the worked example must produce "2–4" and "4–9" seconds.
+- [x] **P4.1** Platform: `HardwareProbe` returning `HardwareProfile` (ARCHITECTURE.md). A debug page shows the raw values.
+- [x] **P4.2** Core: `TierClassifier` per MODELS.md. Tests for every tier boundary.
+- [x] **P4.3** Core: `CatalogParser` (schema checks, ignore unknown fields, reject newer major schema) with the embedded `models.json`. Tests with valid, invalid and future-schema files.
+- [x] **P4.4** Core: `Recommender` and `SpeedEstimator` per MODELS.md, including the step-down rules. Tests: the worked example must produce "2–4" and "4–9" seconds.
   *Human check:* on your laptop the tier and hardware summary are correct.
 
 ## Phase P5: Consent, download, import (day 7)
