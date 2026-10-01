@@ -84,10 +84,33 @@
                        Margin="0,12,0,0"
                        Visibility="Collapsed" />
 
+            <!-- The download, while it runs (docs/PLAN.md P5.3). -->
+            <StackPanel x:Name="Downloading" Visibility="Collapsed" Margin="0,16,0,0">
+                <TextBlock x:Name="DownloadTitle" Style="{StaticResource BodyText}" />
+                <ProgressBar x:Name="DownloadBar" Margin="0,8,0,0" Height="4" Minimum="0" Maximum="100" />
+                <TextBlock x:Name="DownloadLine" Style="{StaticResource SecondaryText}" Margin="0,6,0,0" />
+            </StackPanel>
+
+            <!-- Downloading or verifying, one line and no way to go on. -->
+            <TextBlock x:Name="Busy"
+                       Style="{StaticResource BodyText}"
+                       Margin="0,16,0,0"
+                       Visibility="Collapsed" />
+
+            <!-- Something went wrong: say what, and offer the next step. -->
+            <TextBlock x:Name="Problem"
+                       Style="{StaticResource BodyText}"
+                       Foreground="{DynamicResource CautionBrush}"
+                       Margin="0,16,0,0"
+                       Visibility="Collapsed" />
+
+            <!-- The two buttons change with the state (docs/PLAN.md P5.3): agree
+                 and close, then cancel or resume once a download is running. -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-                <ui:Button Margin="0,0,8,0"
+                <ui:Button x:Name="SecondaryButton"
+                           Margin="0,0,8,0"
                            Content="{res:Str Ai.Rec.Secondary}"
-                           Click="OnNotNowClicked" />
+                           Click="OnSecondaryClicked" />
                 <ui:Button x:Name="PrimaryButton"
                            Appearance="Primary"
                            Content="{res:Str Ai.Rec.Primary}"

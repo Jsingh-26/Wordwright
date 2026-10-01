@@ -215,6 +215,13 @@ public partial class App : Application
     /// <summary>The user's data folder, for "Open data folder" and the stores.</summary>
     internal string UserDataFolder => _settingsStore.DirectoryPath;
 
+    /// <summary>Where model files live: <c>%LocalAppData%\Wordwright\models</c>,
+    /// which does not roam (docs/ARCHITECTURE.md → Data files).</summary>
+    internal string ModelsFolder => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "Wordwright",
+        "models");
+
     /// <summary>The snippet engine, so a window can tell when a snippet expanded.
     /// It is rebuilt when the excluded apps change, so read it each time.</summary>
     internal SnippetEngine? SnippetEngine => _snippetEngine;
