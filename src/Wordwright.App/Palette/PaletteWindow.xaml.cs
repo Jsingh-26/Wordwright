@@ -36,6 +36,10 @@ public partial class PaletteWindow : FluentWindow
     /// because AI is off and there is a selection.</summary>
     public bool ShowAiOff { get; init; }
 
+    /// <summary>The text captured before the palette opened, held so the rewrite
+    /// can run without touching the clipboard again.</summary>
+    public string? Selection { get; set; }
+
     internal PaletteViewModel ViewModel { get; }
 
     public PaletteWindow(IReadOnlyList<AiAction> actions, bool showAiOff = false)
