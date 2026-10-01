@@ -11,6 +11,7 @@ using Wordwright.App.Snippets;
 using Wordwright.App.Tray;
 using Wordwright.Core.Settings;
 using Wordwright.Core.Snippets;
+using Velopack;
 using Wordwright.Platform.Input;
 using Wordwright.Platform.Keyboard;
 using Wordwright.Platform.Startup;
@@ -28,6 +29,20 @@ public partial class App : Application
     private static readonly Color Ochre = Color.FromRgb(0x9A, 0x5B, 0x00);
     private static readonly Color Steel = Color.FromRgb(0xE9, 0xEC, 0xF3);
     private static readonly Color OchreDarkTheme = Color.FromRgb(0xE8, 0xB4, 0x5A);
+
+    /// <summary>
+    /// The first thing the generated entry point does, before WPF loads its
+    /// resources or a window exists. The installer runs the app with its own
+    /// arguments to finish an install, an update or an uninstall, and Velopack
+    /// has to see those first (docs/PLAN.md P3.5). Velopack's packer would
+    /// rather this sat in a hand-written <c>Main</c>, but the WPF SDK's XAML pass
+    /// rejects a second entry point, and a constructor runs in the same place.
+    /// Nothing here ever checks for or downloads an update on its own.
+    /// </summary>
+    public App()
+    {
+        VelopackApp.Build().Run();
+    }
 
     private Mutex? _mutex;
     private EventWaitHandle? _showWindowEvent;
