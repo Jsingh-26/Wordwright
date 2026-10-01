@@ -1,0 +1,85 @@
+<ui:FluentWindow x:Class="Wordwright.App.Palette.PaletteWindow"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                xmlns:res="clr-namespace:Wordwright.App.Resources"
+                Title="Wordwright"
+                Width="360"
+                SizeToContent="Height"
+                WindowStyle="None"
+                ResizeMode="NoResize"
+                ShowInTaskbar="False"
+                Topmost="True"
+                ShowActivated="True"
+                WindowStartupLocation="Manual"
+                ExtendsContentIntoTitleBar="True">
+    <Border Padding="12">
+        <StackPanel>
+            <!-- Type to filter -->
+            <ui:TextBox x:Name="FilterBox"
+                        AutomationProperties.Name="{res:Str Palette.Filter}"
+                        PlaceholderText="{res:Str Palette.Filter}"
+                        Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}"
+                        PreviewKeyDown="OnFilterKeyDown" />
+
+            <!-- The AI-off invitation, shown when AI is off and there is text to
+                 rewrite (P6.5). P6.8 adds the snippets group below the actions. -->
+            <StackPanel x:Name="AiOffPanel" Margin="4,12,4,4" Visibility="Collapsed">
+                <TextBlock Style="{StaticResource BodyText}"
+                           FontWeight="SemiBold"
+                           Text="{res:Str Palette.AiOff.Title}" />
+                <TextBlock Style="{StaticResource SecondaryText}"
+                           Margin="0,4,0,0"
+                           TextWrapping="Wrap"
+                           Text="{res:Str Palette.AiOff.Body}" />
+                <ui:Button Appearance="Primary"
+                           Margin="0,10,0,0"
+                           HorizontalAlignment="Left"
+                           Content="{res:Str Palette.AiOff.Button}"
+                           Click="OnTurnOnAiClicked" />
+            </StackPanel>
+
+            <!-- The actions -->
+            <ListBox x:Name="ActionList"
+                     Margin="0,12,0,0"
+                     MaxHeight="240"
+                     ItemsSource="{Binding Actions}"
+                     SelectedItem="{Binding SelectedAction}"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     PreviewKeyDown="OnListKeyDown"
+                     MouseDoubleClick="OnListDoubleClick">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="4,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding Name}" />
+                            <TextBlock Grid.Column="1"
+                                       Margin="8,0,0,0"
+                                       Style="{StaticResource SecondaryText}"
+                                       Text="{Binding Letter}" />
+                            <TextBlock Grid.Column="2"
+                                       Margin="8,0,0,0"
+                                       Style="{StaticResource SecondaryText}"
+                                       Text="{Binding Hotkey}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Custom instruction, revealed for the custom action -->
+            <StackPanel x:Name="CustomPanel" Margin="0,8,0,0" Visibility="Collapsed">
+                <ui:TextBox x:Name="CustomBox"
+                            AutomationProperties.Name="{res:Str Palette.CustomPlaceholder}"
+                            PlaceholderText="{res:Str Palette.CustomPlaceholder}"
+                            Text="{Binding CustomInstruction, UpdateSourceTrigger=PropertyChanged}"
+                            PreviewKeyDown="OnCustomKeyDown" />
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</ui:FluentWindow>
