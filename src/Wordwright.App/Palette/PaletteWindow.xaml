@@ -46,7 +46,7 @@
             <!-- Actions, then the snippet group (docs/DESIGN.md §6). -->
             <ListBox x:Name="ActionList"
                      Margin="0,12,0,0"
-                     MaxHeight="320"
+                     MaxHeight="250"
                      ItemsSource="{Binding Rows}"
                      SelectedItem="{Binding SelectedRow}"
                      Background="Transparent"
