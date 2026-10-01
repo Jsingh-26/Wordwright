@@ -23,6 +23,8 @@ Placeholders use `{Name}`.
 | Welcome.AiHint | Want AI rewriting too? It runs on this PC, with no account and no cloud. You can turn it on any time. |
 | Welcome.Primary | Show my snippets |
 | Welcome.Secondary | Turn on offline AI |
+| Welcome.TryHere | Try it: type {Prefix}date here |
+| Welcome.TryHere.Done | That works everywhere: Word, Outlook, your browser, any app. |
 
 ## Navigation
 | ID | Text |
@@ -40,6 +42,7 @@ Placeholders use `{Name}`.
 | Snippets.New | New snippet |
 | Snippets.Search | Search snippets |
 | Snippets.Empty | No snippets yet. Create one, then type {Prefix} and its shortcut in any app. |
+| Snippets.Empty.TryHere | Or try an example first: type {Prefix}date here |
 | Snippets.Field.Name | Name |
 | Snippets.Field.Shortcut | Shortcut |
 | Snippets.Field.ShortcutHelp | Type {Prefix}{Shortcut} in any app to insert this text. |
@@ -101,6 +104,7 @@ Placeholders use `{Name}`.
 | Pill.Working | Rewriting… {Seconds} s |
 | Pill.Cancel | Esc to cancel |
 | Pill.Done | Done. Ctrl+Z undoes it. |
+| Pill.Ruler.Name | Progress against the expected time (screen-reader name of the ruler tick) |
 | Pill.Cancelled | Cancelled. Your text is unchanged. |
 | Pill.NoSelection | Select some text first. |
 | Pill.TooLong | That's too much text for one rewrite. Select up to about 1,000 words. |
@@ -209,3 +213,11 @@ Placeholders use `{Name}`.
 | ID | Text |
 |---|---|
 | Dialog.Cancel | Cancel |
+
+## Accessibility (automation names for controls that have no visible label)
+| ID | Text |
+|---|---|
+| A11y.Minimize | Minimise |
+| A11y.Maximize | Maximise |
+| A11y.Close | Close |
+| A11y.NavToggle | Show or hide the menu |

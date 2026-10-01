@@ -12,7 +12,7 @@ Repository: https://github.com/Jsingh-26/Wordwright (local folder: `C:\Users\get
 
    > Read AGENTS.md, then do task **P2.3** from docs/PLAN.md. Restate its acceptance criteria first. Build only that task. Run `dotnet build` and `dotnet test`. Tick the checkbox, then commit as `P2.3: <summary>`. Stop and tell me what to check manually, if anything.
 
-4. At each **Human check**, test on your machine before moving on. Paste errors back to the agent exactly as shown.
+4. At each **Human check**, test on your machine before moving on. `scripts/check-screens.ps1` captures every page of the running app and counts controls without an automation name. Paste errors back to the agent exactly as shown.
 5. Review each finished phase with a second model (`kimi-k3`): "Review the diff for phase P2 against AGENTS.md hard rules and ARCHITECTURE.md. List violations and bugs only."
 
 ## Phase P0: Repository and solution (day 1)
@@ -38,11 +38,20 @@ Repository: https://github.com/Jsingh-26/Wordwright (local folder: `C:\Users\get
 - [x] **P2.6** App: wire hook → matcher → expander → backspaces → paste. Seed three example snippets on first run: `;date`, `;thanks`, `;sig`.
   *Human check:* expansion works in Notepad, Word, Outlook, Chrome (Gmail), Slack or Teams, VS Code, and the Windows search box; clipboard is restored afterwards; nothing appears in Win+V history; a 10,000-character snippet inserts in under 1 s; typing speed does not lag.
 
+## Decisions needed (from the 2026-10-01 design study in DESIGN.md)
+Two product changes the study recommended. Both approved by the maintainer on 2026-10-01; the copy is in UX_COPY.md.
+- [x] **D1 "Try it here" playground.** The welcome window (and the empty Snippets list) gets a one-line text box where typing `;date` expands in place, instead of sending the user to another app to try it. Mechanism borrowed from Espanso's welcome window; none of the Windows expanders, Text Blaze included, do it. → **P3.4c**.
+- [x] **D2 Pill ruler tick.** The progress pill (DESIGN.md §7) shows a hairline ruler that fills against the measured estimate, so every rewrite echoes the time ruler. Must stay inside the 32 px pill and skip when Windows animations are off. → folded into **P6.6**.
+
 ## Phase P3: Snippet manager UI (day 4–5)
 - [x] **P3.1** Snippets page: searchable list + editor (DESIGN.md §2), auto-save, "Saved" indicator, validation messages, delete with confirmation.
 - [x] **P3.2** Insert buttons (Date, Time, Clipboard, Cursor position) insert variables at the caret.
 - [x] **P3.3** Settings page: snippet prefix, excluded apps, export/import snippets (JSON), open data folder.
 - [x] **P3.4** First-run welcome (UX_COPY "First run").
+- [ ] **P3.4a** Window basics found missing in the 2026-10-01 design study: `MinWidth` 800 / `MinHeight` 600 on the main window; remember size, position and maximised state in `settings.json` (`window` object, clamped to the current work area on restore); keyboard accelerators Ctrl+N (new snippet), Ctrl+F (focus search), Delete on a selected list row (opens the same confirmation), Esc closes dialogs. Core tests for the clamp rule.
+- [ ] **P3.4b** Settings and About per DESIGN.md §8 and §9: grouped `CardControl` rows with Remove inside each excluded-app row; About shows the version (from the assembly), the GitHub link in the brand accent instead of the system blue, and a "Third-party licences" expander listing Zodiak, Phosphor, WPF-UI, H.NotifyIcon, LLamaSharp and Velopack with their licence names. Later phases add their rows into the groups rather than appending to the page. Also give automation names to the four controls `scripts/check-screens.ps1` found unnamed on 2026-10-01: WPF-UI's `TitleBarMinimizeButton`, `TitleBarMaximizeButton`, `TitleBarCloseButton` and `NavigationToggleButton` (set `AutomationProperties.Name` through the TitleBar/NavigationView templates, or on the elements after load; strings go in UX_COPY under a new "Accessibility" table).
+- [ ] **P3.4c** "Try it here" playground (decision D1): a single-line text box on the welcome window under the body text, and in the Snippets page empty state, labelled with `Welcome.TryHere` / `Snippets.Empty.TryHere`. The snippet engine expands inside it exactly as in any other app (same hook, no special path), so the box is a plain `ui:TextBox` with the Wordwright window not in `excludedApps`. After the first expansion the label changes to `Welcome.TryHere.Done`. The box never persists its text. Welcome window stays `SizeToContent`.
+  *Human check:* resize below 800×600 is refused; close, reopen and the window is where it was; Ctrl+N, Ctrl+F, Delete work; `scripts/check-screens.ps1` reports zero unnamed controls on Settings and About; typing `;date` in the welcome box expands in place and the label switches to the done text.
 - [ ] **P3.5** Packaging: Velopack installer published to GitHub Releases as **v0.1.0 (snippets only)**. App-update checking stays off by default.
 - [ ] **P3.6** Packaging: MSIX package for the Microsoft Store (added at the maintainer's request on 2026-10-01). Full-trust package manifest, visual assets from `brand/`, a Store-ready bundle, and the Start-with-Windows setting using the manifest's `windows.startupTask` extension when the app runs from the package (the `HKCU\...\Run` key stays for the installer build, which Store policy does not allow).
   *Human check:* install from the release on a clean user account; create, edit, delete snippets; everything persists after restart; then the same from the MSIX package, plus Start with Windows working through the packaged startup task.
@@ -67,7 +76,7 @@ Repository: https://github.com/Jsingh-26/Wordwright (local folder: `C:\Users\get
 - [ ] **P6.3** Core: `ActionStore` with the built-in actions from UX_COPY.md; AI actions page (list, editor, reset, Try it).
 - [ ] **P6.4** Platform: `HotkeyService` (palette hotkey + per-action hotkeys, re-register on change, in-use/duplicate/reserved validation per ARCHITECTURE.md), selection capture, elevated-window detection. Core tests for hotkey parsing and validation.
 - [ ] **P6.5** App: action palette (DESIGN.md §6) near the caret (`GetGUIThreadInfo` caret rect, fallback to mouse), filter, letter shortcuts, custom instruction input.
-- [ ] **P6.6** App: progress pill (DESIGN.md §7), Esc cancels, paste result over the selection, all pill messages from UX_COPY.
+- [ ] **P6.6** App: progress pill (DESIGN.md §7), Esc cancels, paste result over the selection, all pill messages from UX_COPY. Includes the ruler tick (decision D2): a 1 px Steel track under the pill text with a Forge-ink/Ink-light fill that grows over the estimate for this input length (SpeedEstimator, or the calibrated time once measured); it keeps growing in Ember past the estimate instead of resetting; skipped when Windows animations are off; the pill stays 32 px tall.
 - [ ] **P6.7** App: hotkey recorder control on the AI actions page and Settings; palette shows each action's hotkey; direct hotkeys run the action without the palette.
   *Human check:* Ctrl+Alt+G fixes grammar directly and Ctrl+Alt+Space opens the palette; a hotkey already used by another app shows the in-use message; every built-in action works in Notepad, Word, Outlook, Chrome and Teams; Ctrl+Z restores the original; Esc cancels cleanly; no text is written to the log file.
 
@@ -90,9 +99,9 @@ Repository: https://github.com/Jsingh-26/Wordwright (local folder: `C:\Users\get
 - [ ] **P9.5** `.github/workflows/model-watch.yml`: weekly job that opens an issue for new GGUF releases from the watched publishers. Never edits the catalog.
 
 ## Phase P10: Release (day 13–14)
-- [ ] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and About page.
+- [ ] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and the About page slot from DESIGN.md §9.
 - [ ] **P10.1** README: GIF of a snippet expansion and a rewrite, install steps, the SmartScreen "unknown publisher" explanation, privacy section, link to REPORT.md.
-- [ ] **P10.2** Manual test pass using the checklist below and the DESIGN.md polish checklist; fix blockers.
+- [ ] **P10.2** Manual test pass using the checklist below and the DESIGN.md polish checklist (light, dark and a high-contrast theme; 100 %, 150 % and 200 % scaling; 800×600 and maximised; keyboard-only; Accessibility Insights for Windows with zero unnamed controls); fix blockers.
 - [ ] **P10.3** Release **v1.0.0** on GitHub with notes.
 - [ ] **P10.4** 60–90 s demo video: snippet → turn on offline AI (time ruler) → rewrite in Outlook → Ctrl+Z.
 
