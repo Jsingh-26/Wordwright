@@ -73,14 +73,13 @@ internal sealed class RewriteService : IDisposable
     /// <summary>Unloads the model now, freeing its memory.</summary>
     public void Unload() => _model.Unload();
 
-    /// <summary>
-    /// Runs <paramref name="instruction"/> over <paramref name="text"/> and returns
+    /// <summary>Runs <paramref name="instruction"/> over <paramref name="text"/> and returns
     /// the cleaned rewrite. A cancellation stops generation and is reported as
-    /// cancelled by the caller, not as a failure.
-    /// </summary>
+    /// cancelled by the caller, not as a failure.</summary>
     public async Task<RewriteOutcome> RewriteAsync(
         string instruction,
         string text,
+        Action? generationStarted = null,
         IProgress<float>? loadingProgress = null,
         CancellationToken cancellationToken = default)
     {
@@ -103,6 +102,8 @@ internal sealed class RewriteService : IDisposable
             System.Diagnostics.Debug.WriteLine($"model load failed: {exception.GetType().Name}");
             return new RewriteOutcome(RewriteStatus.NoModel);
         }
+
+        generationStarted?.Invoke();
 
         if (_model.CountTokens(text) > PromptBuilder.MaxInputTokens)
         {

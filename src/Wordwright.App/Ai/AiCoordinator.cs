@@ -1,14 +1,21 @@
+using System.Windows;
 using Wordwright.App.Palette;
+using Wordwright.App.Pill;
+using Wordwright.App.Resources;
 using Wordwright.Core.Actions;
 using Wordwright.Platform.Hotkeys;
+using Wordwright.Platform.Input;
+using Wordwright.Platform.Keyboard;
 
 namespace Wordwright.App.Ai;
 
 /// <summary>
-/// Connects the hotkeys to the AI surface: the palette hotkey opens the palette
-/// (docs/PLAN.md P6.5). The rewrite, the pill and running a chosen action are
-/// P6.6; the per-action hotkeys and the recorder are P6.7. It re-registers
-/// whenever settings or actions change (docs/ARCHITECTURE.md → Hotkeys).
+/// Connects the hotkeys to the AI surface and runs the rewrite flow
+/// (docs/ARCHITECTURE.md → AI rewrite flow, docs/PLAN.md P6.5–P6.7):
+/// the palette hotkey opens the palette, an action's own hotkey runs it directly,
+/// the selection is captured, the model rewrites it, a progress pill shows how it
+/// is going, Esc cancels, and the result is pasted (or copied when the target app
+/// is elevated). It re-registers hotkeys whenever settings or actions change.
 /// </summary>
 internal sealed class AiCoordinator : IDisposable
 {
@@ -17,10 +24,20 @@ internal sealed class AiCoordinator : IDisposable
 
     private const string ActionIdPrefix = "action:";
 
+    /// <summary>A rewrite with no calibration yet still needs a ruler tick to
+    /// grow against; this is the placeholder until P7.1 measures the real time.</summary>
+    private static readonly TimeSpan DefaultEstimate = TimeSpan.FromSeconds(8);
+
     private readonly App _app;
     private readonly HotkeyService _hotkeys = new();
+    private readonly ClipboardService _clipboard = new();
 
     private PaletteWindow? _palette;
+    private PillWindow? _pill;
+    private EscapeWatcher? _escape;
+    private CancellationTokenSource? _rewrite;
+    private bool _running;
+    private IntPtr _previousForeground;
 
     public AiCoordinator(App app)
     {
@@ -31,7 +48,8 @@ internal sealed class AiCoordinator : IDisposable
 
     public HotkeyService Hotkeys => _hotkeys;
 
-    /// <summary>Re-registers the palette hotkey from the current settings.</summary>
+    /// <summary>Re-registers the palette hotkey and every enabled action's own
+    /// hotkey (docs/ARCHITECTURE.md → Hotkeys).</summary>
     public void Apply()
     {
         var registrations = new List<HotkeyRegistration>();
@@ -39,6 +57,14 @@ internal sealed class AiCoordinator : IDisposable
         if (HotkeySpec.Parse(_app.Settings.PaletteHotkey) is { } palette)
         {
             registrations.Add(new HotkeyRegistration(PaletteHotkeyId, palette));
+        }
+
+        foreach (var action in _app.Actions.Actions.Where(action => action.Enabled))
+        {
+            if (HotkeySpec.Parse(action.Hotkey) is { } spec)
+            {
+                registrations.Add(new HotkeyRegistration(ActionId(action.Id), spec));
+            }
         }
 
         _hotkeys.Apply(registrations);
@@ -52,6 +78,16 @@ internal sealed class AiCoordinator : IDisposable
         if (e.Id == PaletteHotkeyId)
         {
             OpenPalette();
+            return;
+        }
+
+        if (e.Id.StartsWith(ActionIdPrefix, StringComparison.Ordinal))
+        {
+            var actionId = e.Id[ActionIdPrefix.Length..];
+            if (_app.Actions.Actions.FirstOrDefault(action => action.Id == actionId) is { } action)
+            {
+                _ = RunDirectAsync(action);
+            }
         }
     }
 
@@ -64,20 +100,222 @@ internal sealed class AiCoordinator : IDisposable
             return;
         }
 
-        var palette = new PaletteWindow(
-            _app.Actions.Actions,
-            showAiOff: !_app.Settings.AiEnabled);
+        if (_running)
+        {
+            // One rewrite at a time; the pill is already up.
+            return;
+        }
 
+        var selection = CaptureSelection();
+        if (selection is null)
+        {
+            ShowPill(Strings.Get("Pill.NoSelection"), PillState.Error);
+            return;
+        }
+
+        if (!_app.Settings.AiEnabled || _app.Rewrite.ActiveModel() is null)
+        {
+            // With text selected but AI off, the palette invites turning it on.
+            var off = new PaletteWindow(_app.Actions.Actions, showAiOff: true)
+            {
+                Selection = selection,
+            };
+            off.TurnOnAiRequested += (_, _) => new ConsentWindow().Show();
+            _palette = off;
+            off.Closed += (_, _) => _palette = null;
+            off.Show();
+            return;
+        }
+
+        var palette = new PaletteWindow(_app.Actions.Actions) { Selection = selection };
+        _previousForeground = ForegroundWindow.Current();
+        palette.ChosenAction += (_, _) => OnPaletteChosen(palette);
         _palette = palette;
         palette.Closed += (_, _) => _palette = null;
         palette.Show();
+    }
+
+    private void OnPaletteChosen(PaletteWindow palette)
+    {
+        if (palette.Chosen is not { } action || palette.Selection is not { } selection)
+        {
+            return;
+        }
+
+        // Give the app the user was writing in its focus back before we paste.
+        ForegroundWindow.Restore(_previousForeground);
+        _ = RunAsync(action, selection, palette.CustomInstruction);
+    }
+
+    /// <summary>Runs an action from its own hotkey, capturing the selection now.</summary>
+    private async Task RunDirectAsync(AiAction action)
+    {
+        if (_running)
+        {
+            return;
+        }
+
+        if (!_app.Settings.AiEnabled || _app.Rewrite.ActiveModel() is null)
+        {
+            ShowPill(Strings.Get("Pill.AiOff"), PillState.Error);
+            return;
+        }
+
+        if (CaptureSelection() is not { } selection)
+        {
+            ShowPill(Strings.Get("Pill.NoSelection"), PillState.Error);
+            return;
+        }
+
+        await RunAsync(action, selection, customInstruction: null);
+    }
+
+    /// <summary>The rewrite itself: capture already done, run, then deliver.</summary>
+    private async Task RunAsync(AiAction action, string selection, string? customInstruction)
+    {
+        var instruction = action.Id == "custom"
+            ? customInstruction ?? ""
+            : action.Instruction;
+
+        if (instruction.Trim().Length == 0)
+        {
+            return;
+        }
+
+        _running = true;
+        _rewrite = new CancellationTokenSource();
+
+        var pill = ShowPillWindow();
+        var dispatcher = _app.Dispatcher;
+
+        // The model runs on pool threads, so every pill change hops back here.
+        void Post(Action action) => dispatcher.BeginInvoke(action);
+
+        _escape = new EscapeWatcher();
+        _escape.Pressed += (_, _) => Post(pill.ReportEscape);
+        pill.CancelRequested += (_, _) => _rewrite?.Cancel();
+        _escape.Start();
+
+        try
+        {
+            var outcome = await _app.Rewrite.RewriteAsync(
+                instruction,
+                selection,
+                generationStarted: () => Post(pill.ShowWorking),
+                cancellationToken: _rewrite.Token);
+
+            switch (outcome.Status)
+            {
+                case RewriteStatus.Done:
+                    Deliver(pill, outcome.Text);
+                    break;
+
+                case RewriteStatus.TooLong:
+                    Post(() => pill.ShowResult(PillState.Error, Strings.Get("Pill.TooLong")));
+                    break;
+
+                case RewriteStatus.BadOutput:
+                    Post(() => pill.ShowResult(PillState.Error, Strings.Get("Pill.BadOutput")));
+                    break;
+
+                default:
+                    Post(() => pill.ShowResult(PillState.Error, Strings.Get("Pill.AiOff")));
+                    break;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Post(() => pill.ShowResult(PillState.Error, Strings.Get("Pill.Cancelled")));
+        }
+        catch (Exception exception)
+        {
+            // Never let a rewrite take the tray app down.
+            System.Diagnostics.Debug.WriteLine($"rewrite failed: {exception.GetType().Name}");
+            Post(() => pill.ShowResult(PillState.Error, Strings.Get("Pill.BadOutput")));
+        }
+        finally
+        {
+            Post(() =>
+            {
+                _escape?.Dispose();
+                _escape = null;
+                _rewrite?.Dispose();
+                _rewrite = null;
+                _running = false;
+            });
+        }
+    }
+
+    private void Deliver(PillWindow pill, string text)
+    {
+        // Pasting touches the clipboard, which is an OLE object: it belongs on
+        // the UI thread.
+        var delivery = PasteHelper.Deliver(_clipboard, text);
+
+        if (delivery == RewriteDelivery.Copied)
+        {
+            pill.ShowResult(PillState.Done, Strings.Get("Pill.AdminApp.Copied"), sixSeconds: true);
+        }
+        else
+        {
+            pill.ShowResult(PillState.Done, Strings.Get("Pill.Done"));
+        }
+    }
+
+    private string? CaptureSelection()
+    {
+        try
+        {
+            return SelectionCapture.Capture(_clipboard);
+        }
+        catch (Exception exception)
+        {
+            System.Diagnostics.Debug.WriteLine($"selection capture failed: {exception.GetType().Name}");
+            return null;
+        }
+    }
+
+    private PillWindow ShowPillWindow()
+    {
+        var caret = CaretPosition.Current();
+        var pill = new PillWindow { Estimate = DefaultEstimate };
+
+        pill.Show();
+        pill.Start(caret.X, caret.Y);
+
+        if (_app.Rewrite.IsLoaded)
+        {
+            pill.ShowWorking();
+        }
+        else
+        {
+            pill.ShowLoading();
+        }
+
+        _pill = pill;
+        pill.Closed += (_, _) => _pill = null;
+        return pill;
+    }
+
+    /// <summary>Shows a one-off pill message (no rewrite behind it).</summary>
+    private void ShowPill(string message, PillState state)
+    {
+        var caret = CaretPosition.Current();
+        var pill = new PillWindow();
+        pill.Show();
+        pill.Start(caret.X, caret.Y);
+        pill.ShowResult(state, message);
     }
 
     public void Dispose()
     {
         _hotkeys.Pressed -= OnPressed;
         _hotkeys.Dispose();
+        _escape?.Dispose();
+        _rewrite?.Cancel();
+        _pill?.Close();
         _palette?.Close();
+        _pill = null;
         _palette = null;
     }
 }
