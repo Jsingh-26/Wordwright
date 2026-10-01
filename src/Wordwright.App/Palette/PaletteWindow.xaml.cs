@@ -3,57 +3,78 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Wpf.Ui.Controls;
 using Wordwright.Core.Actions;
+using Wordwright.Core.Snippets;
 using Wordwright.Platform.Input;
 
 namespace Wordwright.App.Palette;
 
+/// <summary>What the palette offers (docs/DESIGN.md §6, docs/PLAN.md P6.8).</summary>
+public enum PaletteMode
+{
+    /// <summary>AI is on: the actions, then the snippet group.</summary>
+    Actions,
+
+    /// <summary>AI is off but text is selected: the invitation to turn it on.</summary>
+    AiOff,
+
+    /// <summary>AI is off and nothing is selected: the snippet group alone.</summary>
+    SnippetsOnly,
+}
+
 /// <summary>
-/// The action palette (docs/DESIGN.md §6, docs/PLAN.md P6.5): a small floating
-/// window near the caret that lists every enabled action, filters as the user
-/// types, and runs the chosen one. It never takes focus from the app being
-/// rewritten — but it does take keyboard focus, because the user types into it,
-/// and closing it returns focus to where it was.
-/// <para>
-/// This window raises intent only. Running the rewrite, pasting and the pill are
-/// P6.6; the snippet group is P6.8.
-/// </para>
+/// The action palette (docs/DESIGN.md §6, docs/PLAN.md P6.5 and P6.8): a small
+/// floating window near the caret listing every enabled action, then a "Snippets"
+/// group listing every enabled snippet. Type to filter, arrows and Enter to pick,
+/// a letter to jump to its action, Esc to close. Picking a snippet inserts it at
+/// the caret through the normal snippet path; picking an action starts a rewrite.
 /// </summary>
 public partial class PaletteWindow : FluentWindow
 {
-    /// <summary>Which action the user picked, or null when the palette was closed
-    /// without a choice.</summary>
-    public AiAction? Chosen { get; private set; }
+    /// <summary>The action the user picked, or null when they picked a snippet or
+    /// closed the palette.</summary>
+    public AiAction? ChosenAction { get; private set; }
+
+    /// <summary>The snippet the user picked, or null.</summary>
+    public Snippet? ChosenSnippet { get; private set; }
 
     /// <summary>What the user typed as a custom instruction, when they chose
-    /// <c>custom</c>.</summary>
+    /// the custom action.</summary>
     public string? CustomInstruction { get; private set; }
 
-    /// <summary>Raised after <see cref="Chosen"/> is set, once the window is
-    /// closing. P6.6 hangs the rewrite off this.</summary>
-    public event EventHandler? ChosenAction;
-
-    /// <summary>True when the palette should invite the user to turn AI on,
-    /// because AI is off and there is a selection.</summary>
-    public bool ShowAiOff { get; init; }
-
-    /// <summary>The text captured before the palette opened, held so the rewrite
-    /// can run without touching the clipboard again.</summary>
+    /// <summary>The text captured before the palette opened.</summary>
     public string? Selection { get; set; }
+
+    /// <summary>What the palette is for.</summary>
+    public PaletteMode Mode { get; init; } = PaletteMode.Actions;
+
+    /// <summary>True when the palette should invite the user to turn AI on.</summary>
+    public bool ShowAiOff => Mode == PaletteMode.AiOff;
+
+    /// <summary>Raised once the user has chosen an action or a snippet.</summary>
+    public event EventHandler? Chosen;
+
+    /// <summary>The user asked to turn offline AI on from the palette.</summary>
+    public event EventHandler? TurnOnAiRequested;
 
     internal PaletteViewModel ViewModel { get; }
 
-    public PaletteWindow(IReadOnlyList<AiAction> actions, bool showAiOff = false)
+    private bool _choosing;
+
+    public PaletteWindow(
+        IReadOnlyList<AiAction> actions,
+        IReadOnlyList<Snippet> snippets,
+        string prefix,
+        PaletteMode mode = PaletteMode.Actions)
     {
-        ViewModel = new PaletteViewModel(actions);
-        ShowAiOff = showAiOff;
+        Mode = mode;
+        ViewModel = new PaletteViewModel(actions, snippets, prefix, actionsEnabled: mode == PaletteMode.Actions);
 
         InitializeComponent();
         DataContext = ViewModel;
 
-        AiOffPanel.Visibility = showAiOff ? Visibility.Visible : Visibility.Collapsed;
-        ActionList.Visibility = showAiOff ? Visibility.Collapsed : Visibility.Visible;
+        AiOffPanel.Visibility = ShowAiOff ? Visibility.Visible : Visibility.Collapsed;
+        ActionList.Visibility = ShowAiOff ? Visibility.Collapsed : Visibility.Visible;
 
-        // Place near the caret, then focus the filter box so typing filters.
         Loaded += OnLoaded;
     }
 
@@ -77,8 +98,6 @@ public partial class PaletteWindow : FluentWindow
         }
     }
 
-    private bool _choosing;
-
     private void OnFilterKeyDown(object sender, KeyEventArgs e) => HandleKey(e);
 
     private void OnListKeyDown(object sender, KeyEventArgs e) => HandleKey(e);
@@ -89,13 +108,9 @@ public partial class PaletteWindow : FluentWindow
 
     private void OnTurnOnAiClicked(object sender, RoutedEventArgs e)
     {
-        // The window that wants to show the consent dialogue listens for this.
         TurnOnAiRequested?.Invoke(this, EventArgs.Empty);
         Close();
     }
-
-    /// <summary>The user asked to turn offline AI on from the palette.</summary>
-    public event EventHandler? TurnOnAiRequested;
 
     private void HandleKey(KeyEventArgs e)
     {
@@ -108,13 +123,13 @@ public partial class PaletteWindow : FluentWindow
 
             case Key.Down:
                 ViewModel.MoveSelection(1);
-                ActionList.ScrollIntoView(ViewModel.SelectedAction);
+                ActionList.ScrollIntoView(ViewModel.SelectedRow);
                 e.Handled = true;
                 return;
 
             case Key.Up:
                 ViewModel.MoveSelection(-1);
-                ActionList.ScrollIntoView(ViewModel.SelectedAction);
+                ActionList.ScrollIntoView(ViewModel.SelectedRow);
                 e.Handled = true;
                 return;
 
@@ -124,48 +139,68 @@ public partial class PaletteWindow : FluentWindow
                 return;
         }
 
-        // A bare letter picks the action with that letter, as the palette shows
-        // (docs/DESIGN.md §6). Letters typed with a modifier are left alone.
+        // A bare letter jumps to the action with that letter (docs/DESIGN.md §6).
+        // Letters typed with a modifier are left alone.
         if (e.Key is >= Key.A and <= Key.Z
             && Keyboard.Modifiers == ModifierKeys.None
             && !CustomPanel.IsVisible)
         {
-            ViewModel.FilterByLetter(e.Key.ToString());
+            JumpToLetter(e.Key.ToString());
             e.Handled = true;
+        }
+    }
+
+    private void JumpToLetter(string letter)
+    {
+        var row = ViewModel.Rows.FirstOrDefault(candidate =>
+            !candidate.IsHeader
+            && string.Equals(candidate.Letter, letter, StringComparison.OrdinalIgnoreCase));
+
+        if (row is not null)
+        {
+            ViewModel.SelectedRow = row;
+            ActionList.ScrollIntoView(row);
         }
     }
 
     private void Choose()
     {
-        if (ViewModel.SelectedAction is not { } item)
+        if (ViewModel.SelectedRow is not { IsHeader: false } row)
         {
             return;
         }
 
-        if (item.Id == "custom" && CustomInstruction is null or "")
+        if (row.IsSnippet)
+        {
+            _choosing = true;
+            ChosenSnippet = row.Snippet;
+            Chosen?.Invoke(this, EventArgs.Empty);
+            Close();
+            return;
+        }
+
+        if (row.Action is not { } action)
+        {
+            return;
+        }
+
+        if (action.Id == "custom" && CustomBox.Text.Trim().Length == 0)
         {
             // Reveal the instruction box rather than run an empty instruction.
-            ShowCustomBox();
+            CustomPanel.Visibility = Visibility.Visible;
+            CustomBox.Focus();
             return;
         }
 
         _choosing = true;
-        Chosen = item;
+        ChosenAction = action;
 
-        if (item.Id == "custom")
+        if (action.Id == "custom")
         {
             CustomInstruction = CustomBox.Text.Trim();
         }
 
-        ChosenAction?.Invoke(this, EventArgs.Empty);
+        Chosen?.Invoke(this, EventArgs.Empty);
         Close();
     }
-
-    private void ShowCustomBox()
-    {
-        CustomPanel.Visibility = Visibility.Visible;
-        CustomBox.Focus();
-    }
-
-    internal IReadOnlyList<AiAction> AllActions => ViewModel.AllActions;
 }

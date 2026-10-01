@@ -3,6 +3,7 @@ using Wordwright.App.Palette;
 using Wordwright.App.Pill;
 using Wordwright.App.Resources;
 using Wordwright.Core.Actions;
+using Wordwright.Core.Snippets;
 using Wordwright.Platform.Hotkeys;
 using Wordwright.Platform.Input;
 using Wordwright.Platform.Keyboard;
@@ -28,9 +29,16 @@ internal sealed class AiCoordinator : IDisposable
     /// grow against; this is the placeholder until P7.1 measures the real time.</summary>
     private static readonly TimeSpan DefaultEstimate = TimeSpan.FromSeconds(8);
 
+    /// <summary>How long our snippet text stays on the clipboard after Ctrl+V.</summary>
+    private const int PasteSettleMilliseconds = 150;
+
     private readonly App _app;
     private readonly HotkeyService _hotkeys = new();
     private readonly ClipboardService _clipboard = new();
+
+    /// <summary>Expands a palette-inserted snippet's variables, reading the clock
+    /// and the clipboard at insert time (before the clipboard is replaced).</summary>
+    private readonly VariableExpander _expander;
 
     private PaletteWindow? _palette;
     private PillWindow? _pill;
@@ -42,6 +50,7 @@ internal sealed class AiCoordinator : IDisposable
     public AiCoordinator(App app)
     {
         _app = app;
+        _expander = new VariableExpander(() => DateTimeOffset.Now, _clipboard.GetText);
         _hotkeys.Pressed += OnPressed;
         Apply();
     }
@@ -106,30 +115,30 @@ internal sealed class AiCoordinator : IDisposable
             return;
         }
 
+        var snippets = SnippetRules.Expandable(_app.Snippets.Snippets).ToList();
+        var prefix = _app.Snippets.TriggerPrefix;
+        var aiOn = _app.Settings.AiEnabled && _app.Rewrite.ActiveModel() is not null;
+
+        // Capture the selection first: with AI off and nothing selected, the
+        // palette opens straight to the snippet list (P6.8).
         var selection = CaptureSelection();
-        if (selection is null)
-        {
-            ShowPill(Strings.Get("Pill.NoSelection"), PillState.Error);
-            return;
-        }
 
-        if (!_app.Settings.AiEnabled || _app.Rewrite.ActiveModel() is null)
+        var mode = (aiOn, selection is not null) switch
         {
-            // With text selected but AI off, the palette invites turning it on.
-            var off = new PaletteWindow(_app.Actions.Actions, showAiOff: true)
-            {
-                Selection = selection,
-            };
-            off.TurnOnAiRequested += (_, _) => new ConsentWindow().Show();
-            _palette = off;
-            off.Closed += (_, _) => _palette = null;
-            off.Show();
-            return;
-        }
+            (true, true) => PaletteMode.Actions,
+            (false, true) => PaletteMode.AiOff,
+            _ => PaletteMode.SnippetsOnly,
+        };
 
-        var palette = new PaletteWindow(_app.Actions.Actions) { Selection = selection };
         _previousForeground = ForegroundWindow.Current();
-        palette.ChosenAction += (_, _) => OnPaletteChosen(palette);
+
+        var palette = new PaletteWindow(_app.Actions.Actions, snippets, prefix, mode)
+        {
+            Selection = selection,
+        };
+
+        palette.TurnOnAiRequested += (_, _) => new ConsentWindow().Show();
+        palette.Chosen += (_, _) => OnPaletteChosen(palette);
         _palette = palette;
         palette.Closed += (_, _) => _palette = null;
         palette.Show();
@@ -137,7 +146,13 @@ internal sealed class AiCoordinator : IDisposable
 
     private void OnPaletteChosen(PaletteWindow palette)
     {
-        if (palette.Chosen is not { } action || palette.Selection is not { } selection)
+        if (palette.ChosenSnippet is { } snippet)
+        {
+            InsertSnippet(snippet);
+            return;
+        }
+
+        if (palette.ChosenAction is not { } action || palette.Selection is not { } selection)
         {
             return;
         }
@@ -145,6 +160,29 @@ internal sealed class AiCoordinator : IDisposable
         // Give the app the user was writing in its focus back before we paste.
         ForegroundWindow.Restore(_previousForeground);
         _ = RunAsync(action, selection, palette.CustomInstruction);
+    }
+
+    /// <summary>
+    /// Inserts a snippet the user picked in the palette at the caret, through the
+    /// normal snippet path (variables included) and with the clipboard restored
+    /// (docs/PLAN.md P6.8).
+    /// </summary>
+    private void InsertSnippet(Snippet snippet)
+    {
+        ForegroundWindow.Restore(_previousForeground);
+
+        var expanded = _expander.Expand(snippet.Body);
+
+        using (_clipboard.ReplaceWithText(expanded.Text))
+        {
+            InputSender.Paste();
+            Thread.Sleep(PasteSettleMilliseconds);
+        }
+
+        if (expanded.CharactersAfterCursor > 0)
+        {
+            InputSender.SendLeftArrows(expanded.CharactersAfterCursor);
+        }
     }
 
     /// <summary>Runs an action from its own hotkey, capturing the selection now.</summary>
