@@ -30,6 +30,15 @@ eval/                  Python evaluation harness (not shipped)
 
 WPF-UI allows one `ContentDialogHost` per window and throws when a second one registers. It belongs on `MainWindow`, never on a page: WPF-UI builds a page again every time the user navigates back to it, so a host on a page takes the app down on the second visit.
 
+## Packaging
+
+Two builds ship from the same source. Both keep the user's data in the same place; they differ in how they are installed and how they start with Windows.
+
+- **Installer (GitHub Releases):** `scripts/pack-release.ps1` publishes the app self-contained and packs it with Velopack. `App.xaml.cs` calls `VelopackApp.Build().Run()` in its constructor, the first thing the generated entry point does, so an install or uninstall can finish. Nothing ever checks for an update unless the user turns that on (P8).
+- **Microsoft Store package:** `scripts/pack-msix.ps1` packs `packaging/AppxManifest.xml` with the tile assets `scripts/IconGen --msix` renders from the brand geometry. It is a full-trust (`runFullTrust`) desktop package; the manifest's Identity is a placeholder until Partner Center reserves the name.
+- Both builds target `net10.0-windows10.0.19041.0`, which is what gives the app the WinRT `StartupTask` API; the manifest declares Windows 10 19045 as the floor.
+- **Start with Windows** goes through `Wordwright.Platform.Startup.StartWithWindows`: the `HKCU\...\Run` key when unpackaged, the manifest's `desktop:startupTask` when packaged (Store policy forbids the Run key). `PackageIdentity.IsPackaged` decides which.
+
 ## Dependencies (the complete allowed list)
 
 | Package | Used in | Why |

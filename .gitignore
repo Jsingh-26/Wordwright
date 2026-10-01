@@ -480,3 +480,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# MSIX packaging staging (docs/PLAN.md P3.6)
+packaging/stage/
+packaging/stage-bundle/

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Microsoft Store package (docs/PLAN.md P3.6).
+
+  Identity Name and Publisher are placeholders: both must be replaced with the
+  values Partner Center reserves for Wordwright before a Store upload, and
+  Publisher must match the signing certificate exactly.
+
+  The startup task is how the packaged build starts with Windows — Store policy
+  forbids the HKCU Run key that the installer build uses. It starts disabled and
+  the app turns it on when the user's "Start Wordwright when I sign in" setting
+  says so. Description matches docs/UX_COPY.md About.Body.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap desktop rescap">
+
+  <Identity
+    Name="Jsingh26.Wordwright"
+    Publisher="CN=Jsingh26"
+    Version="0.1.0.0"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>Wordwright</DisplayName>
+    <PublisherDisplayName>Jaspreet Singh</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19045.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+
+  <Applications>
+    <!-- A full-trust desktop app: no sandbox, no UWP entry point. -->
+    <Application Id="Wordwright" Executable="Wordwright.App.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="Wordwright"
+        Description="Wordwright is free and open source (MIT). Snippets and AI rewriting run entirely on this PC."
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+      </uap:VisualElements>
+      <Extensions>
+        <desktop:Extension Category="windows.startupTask" Executable="Wordwright.App.exe" EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask TaskId="Wordwright" Enabled="false" DisplayName="Wordwright" />
+        </desktop:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <!-- Required by any packaged app that leaves the sandbox, which Wordwright's
+         global keyboard hook and SendInput do. -->
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>
