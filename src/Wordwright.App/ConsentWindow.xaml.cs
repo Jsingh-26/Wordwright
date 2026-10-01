@@ -1,8 +1,9 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Globalization;
 using System.Windows;
+using Microsoft.Win32;
 using Wpf.Ui.Controls;
 using Wordwright.App.Controls;
 using Wordwright.App.Resources;
@@ -370,6 +371,64 @@ public partial class ConsentWindow : FluentWindow
         PrimaryButton.Content = Strings.Get(corrupt ? "Ai.Rec.Primary" : "Ai.Dl.Resume");
         PrimaryButton.Visibility = Visibility.Visible;
         SecondaryButton.Content = Strings.Get(corrupt ? "Ai.Rec.Secondary" : "Ai.Dl.Cancel");
+    }
+
+    /// <summary>
+    /// Imports a model file the user already has (docs/PLAN.md P5.4): a GGUF
+    /// whose hash the catalog knows counts as that model, anything else is a
+    /// custom model taken on trust. The file moves into Wordwright's models
+    /// folder, and the dialogue closes; turning AI on with it is the calibration
+    /// step, which arrives with P7.1.
+    /// </summary>
+    private void OnImportClicked(object sender, RoutedEventArgs e)
+    {
+        var picker = new OpenFileDialog
+        {
+            Title = Strings.Get("Ai.Rec.Import"),
+            Filter = "*.gguf|*.gguf",
+            CheckFileExists = true,
+        };
+
+        if (picker.ShowDialog(this) != true)
+        {
+            return;
+        }
+
+        Import(picker.FileName);
+    }
+
+    /// <summary>The import itself, once a file has been chosen.</summary>
+    private void Import(string path)
+    {
+        Busy.Text = Strings.Get("Ai.Verify");
+        Busy.Visibility = Visibility.Visible;
+        Problem.Visibility = Visibility.Collapsed;
+
+        var app = (App)Application.Current;
+        var (outcome, model, catalogEntry) = ModelImporter.Import(
+            path, app.ModelsFolder, CatalogParser.Embedded());
+
+        switch (outcome)
+        {
+            case ImportOutcome.Imported:
+                new InstalledModelStore(app.ModelsFolder).Add(model!);
+                Debug.WriteLine(
+                    $"consent: imported {model!.Id} ({(catalogEntry is null ? "custom, unverified" : "verified")})");
+                Close();
+                break;
+
+            case ImportOutcome.NotGguf:
+                Busy.Visibility = Visibility.Collapsed;
+                Problem.Text = Strings.Get("Ai.Import.NotModel");
+                Problem.Visibility = Visibility.Visible;
+                break;
+
+            default:
+                Busy.Visibility = Visibility.Collapsed;
+                Problem.Text = Strings.Get("Ai.Import.Failed");
+                Problem.Visibility = Visibility.Visible;
+                break;
+        }
     }
 
     /// <summary>One line under "Show other options".</summary>
