@@ -126,4 +126,92 @@ public class KeystrokeBufferTests
         buffer.Text.Should().BeEmpty();
         buffer.Length.Should().Be(0);
     }
+
+    [Fact]
+    public void Append_withinTheTypingTimeout_keepsWhatWasTypedBeforeThePause()
+    {
+        var clock = new TestClock();
+        var buffer = new KeystrokeBuffer(() => clock.Now);
+
+        Type(buffer, ";si");
+        clock.Advance(TimeSpan.FromMilliseconds(4900));
+        buffer.Append('g');
+
+        buffer.Text.Should().Be(";sig", "4.9 s is still a pause a person typing makes");
+    }
+
+    [Fact]
+    public void Append_afterTheTypingTimeout_startsAFreshBuffer()
+    {
+        var clock = new TestClock();
+        var buffer = new KeystrokeBuffer(() => clock.Now);
+
+        Type(buffer, ";si");
+        clock.Advance(TimeSpan.FromMilliseconds(5100));
+        buffer.Append('g');
+
+        // The shortcut was not typed as a shortcut, so nothing expands.
+        buffer.Text.Should().Be("g");
+    }
+
+    [Fact]
+    public void TheTypingTimeoutIsMeasuredBetweenConsecutiveCharacters()
+    {
+        var clock = new TestClock();
+        var buffer = new KeystrokeBuffer(() => clock.Now);
+
+        Type(buffer, ";sig");
+        clock.Advance(TimeSpan.FromSeconds(4));
+        buffer.Append('!');
+        clock.Advance(TimeSpan.FromSeconds(4));
+        buffer.Append('?');
+
+        buffer.Text.Should().Be(";sig!?", "each character restarts the five seconds");
+    }
+
+    [Fact]
+    public void Append_afterAClearedBuffer_isUnaffectedByTheOldPause()
+    {
+        var clock = new TestClock();
+        var buffer = new KeystrokeBuffer(() => clock.Now);
+
+        Type(buffer, ";sig");
+        clock.Advance(TimeSpan.FromMinutes(1));
+        buffer.Clear();
+        buffer.Append('g');
+
+        buffer.Text.Should().Be("g");
+    }
+
+    [Fact]
+    public void Backspace_afterTheTypingTimeout_removesNothingFromAFreshBuffer()
+    {
+        var clock = new TestClock();
+        var buffer = new KeystrokeBuffer(() => clock.Now);
+
+        Type(buffer, "abc");
+        clock.Advance(TimeSpan.FromSeconds(6));
+        buffer.Append('d');
+        buffer.Backspace();
+
+        buffer.Text.Should().BeEmpty("the pause already started the buffer over at 'd'");
+    }
+
+    private static void Type(KeystrokeBuffer buffer, string text)
+    {
+        foreach (var character in text)
+        {
+            buffer.Append(character);
+        }
+    }
+
+    /// <summary>A clock the tests can move forward by hand.</summary>
+    private sealed class TestClock
+    {
+        private DateTimeOffset _now = new(2026, 10, 1, 12, 0, 0, TimeSpan.Zero);
+
+        public DateTimeOffset Now => _now;
+
+        public void Advance(TimeSpan by) => _now += by;
+    }
 }

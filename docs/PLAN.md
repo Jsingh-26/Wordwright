@@ -37,7 +37,7 @@ Repository: https://github.com/Jsingh-26/Wordwright (local folder: `C:\Users\get
 - [x] **P2.5** Platform: `ClipboardService` (save/restore, exclude-from-history format) and `InputSender` (Backspaces, Ctrl+V, Left arrows).
 - [x] **P2.6** App: wire hook → matcher → expander → backspaces → paste. Seed three example snippets on first run: `;date`, `;thanks`, `;sig`.
   *Human check:* expansion works in Notepad, Word, Outlook, Chrome (Gmail), Slack or Teams, VS Code, and the Windows search box; clipboard is restored afterwards; nothing appears in Win+V history; a 10,000-character snippet inserts in under 1 s; typing speed does not lag.
-- [ ] **P2.7** Typing-delay guard (decision D3): `KeystrokeBuffer` clears itself when more than 5 s pass between two keystrokes, using an injected clock so Core stays testable. Tests: a 4.9 s gap still expands, a 5.1 s gap does not, and the character typed after the gap starts a fresh buffer. No settings entry in v1; no copy needed.
+- [x] **P2.7** Typing-delay guard (decision D3): `KeystrokeBuffer` clears itself when more than 5 s pass between two keystrokes, using an injected clock so Core stays testable. Tests: a 4.9 s gap still expands, a 5.1 s gap does not, and the character typed after the gap starts a fresh buffer. No settings entry in v1; no copy needed.
   *Human check:* type `;si`, wait six seconds, type `g` → nothing expands; type `;sig` normally → expands.
 
 ## Decisions needed (from the 2026-10-01 design study in DESIGN.md)
