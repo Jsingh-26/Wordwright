@@ -117,18 +117,16 @@ def start_server(args: argparse.Namespace) -> subprocess.Popen:
 
 
 def ask(endpoint: str, model: dict, case: dict, timeout: int) -> str:
+    # The thinking hint already rides along in the user message, the way the app
+    # appends it; no chat-template kwarg is involved.
     body = {
-        "messages": common.build_messages(case),
+        "messages": common.build_messages(case, model),
         "temperature": common.TEMPERATURE,
         "top_p": common.TOP_P,
         "repeat_penalty": common.REPEAT_PENALTY,
         "max_tokens": common.max_new_tokens(case["input"]),
         "stream": False,
     }
-
-    # The app turns "thinking" off for models that have it (catalog promptHints).
-    if common.disable_thinking(model):
-        body["chat_template_kwargs"] = {"enable_thinking": False}
 
     response = requests.post(f"{endpoint}/v1/chat/completions", json=body, timeout=timeout)
     response.raise_for_status()
@@ -164,7 +162,7 @@ def main() -> int:
             record = {
                 "model": args.model,
                 "case": case,
-                "messages": common.build_messages(case),
+                "messages": common.build_messages(case, model),
                 "raw_output": output,
                 "cleaned_output": cleaned.text,
                 "rejection": cleaned.rejection.value,

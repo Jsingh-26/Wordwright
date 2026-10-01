@@ -92,9 +92,20 @@ def instruction_for(case: dict) -> str:
     return BUILT_IN_INSTRUCTIONS[action]
 
 
-def build_messages(case: dict) -> list[dict]:
-    """The exact two messages the app builds (PromptBuilder.Build)."""
+def build_messages(case: dict, model: dict | None = None) -> list[dict]:
+    """The exact two messages the app builds.
+
+    ``PromptBuilder.Build`` makes the two messages; ``LocalModel.GenerateAsync``
+    then appends the catalog's thinking hint to the *user* message as plain text
+    (``catalog.PromptHints.DisableThinking``), so the harness does the same —
+    sending it as a chat-template kwarg instead would measure a different prompt.
+    """
     user = f"Instruction: {instruction_for(case)}\n\nText:\n{case['input']}"
+
+    if model is not None:
+        hint = thinking_hint(model)
+        if hint:
+            user += "\n" + hint
 
     return [
         {"role": "system", "content": SYSTEM_MESSAGE},
@@ -118,14 +129,19 @@ def max_new_tokens(input_text: str) -> int:
     return min((2 * estimate_tokens(input_text)) + 64, MAX_NEW_TOKENS_CAP)
 
 
-def disable_thinking(model: dict) -> bool:
-    """Whether the catalog asks for "thinking" to be turned off.
+def thinking_hint(model: dict) -> str:
+    """The text the app appends to the user message to stop a model thinking.
 
-    The catalog still carries TODO placeholders for the candidates, so only a
-    real boolean/instruction counts.
+    ``PromptHints.DisableThinking`` is a **string** (the C# record declares it as
+    ``string``), not a flag. Entries that still carry a TODO placeholder have no
+    usable hint yet, so they are treated as "no hint" rather than sent verbatim.
     """
-    hint = (model.get("promptHints") or {}).get("disableThinking")
-    return isinstance(hint, bool) and hint
+    hint = (model.get("promptHints") or {}).get("disableThinking") or ""
+
+    if not isinstance(hint, str) or hint.strip().upper().startswith("TODO"):
+        return ""
+
+    return hint.strip()
 
 
 def raw_dir(model_id: str) -> Path:

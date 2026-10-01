@@ -1,8 +1,34 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "2026-10-01",
-  "notes": "DRAFT. All entries are candidates. Fill url, sizeBytes and sha256 from the real files and replace provisional speeds with measured ones before approving (see docs/MODELS.md and docs/EVAL.md). Verify every repo and licence on Hugging Face first.",
+  "catalogVersion": "2026-10-02",
+  "notes": "DRAFT. All entries are candidates. Fill url, sizeBytes and sha256 from the real files and replace provisional speeds with measured ones before approving (see docs/MODELS.md and docs/EVAL.md). Verify every repo and licence on Hugging Face first. qwen3-0.6b-q8_0 is verified: ungated, Apache-2.0, with the size and SHA-256 taken from the repository's own file metadata and a range request, not typed in. Its ramRequiredGB and speed range are still estimates.",
   "models": [
+    {
+      "id": "qwen3-0.6b-q8_0",
+      "displayName": "Qwen3 0.6B",
+      "publisher": "Alibaba Qwen",
+      "parameters": "0.6B",
+      "quantization": "Q8_0",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/blob/main/LICENSE",
+      "source": {
+        "repo": "Qwen/Qwen3-0.6B-GGUF",
+        "file": "Qwen3-0.6B-Q8_0.gguf",
+        "url": "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q8_0.gguf"
+      },
+      "sizeBytes": 639446688,
+      "sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+      "ramRequiredGB": 1.5,
+      "tiers": ["minimal"],
+      "strengths": ["Spelling and simple grammar", "Very fast", "Loads on very little memory"],
+      "weaknesses": ["Tone changes", "Longer text", "Languages other than English"],
+      "promptHints": { "disableThinking": "/no_think" },
+      "speed": {
+        "minimal": { "promptTps": [60, 150], "genTps": [15, 35], "loadSeconds": 7, "provisional": true }
+      },
+      "evalScores": null,
+      "status": "candidate"
+    },
     {
       "id": "qwen3.5-0.8b-q4km",
       "displayName": "Qwen3.5 0.8B",
