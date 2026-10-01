@@ -131,6 +131,11 @@
                                    Foreground="{DynamicResource CautionBrush}"
                                    Text="{Binding HotkeyMessage}"
                                    Visibility="{Binding HasHotkeyMessage, Converter={StaticResource BoolToVisibility}}" />
+                        <TextBlock Margin="2,4,0,0"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource CautionBrush}"
+                                   Text="{Binding HotkeyInUseMessage}"
+                                   Visibility="{Binding HasHotkeyInUseMessage, Converter={StaticResource BoolToVisibility}}" />
                         <TextBlock Style="{StaticResource SecondaryText}"
                                    Margin="2,4,0,0"
                                    Text="{res:Str Actions.Field.HotkeyHelp}" />

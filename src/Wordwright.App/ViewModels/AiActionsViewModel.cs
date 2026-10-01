@@ -100,6 +100,16 @@ internal sealed partial class AiActionsViewModel : ObservableObject
 
     public bool HasTryItHint => TryItHint.Length > 0;
 
+    /// <summary>A note when this action's hotkey could not be registered because
+    /// another app owns it (docs/UX_COPY.md → Actions.Hotkey.InUse), or null.</summary>
+    public string? HotkeyInUseMessage =>
+        SelectedAction is { Action.Hotkey: { Length: > 0 } hotkey }
+        && !_app.IsActionHotkeyRegistered(SelectedAction.Id)
+            ? Strings.Get("Actions.Hotkey.InUse", ("Hotkey", hotkey))
+            : null;
+
+    public bool HasHotkeyInUseMessage => HotkeyInUseMessage is not null;
+
     /// <summary>Starts an action and puts the editor on it.</summary>
     public ActionListItem AddNew()
     {
@@ -181,6 +191,8 @@ internal sealed partial class AiActionsViewModel : ObservableObject
         OnPropertyChanged(nameof(HasSelection));
         OnPropertyChanged(nameof(CanReset));
         OnPropertyChanged(nameof(CanTryIt));
+        OnPropertyChanged(nameof(HotkeyInUseMessage));
+        OnPropertyChanged(nameof(HasHotkeyInUseMessage));
     }
 
     partial void OnNameChanged(string value) => OnFieldChanged();
@@ -252,6 +264,8 @@ internal sealed partial class AiActionsViewModel : ObservableObject
         OnPropertyChanged(nameof(CanTryIt));
         OnPropertyChanged(nameof(TryItHint));
         OnPropertyChanged(nameof(HasTryItHint));
+        OnPropertyChanged(nameof(HotkeyInUseMessage));
+        OnPropertyChanged(nameof(HasHotkeyInUseMessage));
     }
 
     /// <summary>Runs the selected action over the "Try it" text, in place.</summary>

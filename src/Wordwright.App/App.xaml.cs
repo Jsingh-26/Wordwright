@@ -263,6 +263,15 @@ public partial class App : Application
     /// <summary>Re-registers the AI hotkeys after settings or actions changed.</summary>
     internal void ApplyHotkeys() => _ai?.Apply();
 
+    /// <summary>Whether an action's own hotkey could be registered. False means
+    /// another app owns it (docs/ARCHITECTURE.md → Hotkeys).</summary>
+    internal bool IsActionHotkeyRegistered(string actionId) =>
+        _ai?.Hotkeys.IsRegistered(AiCoordinator.ActionId(actionId)) ?? false;
+
+    /// <summary>Whether the palette hotkey could be registered.</summary>
+    internal bool IsPaletteHotkeyRegistered =>
+        _ai?.Hotkeys.IsRegistered(AiCoordinator.PaletteHotkeyId) ?? false;
+
     /// <summary>The user's data folder, for "Open data folder" and the stores.</summary>
     internal string UserDataFolder => _settingsStore.DirectoryPath;
 
