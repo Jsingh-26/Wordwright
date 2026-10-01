@@ -12,6 +12,8 @@ The [Windows installation and AI setup report](WINDOWS_TEST_2026-10-01.md) recor
 
 See [the v0.1.3 desktop validation report](WINDOWS_VALIDATION_2026-10-02.md) and [GitHub issue #2](https://github.com/Jsingh-26/Wordwright/issues/2). The release is installed and its version verified. Hardware readings were compared with Windows; consent, invalid-GGUF rejection and the occupied-action-hotkey warning were observed. Release and Debug builds pass. A full 258-test run passes, but other runs expose an intermittent disposed-HttpListener test-fixture failure. Real-model import/persistence, physical hotkeys and live rewriting remain unverified; only about 0.8–0.9 GB RAM was free. **P4/P5/P6 gate confirmations remain outstanding; P7 is not cleared.** The earlier no-P6-release statements below describe the old baseline and are superseded by the v0.1.3 release record and this report.
 
+The intermittent fixture failure has since been fixed: `HttpListener` disposes itself when `Start()` throws, so `TestHttpServer`'s retry was calling `Prefixes.Clear()` on a disposed listener. It now builds a fresh listener per attempt, `TestHttpServerTests` pins the collision path down (the test reproduces the original `ObjectDisposedException` against the old code), and five consecutive full runs pass **259/259**. No production downloader behaviour changed.
+
 ### Gates before starting P7
 
 - [ ] **P4 human check confirmed by maintainer:** compare the debug Hardware page with this laptop's memory, processor, graphics and disk readings. The release dialogue currently hides those details when there is no approved model, so its no-offer message is not a hardware validation.

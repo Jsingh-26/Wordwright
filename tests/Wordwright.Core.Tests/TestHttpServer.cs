@@ -10,32 +10,77 @@ namespace Wordwright.Core.Tests;
 /// </summary>
 internal sealed class TestHttpServer : IDisposable
 {
-    private readonly HttpListener _listener = new();
+    private const int Attempts = 10;
+
     private readonly CancellationTokenSource _stopping = new();
+    private readonly HttpListener _listener;
 
     public TestHttpServer()
+        : this([])
     {
-        // Port 0 is not allowed by HttpListener, so pick one at random and retry
-        // the few times the port is taken.
-        for (var attempt = 0; attempt < 10; attempt++)
+    }
+
+    /// <summary>
+    /// <paramref name="portsToTryFirst"/> exist so a test can force a port
+    /// collision instead of waiting for a random one; the rest of the attempts
+    /// are random, because port 0 is not allowed by <see cref="HttpListener"/>.
+    /// </summary>
+    internal TestHttpServer(IReadOnlyList<int> portsToTryFirst)
+    {
+        _listener = Listen(portsToTryFirst);
+        _ = Task.Run(ServeAsync);
+    }
+
+    /// <summary>
+    /// Starts a listener on the first free port. A <b>new</b> listener is built
+    /// for every attempt: when <see cref="HttpListener.Start"/> throws it
+    /// disposes the listener, so the object from a failed attempt can never be
+    /// reused — touching it again throws <see cref="ObjectDisposedException"/>,
+    /// which is what made downloader runs fail intermittently.
+    /// </summary>
+    private HttpListener Listen(IReadOnlyList<int> portsToTryFirst)
+    {
+        var ports = portsToTryFirst
+            .Concat(Enumerable.Range(0, Attempts).Select(_ => Random.Shared.Next(20000, 60000)))
+            .Take(Attempts);
+
+        Exception? lastError = null;
+        var tried = 0;
+
+        foreach (var port in ports)
         {
-            var port = Random.Shared.Next(20000, 60000);
-            Url = $"http://localhost:{port}/model.gguf";
-            _listener.Prefixes.Clear();
-            _listener.Prefixes.Add($"http://localhost:{port}/");
+            tried++;
+            var listener = new HttpListener();
+            listener.Prefixes.Add($"http://localhost:{port}/");
 
             try
             {
-                _listener.Start();
-                break;
+                listener.Start();
+                Url = $"http://localhost:{port}/model.gguf";
+                return listener;
             }
-            catch (HttpListenerException) when (attempt < 9)
+            catch (Exception error)
             {
-                // Taken; try another port.
+                lastError = error;
+                Close(listener);
             }
         }
 
-        _ = Task.Run(ServeAsync);
+        throw new InvalidOperationException(
+            $"could not start the test HTTP server after {tried} attempt(s).", lastError);
+    }
+
+    /// <summary>Closes a listener that may already have disposed itself.</summary>
+    private static void Close(HttpListener listener)
+    {
+        try
+        {
+            listener.Close();
+        }
+        catch (ObjectDisposedException)
+        {
+            // A failed Start() already disposed it; nothing left to release.
+        }
     }
 
     public string Url { get; private set; } = "";
