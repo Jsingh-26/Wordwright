@@ -56,15 +56,17 @@ foreach ($n in @("Snippets","AI actions","Offline AI","Settings","About")) {
   }
   Start-Sleep -Milliseconds 700
   Snap ($n -replace ' ','-')
-}
 
-$all = $root.FindAll([System.Windows.Automation.TreeScope]::Descendants, [System.Windows.Automation.Condition]::TrueCondition)
-$unnamed = @(); $total = 0
-foreach ($e in $all) {
-  $c = $e.Current
-  if ($c.ControlType.ProgrammaticName -match 'Button|Edit|ListItem|CheckBox|ComboBox|Hyperlink') {
-    $total++; if (-not $c.Name) { $unnamed += $c.ControlType.ProgrammaticName + " (" + $c.AutomationId + ")" }
+  # Count interactive controls on this page that a screen reader would read as
+  # "button" (docs/PLAN.md P3.4b: Settings and About must report zero).
+  $all = $root.FindAll([System.Windows.Automation.TreeScope]::Descendants, [System.Windows.Automation.Condition]::TrueCondition)
+  $unnamed = @(); $total = 0
+  foreach ($e in $all) {
+    $c = $e.Current
+    if ($c.ControlType.ProgrammaticName -match 'Button|Edit|ListItem|CheckBox|ComboBox|Hyperlink') {
+      $total++; if (-not $c.Name) { $unnamed += $c.ControlType.ProgrammaticName + " (" + $c.AutomationId + ")" }
+    }
   }
+  Write-Output "$n`: $total interactive controls; without an automation name: $($unnamed.Count)"
+  $unnamed | ForEach-Object { Write-Output "  unnamed: $_" }
 }
-Write-Output "interactive controls on the last page: $total; without an automation name: $($unnamed.Count)"
-$unnamed | ForEach-Object { Write-Output "  unnamed: $_" }

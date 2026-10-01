@@ -187,9 +187,12 @@ Placeholders use `{Name}`.
 | Ai.Import.NotGguf | That file isn't a GGUF model. Choose a file ending in .gguf. |
 
 ## Settings
+Group headings sit above their rows (docs/DESIGN.md §8).
 | ID | Text |
 |---|---|
 | Settings.Title | Settings |
+| Settings.Group.Snippets | Snippets |
+| Settings.Group.Wordwright | Wordwright |
 | Settings.PaletteHotkey | Hotkey for all AI actions |
 | Settings.ActionHotkeysHelp | Give single actions their own hotkeys on the AI actions page. |
 | Settings.Prefix | Snippet prefix |
@@ -210,9 +213,17 @@ Placeholders use `{Name}`.
 ## About
 | ID | Text |
 |---|---|
+| About.Version | Version {Version} |
 | About.Body | Wordwright is free and open source (MIT). Snippets and AI rewriting run entirely on this PC. |
 | About.Privacy | Wordwright has no telemetry. It uses the internet only to download a model you chose, or to check for updates if you turned that on. |
 | About.Source | View source on GitHub |
+| About.ThirdParty | Third-party licences |
+| About.Licence.Zodiak | Zodiak — ITF Free Font Licence |
+| About.Licence.Phosphor | Phosphor — MIT |
+| About.Licence.WpfUi | WPF-UI — MIT |
+| About.Licence.NotifyIcon | H.NotifyIcon — MIT |
+| About.Licence.LlamaSharp | LLamaSharp — MIT |
+| About.Licence.Velopack | Velopack — MIT |
 
 ## Shared
 | ID | Text |
@@ -226,3 +237,5 @@ Placeholders use `{Name}`.
 | A11y.Maximize | Maximise |
 | A11y.Close | Close |
 | A11y.NavToggle | Show or hide the menu |
+| A11y.PageUp | Page up |
+| A11y.PageDown | Page down |

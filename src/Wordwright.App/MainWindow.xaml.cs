@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Wpf.Ui.Controls;
 using Wordwright.App.Pages;
 using Wordwright.Core.Settings;
@@ -32,6 +33,42 @@ public partial class MainWindow : FluentWindow
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         RootNavigation.Navigate(_startPage);
+
+        // Loaded runs before the first layout pass and the templates named below
+        // only exist after that, so wait for the dispatcher to catch up.
+        _ = Dispatcher.BeginInvoke(
+            () =>
+            {
+                NameChromeButtons();
+                Accessibility.NameScrollButtons(RootNavigation);
+            },
+            DispatcherPriority.Loaded);
+    }
+
+    /// <summary>
+    /// Names the window buttons WPF-UI builds in its own templates — the three
+    /// title-bar buttons and the navigation toggle — which a screen reader would
+    /// otherwise read as "button" (docs/UX_COPY.md → Accessibility).
+    /// </summary>
+    private void NameChromeButtons()
+    {
+        Accessibility.Name(RootNavigation.Part("NavigationToggleButton"), "A11y.NavToggle");
+
+        foreach (var button in WindowTitleBar.Descendants().OfType<TitleBarButton>())
+        {
+            var stringId = button.ButtonType switch
+            {
+                TitleBarButtonType.Minimize => "A11y.Minimize",
+                TitleBarButtonType.Close => "A11y.Close",
+                TitleBarButtonType.Maximize or TitleBarButtonType.Restore => "A11y.Maximize",
+                _ => null,
+            };
+
+            if (stringId is not null)
+            {
+                Accessibility.Name(button, stringId);
+            }
+        }
     }
 
     /// <summary>Open on a particular page the next time the window appears.</summary>

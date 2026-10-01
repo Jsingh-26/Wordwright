@@ -33,7 +33,10 @@
         <!-- The title bar gets its own row (the arrangement WPF-UI's own project
              template uses); nesting it in NavigationView.ContentOverlay pushes the
              window buttons past the window's right edge. -->
-        <ui:TitleBar Grid.Row="0"
+        <!-- Named so the window can find its template buttons and give them
+             automation names (docs/UX_COPY.md → Accessibility). -->
+        <ui:TitleBar x:Name="WindowTitleBar"
+                     Grid.Row="0"
                      Title="Wordwright"
                      CloseWindowByDoubleClickOnIcon="True" />
 

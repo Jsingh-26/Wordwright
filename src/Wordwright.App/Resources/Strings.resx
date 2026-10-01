@@ -41,7 +41,15 @@
   <!-- About -->
   <data name="About.Body" xml:space="preserve"><value>Wordwright is free and open source (MIT). Snippets and AI rewriting run entirely on this PC.</value></data>
   <data name="About.Privacy" xml:space="preserve"><value>Wordwright has no telemetry. It uses the internet only to download a model you chose, or to check for updates if you turned that on.</value></data>
+  <data name="About.Version" xml:space="preserve"><value>Version {Version}</value></data>
   <data name="About.Source" xml:space="preserve"><value>View source on GitHub</value></data>
+  <data name="About.ThirdParty" xml:space="preserve"><value>Third-party licences</value></data>
+  <data name="About.Licence.Zodiak" xml:space="preserve"><value>Zodiak — ITF Free Font Licence</value></data>
+  <data name="About.Licence.Phosphor" xml:space="preserve"><value>Phosphor — MIT</value></data>
+  <data name="About.Licence.WpfUi" xml:space="preserve"><value>WPF-UI — MIT</value></data>
+  <data name="About.Licence.NotifyIcon" xml:space="preserve"><value>H.NotifyIcon — MIT</value></data>
+  <data name="About.Licence.LlamaSharp" xml:space="preserve"><value>LLamaSharp — MIT</value></data>
+  <data name="About.Licence.Velopack" xml:space="preserve"><value>Velopack — MIT</value></data>
   <!-- Snippets page -->
   <data name="Snippets.New" xml:space="preserve"><value>New snippet</value></data>
   <data name="Snippets.Search" xml:space="preserve"><value>Search snippets</value></data>
@@ -63,6 +71,8 @@
   <data name="Snippets.Warn.VeryLong" xml:space="preserve"><value>This snippet is very long. It will still work, but may take a moment to insert.</value></data>
 
   <!-- Settings page -->
+  <data name="Settings.Group.Snippets" xml:space="preserve"><value>Snippets</value></data>
+  <data name="Settings.Group.Wordwright" xml:space="preserve"><value>Wordwright</value></data>
   <data name="Settings.Prefix" xml:space="preserve"><value>Snippet prefix</value></data>
   <data name="Settings.ExcludedApps" xml:space="preserve"><value>Turn Wordwright off in these apps</value></data>
   <data name="Settings.ExcludedAppsHelp" xml:space="preserve"><value>Wordwright can't always tell when you're typing a password. List apps where it should stay quiet, such as password managers.</value></data>
@@ -78,4 +88,12 @@
 
   <!-- Shared -->
   <data name="Dialog.Cancel" xml:space="preserve"><value>Cancel</value></data>
+
+  <!-- Accessibility: names for controls that have no visible label -->
+  <data name="A11y.Minimize" xml:space="preserve"><value>Minimise</value></data>
+  <data name="A11y.Maximize" xml:space="preserve"><value>Maximise</value></data>
+  <data name="A11y.Close" xml:space="preserve"><value>Close</value></data>
+  <data name="A11y.NavToggle" xml:space="preserve"><value>Show or hide the menu</value></data>
+  <data name="A11y.PageUp" xml:space="preserve"><value>Page up</value></data>
+  <data name="A11y.PageDown" xml:space="preserve"><value>Page down</value></data>
 </root>
