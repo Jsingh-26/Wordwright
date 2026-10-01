@@ -8,7 +8,7 @@ Every catalog model is chosen with measurements, not guesses. The harness lives 
 - 48 cases: 8 per built-in action (`fix`, `clear`, `formal`, `friendly`, `shorten`) plus 8 `custom` instructions.
 - Mix of lengths (one line, short paragraph, ~150-word paragraph), styles (work email, chat message, notes with bullets), and traps: names, numbers, dates, links, line breaks, and a few Hinglish sentences.
 - Each line: `{"id", "action", "instruction", "input", "must_keep": [strings that must survive], "notes"}`.
-- `eval/cases/sample.jsonl` holds the first 12; complete the set in task P9.1.
+- `eval/cases/cases.jsonl` holds the complete set (`sample.jsonl`, the first 12, was folded into it in task P9.1).
 
 ### Running candidates (`eval/run_candidates.py`)
 - Runs each candidate **with the exact GGUF file and prompt Wordwright uses** (`docs/ARCHITECTURE.md` → Prompt, Generation parameters), through a local `llama-server` (llama.cpp) on its OpenAI-compatible endpoint. This keeps results faithful to what users get.
