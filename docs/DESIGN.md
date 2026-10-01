@@ -15,6 +15,14 @@ Follows the maintainer's `craft-studio` playbook (`playbooks/desktop-app.md`): s
 - **Found in the build:** no minimum window size and no remembered size; no keyboard accelerators; Settings is a flat list with Remove buttons far from their rows; About uses the system-blue hyperlink (rule 7 of AGENTS.md) and shows no version; 4 of 5 interactive controls on About have no automation name (confirmed by automation id: WPF-UI's three title-bar buttons and the navigation toggle). DESIGN.md had no sketch for Settings or About; §8 and §9 below add them.
 - **Open questions:** Zodiak embedding licence (confirm before release). The welcome playground is also the empty state of the Snippets list (decided with D1).
 
+### Text Blaze, looked at closely (2026-10-01)
+Design: a web dashboard in red/white with a panda mascot and feature GIFs; folders tree, snippet list, editor, and a searchable command menu on the right. Generic SaaS; nothing to borrow in look, and the red is the opposite of Wordwright's calm ink. Mechanisms worth taking, all four approved on 2026-10-01 (PLAN.md P2.7, P3.4c, P6.6, P6.8):
+- **Typing-delay guard (D3).** A shortcut typed with a long pause in the middle does not expand ("type half, make a cup of tea, type the rest"). Prevents accidental expansions; Wordwright's buffer has no time rule today.
+- **Live preview of variables in the editor (D4).** Text Blaze has a Preview / Try it out button that renders dynamic commands. Wordwright can show the expanded text (`{date}`, `{time}` resolved, `{cursor}` marked) in a quiet line under the Text box, live, with no button.
+- **Copy as the fallback when paste can't happen (D5).** AI Blaze copies the result to the clipboard when no text box is active. Wordwright's elevated-app case could copy the rewrite and say so, instead of only reporting the failure.
+- **Snippet picker in the palette (D6, v1.1 candidate).** Text Blaze's right-click list of all snippets, and every Windows expander's picker hotkey: the palette lists snippets too (type to filter, Enter inserts). Pulled into v1; sketch in §6.
+- Noted, no change: case-insensitive shortcuts by default (Wordwright is case-sensitive; revisit if users hit it); trigger-mode per folder (Wordwright's word-boundary rule already matches the default); forms and formulas (out of scope for v1); descriptive dotted shortcuts like `/english.grade` (the help text under Shortcut already explains the rule).
+
 ## Pass 1: direction
 
 - **Subject.** A *wright* is a maker who shapes raw material into something that works. Wordwright takes rough text and shapes it into clean text, in any app, on your own PC.
@@ -135,9 +143,13 @@ Each estimate: a Steel band for the range with a Forge-ink stroke along it, draw
 │ More friendly              R             │
 │ Shorten                    S             │
 │ Custom instruction…        I             │
+│─────────────────────────────────────────│
+│ Snippets                                 │
+│ Email signature            ;sig          │
+│ Thanks                     ;thanks       │
 └─────────────────────────────────────────┘
 ```
-Right column shows the letter and, if set, the action's own hotkey, so users learn the direct shortcuts.
+Right column shows the letter and, if set, the action's own hotkey, so users learn the direct shortcuts. The Snippets group (D6) lists enabled snippets with their full shortcut in the right column; Enter inserts at the caret. With nothing selected and AI off, the palette opens on this group.
 
 ### 7. Progress pill (floating, 32 px tall, never takes focus)
 Ember dot + "Rewriting… 3 s   Esc to cancel" → check mark + "Done. Ctrl+Z undoes it." (3 s). Short errors use the same pill. Under the text, a 1 px Steel track with an accent fill that grows over the expected time for this input (the ruler tick, decision D2); past the estimate it continues in Ember. Skipped when Windows animations are off.
