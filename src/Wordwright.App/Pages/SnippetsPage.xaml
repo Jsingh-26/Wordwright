@@ -79,6 +79,17 @@
                            Margin="2,0,2,0"
                            Text="{Binding EmptyMessage}"
                            Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}" />
+                <!-- The empty state invites a try right here, through the same
+                     snippet engine that works in other apps (docs/PLAN.md → P3.4c). -->
+                <StackPanel DockPanel.Dock="Top"
+                            Margin="0,12,0,0"
+                            Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}">
+                    <TextBlock Style="{StaticResource SecondaryText}"
+                               Text="{Binding EmptyTryHere}" />
+                    <ui:TextBox x:Name="TryHereBox"
+                                Margin="0,4,0,0"
+                                AutomationProperties.Name="{Binding EmptyTryHere}" />
+                </StackPanel>
                 <ListBox ItemsSource="{Binding Snippets}"
                          SelectedItem="{Binding SelectedSnippet}"
                          Background="Transparent"
@@ -151,6 +162,14 @@
                                 VerticalContentAlignment="Top"
                                 VerticalScrollBarVisibility="Auto"
                                 Text="{Binding Body, UpdateSourceTrigger=PropertyChanged}" />
+                    <!-- Live preview of what the body will insert, with today's
+                         date and time resolved (docs/PLAN.md → P3.4c). -->
+                    <TextBlock Style="{StaticResource SecondaryText}"
+                               Margin="2,8,0,0"
+                               Visibility="{Binding HasPreview, Converter={StaticResource BoolToVisibility}}">
+                        <Run Text="{res:Str Snippets.Preview}" />
+                        <Run Text="{Binding Preview}" />
+                    </TextBlock>
                     <!-- Insert a variable where the caret is (docs/DESIGN.md §2). -->
                     <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                         <TextBlock Style="{StaticResource SecondaryText}"

@@ -40,6 +40,10 @@ internal sealed class SnippetEngine : IDisposable
         _hook.BufferCleared += OnBufferCleared;
     }
 
+    /// <summary>A snippet was just expanded. Raised on the UI thread, which is
+    /// where the welcome's playground reacts to its first one.</summary>
+    public event EventHandler? Expanded;
+
     /// <summary>Takes the snippets the matcher should look for; call it again
     /// whenever the user edits them.</summary>
     public void Apply(SnippetDocument document)
@@ -92,6 +96,8 @@ internal sealed class SnippetEngine : IDisposable
         }
 
         Debug.WriteLine($"snippet {match.Snippet.Trigger} expanded ({expanded.Text.Length} characters)");
+
+        Expanded?.Invoke(this, EventArgs.Empty);
     }
 
     private void OnBackspacePressed(object? sender, EventArgs e) => _buffer.Backspace();
