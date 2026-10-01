@@ -61,3 +61,17 @@ The installed v0.1.3 remains available for desktop checks. Its embedded catalog 
 Model-download consent and physical Ctrl+Alt+Space confirmation were requested from the maintainer. No response was recorded during this recheck; no download, real-model import/persistence, live rewrite, undo/cancellation/clipboard/elevated fallback, or inference-log privacy pass is claimed. Hardware evidence is now complete for the requested CPU flags/core-count comparison, while maintainer phase confirmation remains outstanding. **P4/P5/P6 gate confirmations stay unticked and P7 is not cleared.**
 
 The [remaining checklist in issue #3](https://github.com/Jsingh-26/Wordwright/issues/3) now marks the installed release and independent hardware check as evidenced, corrects the RAM prerequisite and leaves unperformed checks unchecked.
+
+
+## Consented real-model import — 2026-10-02
+
+The maintainer explicitly approved the 639 MB Qwen test-model download in this chat. Downloaded Qwen's official [Qwen3-0.6B-Q8_0.gguf](https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q8_0.gguf) outside the app for manual-import validation. Exact size **639446688 bytes**, SHA-256 **9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031**, and GGUF magic all matched the current catalog before import. This is a candidate, not an approved or calibrated model.
+
+- Installed v0.1.3 consent again displayed no model ready to offer, Download disabled and Import available. The Offline AI navigation page is still a title-only placeholder; consent can be reached from the tray or welcome screen.
+- **PASS: genuine manual import through the Windows file picker.** The dialog closed, the GGUF moved to Wordwright's models folder and settings recorded AI enabled with active ID Qwen3-0.6B-Q8_0.
+- **PASS: restart persistence.** After terminating and relaunching Wordwright, the installed-model record and file remained; the installed file independently rehashed to the same catalog SHA-256. The AI-off hint disappeared, and Try it became enabled after entering synthetic text. No generation was triggered.
+- v0.1.3 records this as a **custom, unverified model** because its embedded catalog predates the Qwen candidate. Its stored SHA matches the independently verified current-catalog hash. Do not relabel the release's record as catalog-verified or claim this tests the latest source's catalog recognition or /no_think hint. Calibration remains null.
+- Original snippets were preserved and restored byte-for-byte while temporarily exposing the welcome screen; original actions were not changed. The imported test model remains installed and AI enabled for the next validation session.
+- Available RAM was about 2.25 GB before download, about 2.00 GB after import and **2.01 GB** after restart (1.8719 GiB). This remains below the unchanged **2.5 GB** prerequisite. The maintainer was asked to close unused apps; no readiness response was received during these checks. **Live inference deferred for insufficient available RAM.**
+
+This completes the file acquisition/hash and installed-release import/persistence observations. Physical hotkeys, actual rewrites across the required apps, cancellation/undo/clipboard/elevated fallback and inference-log privacy remain unperformed. Installed-app download interruption/resume/tamper remains blocked by the unapproved catalog; the external transfer is not a substitute. **P4/P5/P6 confirmations stay unticked; P7 is not cleared.**
