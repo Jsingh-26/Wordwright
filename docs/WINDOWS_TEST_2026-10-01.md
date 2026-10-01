@@ -23,7 +23,11 @@ Hardware observed through the host runtime: AMD Ryzen 5 7535HS, 12 logical proce
 
 The installed process was observed under the desktop host's package-local cache. Standard profile installation/uninstallation, shortcut launch outside the host and data-location behavior were not independently verified in this session.
 
-## Why rewriting cannot be tested yet
+## Note added after the test: P6 has since landed
+
+This report captures the `62d588e` / v0.1.2 baseline. Afterward, **P6.1–P6.8 were implemented and pushed** (`edf7323`): `LocalModel`, `PromptBuilder`, `OutputCleaner`, `ActionStore`, `HotkeyService`, the action palette, the progress pill and ruler tick, the hotkey recorder and the snippet picker. The solution builds with zero warnings and the Core suite now reports **258 passing tests**. The findings below about missing inference, placeholder AI pages and 196 tests describe the tested release only; they are kept as the record of what v0.1.2 did. No release containing P6 exists yet, so a fresh install and the P6 human checks are still outstanding.
+
+## Why rewriting could not be tested in v0.1.2
 
 - The embedded catalog has five candidate entries and no approved models. Download sources, sizes and SHA-256 values are unfinished. The no-offer dialogue is expected with this catalog; it does not prove a hardware incompatibility.
 - `Wordwright.Inference` contains its project and dependencies but no `LocalModel` implementation.
@@ -37,7 +41,7 @@ No model was downloaded or imported. No inference, rewrite output, GPU backend o
 
 - P4: validate the app's hardware readings and tier on the debug page.
 - P5: real-model import and persistence, installed-app download interruption/resume, tamper rejection and consent flow. The catalog blocks the ordinary download path; passing the Core tests is separate evidence.
-- P6/P7: real GGUF loading/generation once implemented, all built-in actions in the listed Windows applications, hotkeys, clipboard restoration, cancellation, undo, unload behavior and calibration against a stopwatch.
+- P6/P7: real GGUF loading/generation once a P6 build is released, all built-in actions in the listed Windows applications, hotkeys, clipboard restoration, cancellation, undo, unload behavior and calibration against a stopwatch.
 - P10: clean-user installation/uninstallation, theme/scaling/accessibility, offline operation, network-monitor verification and no user text in logs.
 
 Follow the gate checklist and next-task handoff in [PLAN.md](PLAN.md). This report does not confirm the maintainer's phase gates, approve a model, or complete any P6/P7 task.
