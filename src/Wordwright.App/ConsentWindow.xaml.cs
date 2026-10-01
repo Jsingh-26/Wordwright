@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Globalization;
 using System.Windows;
 using Wpf.Ui.Controls;
@@ -67,7 +68,7 @@ public partial class ConsentWindow : FluentWindow
         YourPc.Text = Strings.Get(
             "Ai.Rec.YourPc",
             ("Ram", WholeGigabytes(profile.TotalRamBytes)),
-            ("Cpu", profile.CpuName.Length > 0 ? profile.CpuName : "unknown processor"),
+            ("Cpu", Cpu(profile)),
             ("GpuSummary", GpuSummary(profile)));
 
         Ruler.Bands =
@@ -178,6 +179,13 @@ public partial class ConsentWindow : FluentWindow
         range.SlowestSeconds > TimeRuler.MaximumSeconds
             ? Strings.Get("Ai.Rec.RangeOver", ("Max", TimeRuler.MaximumSeconds))
             : Strings.Get("Ai.Rec.Range", ("Min", range.FastestSeconds), ("Max", range.SlowestSeconds));
+
+    /// <summary>The processor's name without the trade marks and clock speed WMI
+    /// reports with it: "Intel(R) Core(TM) i5-1235U CPU @ 1.30GHz" reads as
+    /// "Intel Core i5-1235U", the way people write it.</summary>
+    private static string Cpu(HardwareProfile profile) =>
+        Regex.Replace(profile.CpuName, @"\s*\((R|TM|C)\)|\s+CPU.*$", "", RegexOptions.IgnoreCase).Trim()
+            is { Length: > 0 } name ? name : "unknown processor";
 
     private static string GpuSummary(HardwareProfile profile) =>
         profile.Gpus.FirstOrDefault(gpu => gpu.DedicatedMemoryBytes >= GpuMemoryFloor) is { } suitable

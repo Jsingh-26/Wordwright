@@ -15,6 +15,20 @@ Repository: https://github.com/Jsingh-26/Wordwright (local folder: `C:\Users\get
 4. At each **Human check**, test on your machine before moving on. `scripts/check-screens.ps1` captures every page of the running app and counts controls without an automation name. Paste errors back to the agent exactly as shown.
 5. Review each finished phase with a second model (`kimi-k3`): "Review the diff for phase P2 against AGENTS.md hard rules and ARCHITECTURE.md. List violations and bugs only."
 
+## Testing machines and the AI floor (decided 2026-10-01)
+
+The build machine is a 4 GB laptop with an Intel i3-1005G1 and no AI-capable GPU. **The RAM and disk fit rules in `MODELS.md` stay as written**: with Windows running there is around 0.3 GB free, so no catalog model passes "available RAM ≥ model + 1 GB" and Wordwright offers none — the consent dialogue says which kind of "no" it is. This is the documented behaviour, not a bug, and the `minimal` tier's copy ("can run only a very small model") is for machines that do have the memory free for the tiny model. **Do not relax the fit rule to make the 4 GB machine work.**
+
+Everything AI-facing is therefore tested on the maintainer's **16 GB laptop**, where a model can actually load and run:
+
+- **P4 (human check):** the tier and the hardware summary are checked there. The Hardware page is compiled into debug builds only, so an installed release cannot show the raw values — run a debug build on that machine (`dotnet run --project src/Wordwright.App`) to see them.
+- **P5.3 (human check):** downloading, verifying and importing a model.
+- **P6 and P7 (human checks):** rewriting in real apps, the palette, the pill, and the calibrated times against a stopwatch.
+
+The laptop stays useful as the **minimum-spec machine**: it proves the app installs, expands snippets and refuses AI in the way the docs describe, which the release checklist wants ("works on an 8 GB machine with the `cpu8` recommendation" is the same check one tier down).
+
+**Getting a build onto that machine:** publish a GitHub release (`scripts/pack-release.ps1` then `vpk upload github`), install it there, and report back. A release is worth publishing after any change the check depends on — the assistant should offer.
+
 ## Phase P0: Repository and solution (day 1)
 - [x] **P0.1** Create `Wordwright.sln` with `src/Wordwright.Core`, `src/Wordwright.Platform`, `src/Wordwright.Inference`, `src/Wordwright.App` (WPF), `tests/Wordwright.Core.Tests` (xUnit), project references as in ARCHITECTURE.md. Add `Directory.Build.props` (nullable enabled, warnings as errors in Core, x64) and `Directory.Packages.props` with pinned versions of the allowed dependencies.
   *Done when:* `dotnet build` and `dotnet test` pass on a clean clone; the app launches and shows an empty window.
