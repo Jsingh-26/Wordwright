@@ -4,34 +4,35 @@ Target: a public v1.0 on GitHub Releases in about 14 working days, with a snippe
 
 ## Current status and next handoff (reviewed 2026-10-01)
 
-Reviewed baseline: latest release **v0.1.2**, GitHub main commit `62d588e`. P0–P5 implementation tasks are ticked; **P6–P10 remain incomplete**. A tick records implementation, not confirmation of a phase's human checks.
+Reviewed baseline: latest release **v0.1.2**; GitHub main at `edf7323`. P0–P6 implementation tasks are ticked; **P7–P10 remain incomplete**. A tick records implementation, not confirmation of a phase's human checks.
 
-The [Windows installation and AI setup report](WINDOWS_TEST_2026-10-01.md) records a successful install and launch on the 16 GB laptop, the no-approved-model dialogue, both placeholder AI pages, and **196 passing Core tests**. It does **not** confirm live inference, model import/download in the installed app, calibration, the full build, or the P4/P5 human checks.
+The [Windows installation and AI setup report](WINDOWS_TEST_2026-10-01.md) records a successful install and launch on the 16 GB laptop, the no-approved-model dialogue, both placeholder AI pages, and **196 passing Core tests** at the pre-P6 baseline `62d588e`. Since that test, **P6.1–P6.8 (on-device rewriting: engine, prompt/cleaner, actions, hotkeys, palette, pill and snippet picker) have been implemented and pushed**; the Core suite now reports **258 passing tests** and the solution builds with zero warnings. The report is a record of the v0.1.2 release and does **not** confirm live inference, model import/download in the installed app, calibration, the full build at that time, or the P4/P5/P6 human checks. No build containing P6 has been released yet, so the P6 human checks are blocked on a new release.
 
-### Gates before starting P6
+### Gates before starting P7
 
 - [ ] **P4 human check confirmed by maintainer:** compare the debug Hardware page with this laptop's memory, processor, graphics and disk readings. The release dialogue currently hides those details when there is no approved model, so its no-offer message is not a hardware validation.
 - [ ] **P5 human check confirmed by maintainer:** import a real GGUF; confirm its installed-model record and file survive restart. Exercise download interruption/resume and tamper rejection using controlled test data through the existing downloader tests, and record separately which installed-app checks remain blocked by the unapproved catalog. Do not mark the full human check passed from unit tests alone.
-- [ ] Record the maintainer's gate confirmation here or in a linked GitHub issue/PR before moving to P6, as required by AGENTS.md. No confirmation is recorded by this test session. If the catalog still blocks the installed-app download checks, obtain an explicit maintainer decision on staged validation and record the deferred checks for re-testing after P9.4; this report does not grant that exception.
+- [ ] **P6 human checks confirmed by maintainer:** publish a release containing P6.1–P6.8, install it on the 16 GB laptop, and walk the P6 human checks in this file (palette in Notepad, snippet picker, `Ctrl+Alt+G`, elevated-window copy fallback, in-use hotkey, built-in actions in Word/Outlook/Chrome/Teams, `Ctrl+Z`, Esc, and no user text in the log).
+- [ ] Record the maintainer's gate confirmations here or in a linked GitHub issue/PR before moving to P7, as required by AGENTS.md. No confirmation is recorded by the test session. If the catalog still blocks the installed-app download checks, obtain an explicit maintainer decision on staged validation and record the deferred checks for re-testing after P9.4; the test report does not grant that exception.
 
-### Next implementation task after the gates: P6.1
+### Next implementation task after the gates: P7.1
 
-Implement only `LocalModel` and its load/generate/cancel/unload/idle lifecycle using the existing LLamaSharp CPU/Vulkan dependencies and ARCHITECTURE.md. Validate on a real GGUF with known provenance: CPU load and generation, cancellation, explicit unload and idle unload; verify the applicable Vulkan path on hardware that supports it. Record the backend, model identifier/hash and event timings without recording prompts or outputs. Run `dotnet build` and `dotnet test`; then tick and commit P6.1. An engine check does not complete the hotkeys, action UI or in-app rewrite flow; those remain P6.2–P6.8.
+Calibration run after download/import: measure a real generation on the 16 GB laptop (or the maintainer's test machine) with a known GGUF, store the result, and have the download/import "Done" screen redraw the time ruler with the measured times. Validate against a stopwatch and record event timings without recording prompts or outputs. Run `dotnet build` and `dotnet test`; then tick and commit P7.1. P7.1 and P7.2 remain unverified until the P6 human checks are confirmed, and calibration measures a model the engine can actually load.
 
 ### Verification and release readiness
 
 | Check | Current evidence | Remaining work / owning task |
 |---|---|---|
 | Install and launch | v0.1.2 installer exit 0; welcome and main window opened | Fresh-user install/uninstall and persistence checks: P3 human check, P10.2 |
-| Automated Core checks | 196 passed, 0 failed, 0 skipped on the test laptop | Full build/test and GitHub CI must pass for implementation changes |
+| Automated Core checks | 196 passed at baseline `62d588e`; **258 passed, 0 failed, 0 skipped** after the P6 push (`edf7323`) | Full build/test and GitHub CI must pass for every implementation change |
 | Hardware fit | Laptop has about 15.87 GB usable RAM; about 0.82 GB available at inspection | Validate with HardwareProbe; free enough RAM for the unchanged model + 1 GB rule: P4 / MODELS.md |
 | Model acquisition | No approved models; automatic download disabled; import entry point visible | P5 human check; real source, license, size and SHA-256: P9.3; approval only after P9.4 evaluation |
-| Inference and rewrite | No engine implementation; AI actions and Offline AI pages are placeholders | P6.1–P6.8, followed by P6 human checks in the listed Windows apps |
+| Inference and rewrite | P6.1–P6.8 implemented and pushed; builds clean with 258 Core tests | Release a build with P6, then the P6 human checks in the listed Windows apps; P7.1–P7.2 remains |
 | Calibration and activation | Not implemented; importing alone does not turn AI on | P7.1–P7.2; measured times against a stopwatch |
 | Privacy and recovery | Core tests are passing; no live rewrite evidence | Offline/network-monitor check, no user text in logs, clipboard restore, Ctrl+Z, Esc cancellation and failure recovery: P6 human checks / P10.2 |
 | Safe model replacement | Not implemented | Keep the working model until replacement verification and calibration succeed; switch-back check: P8.3 |
 
-The current catalog is a blocker for the automatic-download path on every laptop, independent of RAM. Manual import is the development route for later P6/P7 checks, **once the engine and relevant UI are implemented**; it does not make v0.1.2 capable of rewriting. Do not approve candidates or relax hardware requirements just to unblock a test. P9 retains its existing evaluation requirements and its stated option to run alongside P6; the normal phase gate still applies.
+The current catalog is a blocker for the automatic-download path on every laptop, independent of RAM. Manual import is the development route for the P6/P7 checks now that the engine and relevant UI are implemented in source; it does not make the v0.1.2 release capable of rewriting. Do not approve candidates or relax hardware requirements just to unblock a test. P9 retains its existing evaluation requirements and its stated option to run alongside P6; the normal phase gate still applies.
 
 ## How to run this plan with a coding agent
 
