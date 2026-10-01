@@ -7,8 +7,10 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
+using Wordwright.App.Ai;
 using Wordwright.App.Snippets;
 using Wordwright.App.Tray;
+using Wordwright.Core.Actions;
 using Wordwright.Core.Settings;
 using Wordwright.Core.Snippets;
 using Velopack;
@@ -50,6 +52,7 @@ public partial class App : Application
     private TrayIconController? _trayIcon;
     private SettingsStore _settingsStore = null!;
     private SnippetStore _snippetStore = null!;
+    private ActionStore _actionStore = null!;
     private ClipboardService? _clipboard;
     private KeyboardHook? _keyboardHook;
     private SnippetEngine? _snippetEngine;
@@ -59,6 +62,9 @@ public partial class App : Application
 
     /// <summary>The user's snippets, as last loaded or saved.</summary>
     internal SnippetDocument Snippets { get; private set; } = null!;
+
+    /// <summary>The user's AI actions, as last loaded or saved.</summary>
+    internal ActionDocument Actions { get; private set; } = null!;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -93,6 +99,14 @@ public partial class App : Application
         _snippetStore = new SnippetStore(userData);
         var firstRun = !File.Exists(Path.Combine(userData, "snippets.json"));
         Snippets = _snippetStore.LoadOrSeed();
+
+        _actionStore = new ActionStore(userData);
+        Actions = _actionStore.LoadOrSeed();
+
+        // Registers the palette hotkey (Ctrl+Alt+Space by default) as soon as the
+        // app is running; the model itself is not loaded until a rewrite is asked
+        // for (docs/ARCHITECTURE.md → Hotkeys, Model lifecycle).
+        _ai = new AiCoordinator(this);
 
         _mainWindow = new MainWindow { Visibility = Visibility.Hidden };
 
@@ -173,6 +187,9 @@ public partial class App : Application
         }
 
         _settingsStore.Save(settings);
+
+        // The palette hotkey may have changed; re-register.
+        ApplyHotkeys();
     }
 
     /// <summary>Starts the keystroke watching that expands snippets, unless the
@@ -211,6 +228,49 @@ public partial class App : Application
         _snippetStore.Save(document);
         _snippetEngine?.Apply(document);
     }
+
+    /// <summary>Replaces the AI actions, e.g. after the AI actions page edits
+    /// them.</summary>
+    internal void UpdateActions(ActionDocument document)
+    {
+        Actions = document;
+        _actionStore.Save(document);
+
+        // Action hotkeys are registered again whenever the set changes (P6.7);
+        // the palette list is read fresh each time it opens, so nothing else to do.
+        ApplyHotkeys();
+    }
+
+    /// <summary>Resets a built-in action to its default and saves the result.</summary>
+    internal ActionDocument ResetAction(string id)
+    {
+        Actions = _actionStore.Reset(Actions, id);
+        return Actions;
+    }
+
+    private RewriteService? _rewrite;
+
+    /// <summary>The one on-device model owner, built on first use so the app does
+    /// not touch LLamaSharp until a rewrite is asked for.</summary>
+    internal RewriteService Rewrite => _rewrite ??= new RewriteService(this);
+
+    private AiCoordinator? _ai;
+
+    /// <summary>Owns the AI hotkeys and palette, built on first use so a
+    /// snippets-only install never registers a hotkey it does not need.</summary>
+    internal AiCoordinator Ai => _ai ??= new AiCoordinator(this);
+
+    /// <summary>Re-registers the AI hotkeys after settings or actions changed.</summary>
+    internal void ApplyHotkeys() => _ai?.Apply();
+
+    /// <summary>Whether an action's own hotkey could be registered. False means
+    /// another app owns it (docs/ARCHITECTURE.md → Hotkeys).</summary>
+    internal bool IsActionHotkeyRegistered(string actionId) =>
+        _ai?.Hotkeys.IsRegistered(AiCoordinator.ActionId(actionId)) ?? false;
+
+    /// <summary>Whether the palette hotkey could be registered.</summary>
+    internal bool IsPaletteHotkeyRegistered =>
+        _ai?.Hotkeys.IsRegistered(AiCoordinator.PaletteHotkeyId) ?? false;
 
     /// <summary>The user's data folder, for "Open data folder" and the stores.</summary>
     internal string UserDataFolder => _settingsStore.DirectoryPath;
@@ -280,6 +340,8 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _ai?.Dispose();
+        _rewrite?.Dispose();
         _snippetEngine?.Dispose();
         _keyboardHook?.Dispose();
         _trayIcon?.Dispose();
