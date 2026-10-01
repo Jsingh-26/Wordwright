@@ -4,4 +4,10 @@
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- The model catalog ships inside the library, so a build can never be
+         missing one (docs/ARCHITECTURE.md → Catalog, recommendation, download). -->
+    <EmbeddedResource Include="..\..\models\models.json" LogicalName="Wordwright.Core.models.json" />
+  </ItemGroup>
+
 </Project>

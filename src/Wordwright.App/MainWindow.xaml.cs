@@ -4,6 +4,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Wpf.Ui.Controls;
 using Wordwright.App.Pages;
+using Wordwright.App.Resources;
 using Wordwright.Core.Settings;
 
 namespace Wordwright.App;
@@ -33,6 +34,16 @@ public partial class MainWindow : FluentWindow
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         RootNavigation.Navigate(_startPage);
+
+#if DEBUG
+        // The hardware page exists to work on the app, so only a debug build
+        // offers a way to reach it (docs/PLAN.md P4.1).
+        RootNavigation.MenuItems.Add(new NavigationViewItem
+        {
+            Content = Strings.Get("Debug.Title"),
+            TargetPageType = typeof(HardwarePage),
+        });
+#endif
 
         // Loaded runs before the first layout pass and the templates named below
         // only exist after that, so wait for the dispatcher to catch up.
