@@ -484,3 +484,6 @@ $RECYCLE.BIN/
 # MSIX packaging staging (docs/PLAN.md P3.6)
 packaging/stage/
 packaging/stage-bundle/
+
+# Evaluation harness outputs (docs/EVAL.md, docs/PLAN.md P9)
+eval/results/
