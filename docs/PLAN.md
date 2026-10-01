@@ -85,7 +85,7 @@ Two product changes the study recommended. Both approved by the maintainer on 20
 
 ## Phase P5: Consent, download, import (day 7)
 - [x] **P5.1** "Turn on offline AI" dialogue: recommendation screen with the time ruler (DESIGN.md §5), good at / not so good at, load note, other options, disk and RAM notes.
-- [ ] **P5.2** Core: `ModelDownloader` (Range resume to `.part`, progress, cancel, free-space check, SHA-256 verify, atomic rename, refuses empty hashes). Tests against a local test HTTP server with a small dummy file.
+- [x] **P5.2** Core: `ModelDownloader` (Range resume to `.part`, progress, cancel, free-space check, SHA-256 verify, atomic rename, refuses empty hashes). Tests against a local test HTTP server with a small dummy file.
 - [ ] **P5.3** Download, verify and failure screens in the dialogue.
 - [ ] **P5.4** Import model file (GGUF magic check, hash match against catalog, custom-unverified path).
   *Human check:* download pauses/resumes across a network drop; a tampered file is rejected and deleted; import works.
