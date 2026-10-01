@@ -11,6 +11,7 @@ namespace Wordwright.Platform.Input;
 public static class InputSender
 {
     private const ushort VK_BACK = 0x08;
+    private const ushort VK_C = 0x43;
     private const ushort VK_CONTROL = 0x11;
     private const ushort VK_LEFT = 0x25;
     private const ushort VK_V = 0x56;
@@ -26,14 +27,19 @@ public static class InputSender
 
     public static void SendLeftArrows(int count) => Tap(VK_LEFT, count);
 
+    /// <summary>Presses and releases Ctrl+C, for capturing the selection.</summary>
+    public static void Copy() => Combo(VK_C);
+
     /// <summary>Presses and releases Ctrl+V.</summary>
-    public static void Paste()
+    public static void Paste() => Combo(VK_V);
+
+    private static void Combo(ushort virtualKey)
     {
         var inputs = new[]
         {
             Key(VK_CONTROL, down: true),
-            Key(VK_V, down: true),
-            Key(VK_V, down: false),
+            Key(virtualKey, down: true),
+            Key(virtualKey, down: false),
             Key(VK_CONTROL, down: false),
         };
 

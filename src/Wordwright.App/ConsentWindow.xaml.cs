@@ -276,8 +276,19 @@ public partial class ConsentWindow : FluentWindow
 
         if (failure == DownloadFailure.None)
         {
-            // Downloaded and verified. Turning AI on and measuring this PC's
-            // speed is the calibration step, which arrives in P7.1.
+            // Downloaded and verified. Register it and turn AI on so rewriting can
+            // use it; measuring this PC's speed is the calibration step (P7.1).
+            var app = (App)Application.Current;
+            new InstalledModelStore(app.ModelsFolder).Add(new InstalledModel
+            {
+                Id = model.Id,
+                File = ModelDownloader.FileNameFor(model),
+                Sha256 = model.Sha256,
+                Verified = true,
+            });
+
+            app.UpdateSettings(app.Settings with { AiEnabled = true, ActiveModelId = model.Id });
+
             Debug.WriteLine($"consent: {model.Id} downloaded and verified");
             Close();
             return;
@@ -412,6 +423,7 @@ public partial class ConsentWindow : FluentWindow
         {
             case ImportOutcome.Imported:
                 new InstalledModelStore(app.ModelsFolder).Add(model!);
+                app.UpdateSettings(app.Settings with { AiEnabled = true, ActiveModelId = model!.Id });
                 Debug.WriteLine(
                     $"consent: imported {model!.Id} ({(catalogEntry is null ? "custom, unverified" : "verified")})");
                 Close();

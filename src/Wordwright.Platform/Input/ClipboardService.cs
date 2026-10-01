@@ -48,6 +48,43 @@ public sealed class ClipboardService
         }
     }
 
+    /// <summary>True when the clipboard holds text, and it is not empty.</summary>
+    public bool ContainsNonEmptyText()
+    {
+        try
+        {
+            return Clipboard.ContainsText() && Clipboard.GetText().Length > 0;
+        }
+        catch (ExternalException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Empties the clipboard and hands back what was there, so a selection capture
+    /// can tell a real copy from an unchanged clipboard
+    /// (docs/ARCHITECTURE.md → Capture selection).
+    /// </summary>
+    public object? CaptureForSelection()
+    {
+        var saved = CaptureCurrent();
+
+        try
+        {
+            Clipboard.Clear();
+        }
+        catch (ExternalException)
+        {
+            // Another program is holding it; the poll will simply see old text.
+        }
+
+        return saved;
+    }
+
+    /// <summary>Puts the clipboard back after a selection capture.</summary>
+    public void RestoreAfterSelection(object? saved) => Restore(saved);
+
     /// <summary>
     /// Replaces the clipboard with <paramref name="text"/>, marked to stay out of
     /// clipboard history, and remembers what was there. Disposing puts the old
@@ -60,6 +97,12 @@ public sealed class ClipboardService
 
         return new RestoredClipboard(saved);
     }
+
+    /// <summary>
+    /// Keeps <paramref name="text"/> on the clipboard without a later restore
+    /// (the elevated-app fallback, docs/PLAN.md P6.6 → copy fallback).
+    /// </summary>
+    public void SetText(string text) => SetOwnText(text);
 
     private static object? CaptureCurrent()
     {
