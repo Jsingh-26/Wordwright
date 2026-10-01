@@ -11,7 +11,7 @@
 
     <!-- The version the app reports on its About page. scripts/pack-release.ps1
          passes the release's version to the build, so the two always agree. -->
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
   </PropertyGroup>
 
   <!-- Wordwright.Core must build with zero warnings so it stays clean and unit-testable. -->
