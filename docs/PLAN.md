@@ -2,9 +2,40 @@
 
 Target: a public v1.0 on GitHub Releases in about 14 working days, with a snippets-only v0.1 release early so there is always something usable.
 
+## Current status and next handoff (reviewed 2026-10-01)
+
+Reviewed baseline: latest release **v0.1.2**, GitHub main commit `62d588e`. P0–P5 implementation tasks are ticked; **P6–P10 remain incomplete**. A tick records implementation, not confirmation of a phase's human checks.
+
+The [Windows installation and AI setup report](WINDOWS_TEST_2026-10-01.md) records a successful install and launch on the 16 GB laptop, the no-approved-model dialogue, both placeholder AI pages, and **196 passing Core tests**. It does **not** confirm live inference, model import/download in the installed app, calibration, the full build, or the P4/P5 human checks.
+
+### Gates before starting P6
+
+- [ ] **P4 human check confirmed by maintainer:** compare the debug Hardware page with this laptop's memory, processor, graphics and disk readings. The release dialogue currently hides those details when there is no approved model, so its no-offer message is not a hardware validation.
+- [ ] **P5 human check confirmed by maintainer:** import a real GGUF; confirm its installed-model record and file survive restart. Exercise download interruption/resume and tamper rejection using controlled test data through the existing downloader tests, and record separately which installed-app checks remain blocked by the unapproved catalog. Do not mark the full human check passed from unit tests alone.
+- [ ] Record the maintainer's gate confirmation here or in a linked GitHub issue/PR before moving to P6, as required by AGENTS.md. No confirmation is recorded by this test session. If the catalog still blocks the installed-app download checks, obtain an explicit maintainer decision on staged validation and record the deferred checks for re-testing after P9.4; this report does not grant that exception.
+
+### Next implementation task after the gates: P6.1
+
+Implement only `LocalModel` and its load/generate/cancel/unload/idle lifecycle using the existing LLamaSharp CPU/Vulkan dependencies and ARCHITECTURE.md. Validate on a real GGUF with known provenance: CPU load and generation, cancellation, explicit unload and idle unload; verify the applicable Vulkan path on hardware that supports it. Record the backend, model identifier/hash and event timings without recording prompts or outputs. Run `dotnet build` and `dotnet test`; then tick and commit P6.1. An engine check does not complete the hotkeys, action UI or in-app rewrite flow; those remain P6.2–P6.8.
+
+### Verification and release readiness
+
+| Check | Current evidence | Remaining work / owning task |
+|---|---|---|
+| Install and launch | v0.1.2 installer exit 0; welcome and main window opened | Fresh-user install/uninstall and persistence checks: P3 human check, P10.2 |
+| Automated Core checks | 196 passed, 0 failed, 0 skipped on the test laptop | Full build/test and GitHub CI must pass for implementation changes |
+| Hardware fit | Laptop has about 15.87 GB usable RAM; about 0.82 GB available at inspection | Validate with HardwareProbe; free enough RAM for the unchanged model + 1 GB rule: P4 / MODELS.md |
+| Model acquisition | No approved models; automatic download disabled; import entry point visible | P5 human check; real source, license, size and SHA-256: P9.3; approval only after P9.4 evaluation |
+| Inference and rewrite | No engine implementation; AI actions and Offline AI pages are placeholders | P6.1–P6.8, followed by P6 human checks in the listed Windows apps |
+| Calibration and activation | Not implemented; importing alone does not turn AI on | P7.1–P7.2; measured times against a stopwatch |
+| Privacy and recovery | Core tests are passing; no live rewrite evidence | Offline/network-monitor check, no user text in logs, clipboard restore, Ctrl+Z, Esc cancellation and failure recovery: P6 human checks / P10.2 |
+| Safe model replacement | Not implemented | Keep the working model until replacement verification and calibration succeed; switch-back check: P8.3 |
+
+The current catalog is a blocker for the automatic-download path on every laptop, independent of RAM. Manual import is the development route for later P6/P7 checks, **once the engine and relevant UI are implemented**; it does not make v0.1.2 capable of rewriting. Do not approve candidates or relax hardware requirements just to unblock a test. P9 retains its existing evaluation requirements and its stated option to run alongside P6; the normal phase gate still applies.
+
 ## How to run this plan with a coding agent
 
-Repository: https://github.com/Jsingh-26/Wordwright (local folder: `C:\Users\getli\Desktop\Jaspreet Personal Github\Wordwright`).
+Repository: https://github.com/Jsingh-26/Wordwright. Work from a current clone; laptop-specific checkout paths are not prerequisites.
 
 1. Install the .NET 10 SDK, Git, and the GitHub CLI on Windows. Open a terminal in this repo folder.
 2. Start OpenCode on Ollama Cloud: `ollama launch opencode --model glm-5.3:cloud` (if the tag differs, pick GLM-5.3 from the menu).
@@ -12,14 +43,14 @@ Repository: https://github.com/Jsingh-26/Wordwright (local folder: `C:\Users\get
 
    > Read AGENTS.md, then do task **P2.3** from docs/PLAN.md. Restate its acceptance criteria first. Build only that task. Run `dotnet build` and `dotnet test`. Tick the checkbox, then commit as `P2.3: <summary>`. Stop and tell me what to check manually, if anything.
 
-4. At each **Human check**, test on your machine before moving on. `scripts/check-screens.ps1` captures every page of the running app and counts controls without an automation name. Paste errors back to the agent exactly as shown.
+4. At each **Human check**, test on your machine and record the maintainer confirmation before moving on. `scripts/check-screens.ps1` captures every page and counts unnamed controls where PowerShell is allowed. On a Windows machine that blocks PowerShell, do not invoke `powershell.exe` or `pwsh.exe`: run Git and .NET commands directly, and use an available UI Automation tool for screen checks. Record any check that cannot be performed; an environment limitation is not a pass.
 5. Review each finished phase with a second model (`kimi-k3`): "Review the diff for phase P2 against AGENTS.md hard rules and ARCHITECTURE.md. List violations and bugs only."
 
 ## Testing machines and the AI floor (decided 2026-10-01)
 
 The build machine is a 4 GB laptop with an Intel i3-1005G1 and no AI-capable GPU. **The RAM and disk fit rules in `MODELS.md` stay as written**: with Windows running there is around 0.3 GB free, so no catalog model passes "available RAM ≥ model + 1 GB" and Wordwright offers none — the consent dialogue says which kind of "no" it is. This is the documented behaviour, not a bug, and the `minimal` tier's copy ("can run only a very small model") is for machines that do have the memory free for the tiny model. **Do not relax the fit rule to make the 4 GB machine work.**
 
-Everything AI-facing is therefore tested on the maintainer's **16 GB laptop**, where a model can actually load and run:
+Everything AI-facing is therefore intended to be tested on the maintainer's **16 GB laptop**, after the required implementation exists and enough memory is free for the chosen model:
 
 - **P4 (human check):** the tier and the hardware summary are checked there. The Hardware page is compiled into debug builds only, so an installed release cannot show the raw values — run a debug build on that machine (`dotnet run --project src/Wordwright.App`) to see them.
 - **P5.3 (human check):** downloading, verifying and importing a model.
@@ -27,9 +58,9 @@ Everything AI-facing is therefore tested on the maintainer's **16 GB laptop**, w
 
 The laptop stays useful as the **minimum-spec machine**: it proves the app installs, expands snippets and refuses AI in the way the docs describe, which the release checklist wants ("works on an 8 GB machine with the `cpu8` recommendation" is the same check one tier down).
 
-**No catalogue model is approved yet** — that happens in P9.4 — so until then the dialogue on that laptop says "no model ready to offer yet" and the catalogue download path cannot be exercised there. **Import model file** works now: download any GGUF by hand, import it, and P6's rewriting can be tested with it. Calibration (P7.1) measures it like any other model.
+**No catalogue model is approved yet** — that happens in P9.4 — so until then the dialogue on that laptop says "no model ready to offer yet" and the catalogue download path cannot be exercised there. **Import model file** is implemented now, but importing only stores and records the file. It does not enable rewriting in v0.1.2. After P6 is implemented, a manually imported GGUF can be used to test rewriting. Calibration and activation remain P7.1.
 
-**Getting a build onto that machine:** publish a GitHub release (`scripts/pack-release.ps1` then `vpk upload github`), install it there, and report back. A release is worth publishing after any change the check depends on — the assistant should offer.
+**Getting a build onto that machine:** publish a GitHub release (`scripts/pack-release.ps1` with an explicit new version, then `vpk upload github`), install it there, and record which commit and checks the build covers. The packaging script defaults to 0.1.0, so do not use its default for a new release. On machines that block PowerShell, use the equivalent direct `dotnet publish` and `vpk pack` commands from that script; do not bypass the policy. A release is worth publishing after any change the check depends on — the assistant should offer.
 
 ## Phase P0: Repository and solution (day 1)
 - [x] **P0.1** Create `Wordwright.sln` with `src/Wordwright.Core`, `src/Wordwright.Platform`, `src/Wordwright.Inference`, `src/Wordwright.App` (WPF), `tests/Wordwright.Core.Tests` (xUnit), project references as in ARCHITECTURE.md. Add `Directory.Build.props` (nullable enabled, warnings as errors in Core, x64) and `Directory.Packages.props` with pinned versions of the allowed dependencies.
