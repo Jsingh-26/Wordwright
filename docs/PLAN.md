@@ -2,17 +2,23 @@
 
 Target: a public v1.0 on GitHub Releases in about 14 working days, with a snippets-only v0.1 release early so there is always something usable.
 
-## Current status and next handoff (reviewed 2026-10-01)
+## Current status and next handoff (reviewed 2026-10-02)
 
-Reviewed baseline: latest release **v0.1.2**; GitHub main at `edf7323`. P0–P6 implementation tasks are ticked; **P7–P10 remain incomplete**. A tick records implementation, not confirmation of a phase's human checks.
+Reviewed baseline: installed release **v0.1.3**; source rechecked at `bb5b29e`. P0–P6 implementation tasks are ticked; **P7–P10 remain incomplete**. A tick records implementation, not confirmation of a phase's human checks.
 
-The [Windows installation and AI setup report](WINDOWS_TEST_2026-10-01.md) records a successful install and launch on the 16 GB laptop, the no-approved-model dialogue, both placeholder AI pages, and **196 passing Core tests** at the pre-P6 baseline `62d588e`. Since that test, **P6.1–P6.8 (on-device rewriting: engine, prompt/cleaner, actions, hotkeys, palette, pill and snippet picker) have been implemented and pushed**; the Core suite now reports **258 passing tests** and the solution builds with zero warnings. The report is a record of the v0.1.2 release and does **not** confirm live inference, model import/download in the installed app, calibration, the full build at that time, or the P4/P5/P6 human checks. No build containing P6 has been released yet, so the P6 human checks are blocked on a new release.
+The [Windows installation and AI setup report](WINDOWS_TEST_2026-10-01.md) records a successful install and launch on the 16 GB laptop, the no-approved-model dialogue, both placeholder AI pages, and **196 passing Core tests** at the pre-P6 baseline `62d588e`. Since that test, **P6.1–P6.8 (on-device rewriting: engine, prompt/cleaner, actions, hotkeys, palette, pill and snippet picker) have been implemented and pushed**; the Core suite now reports **258 passing tests** and the solution builds with zero warnings. The report is a record of the v0.1.2 release and does **not** confirm live inference, model import/download in the installed app, calibration, the full build at that time, or the P4/P5/P6 human checks. v0.1.3 is now installed on the 16 GB laptop and contains P6; the remaining desktop checks are listed in issue #3.
 
 ### Latest 16 GB laptop validation (2026-10-02)
 
 See [the v0.1.3 desktop validation report](WINDOWS_VALIDATION_2026-10-02.md) and [GitHub issue #2](https://github.com/Jsingh-26/Wordwright/issues/2). The release is installed and its version verified. Hardware readings were compared with Windows; consent, invalid-GGUF rejection and the occupied-action-hotkey warning were observed. Release and Debug builds pass. A full 258-test run passes, but other runs expose an intermittent disposed-HttpListener test-fixture failure. Real-model import/persistence, physical hotkeys and live rewriting remain unverified; only about 0.8–0.9 GB RAM was free. **P4/P5/P6 gate confirmations remain outstanding; P7 is not cleared.** The earlier no-P6-release statements below describe the old baseline and are superseded by the v0.1.3 release record and this report.
 
 The intermittent fixture failure has since been fixed: `HttpListener` disposes itself when `Start()` throws, so `TestHttpServer`'s retry was calling `Prefixes.Clear()` on a disposed listener. It now builds a fresh listener per attempt, `TestHttpServerTests` pins the collision path down (the test reproduces the original `ObjectDisposedException` against the old code), and five consecutive full runs pass **259/259**. No production downloader behaviour changed.
+
+### Follow-up checks on the 16 GB laptop (2026-10-02)
+
+At source `bb5b29e`, the Release build passes with zero warnings/errors, the Core suite passes **259/259**, and the Python cleaner suite passes **21/21**. Independent Windows/.NET checks confirm **6 physical cores, AVX2 supported, AVX512F unsupported**, matching the debug Hardware page. See the follow-up in [the validation report](WINDOWS_VALIDATION_2026-10-02.md) and [issue #3](https://github.com/Jsingh-26/Wordwright/issues/3).
+
+**Corrected RAM prerequisite:** the current Qwen candidate has `ramRequiredGB: 1.5`; MODELS.md requires that plus 1 GB, so **2.5 GB available** is needed, rather than the file-size-based 1.7 GB in the initial handoff. The latest Windows sample was about **2.09 GB available**. Model-download consent and physical-hotkey results remain pending; real-model import/persistence and live rewriting are unverified. **P7 stays gated.**
 
 ### Gates before starting P7
 
@@ -38,7 +44,7 @@ Calibration run after download/import: measure a real generation on the 16 GB la
 | Hardware fit | Laptop has about 15.87 GB usable RAM; about 0.82 GB available at inspection | Validate with HardwareProbe; free enough RAM for the unchanged model + 1 GB rule: P4 / MODELS.md |
 | Model acquisition | No approved models; automatic download disabled; import entry point visible | P5 human check; real source, license, size and SHA-256: P9.3; approval only after P9.4 evaluation |
 | Inference and rewrite | P6.1–P6.8 implemented and pushed; **v0.1.3 is the first release containing P6**; builds clean with 258 Core tests | The P6 human checks in the listed Windows apps against v0.1.3; P7.1–P7.2 remains |
-| Calibration and activation | Not implemented; importing alone does not turn AI on | P7.1–P7.2; measured times against a stopwatch |
+| Calibration and activation | Calibration not implemented; P6 import enables AI but successful generation remains unverified | P7.1–P7.2; measured times against a stopwatch |
 | Privacy and recovery | Core tests are passing; no live rewrite evidence | Offline/network-monitor check, no user text in logs, clipboard restore, Ctrl+Z, Esc cancellation and failure recovery: P6 human checks / P10.2 |
 | Safe model replacement | Not implemented | Keep the working model until replacement verification and calibration succeed; switch-back check: P8.3 |
 

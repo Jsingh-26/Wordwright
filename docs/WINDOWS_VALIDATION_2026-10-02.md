@@ -41,3 +41,23 @@ Validation on the maintainer's 16 GB laptop, 2026-10-01–02 (Asia/Kolkata).
 6. Installed-app download interruption/resume and tamper handling remain blocked by the unapproved catalog. Any staged-validation exception requires an explicit maintainer decision and deferred retest after P9.4.
 
 The other laptop can investigate the HTTP test fixture and continue work explicitly allowed by the existing plan (such as catalog metadata/evaluation prerequisites). It must not treat this report as a P7 gate approval, model approval, completed calibration, or successful live rewriting.
+
+
+## Follow-up recheck — 2026-10-02
+
+Source synchronized to `bb5b29e` (HTTP fixture retry fix, verified Qwen candidate, evaluation prompt-hint fix and updated handoff).
+
+- Release solution build: **0 warnings / 0 errors**.
+- Core suite: **259/259 passed**, including the deterministic occupied-port regression test. The prior disposed-listener fixture failure did not recur in this run.
+- Python cleaner suite: **21/21 passed** using an isolated virtual environment under the chat workspace; no repository dependencies were changed.
+- Catalog/prompt smoke check: Qwen's `disableThinking` is a string; `/no_think` is appended to the user message and not the system message, matching the current inference implementation.
+- Independent hardware evidence: Windows `GetLogicalProcessorInformationEx(RelationProcessorCore)` reports **6 physical cores**. A separate .NET intrinsics probe reports **AVX2 True; AVX512F False**. These match Wordwright's debug page.
+- Available RAM at recheck: **1.9468 GiB**, approximately **2.09 decimal GB**.
+
+**RAM correction:** issue #3 previously calculated 1.7 GB from the 639 MB file size. The documented rule actually uses `ramRequiredGB + 1 GB`; the current verified Qwen candidate has `ramRequiredGB: 1.5`, so the required available RAM is **2.5 GB**. The latest sample remains below that threshold. No fit rule or catalog estimate was relaxed.
+
+The installed v0.1.3 remains available for desktop checks. Its embedded catalog predates the new Qwen entry; the latest source catalog change does not make the installed release offer an approved model. Manual-import and actual generation must be observed separately.
+
+Model-download consent and physical Ctrl+Alt+Space confirmation were requested from the maintainer. No response was recorded during this recheck; no download, real-model import/persistence, live rewrite, undo/cancellation/clipboard/elevated fallback, or inference-log privacy pass is claimed. Hardware evidence is now complete for the requested CPU flags/core-count comparison, while maintainer phase confirmation remains outstanding. **P4/P5/P6 gate confirmations stay unticked and P7 is not cleared.**
+
+The [remaining checklist in issue #3](https://github.com/Jsingh-26/Wordwright/issues/3) now marks the installed release and independent hardware check as evidenced, corrects the RAM prerequisite and leaves unperformed checks unchecked.
