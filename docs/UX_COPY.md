@@ -52,6 +52,8 @@ Placeholders use `{Name}`.
 | Snippets.Insert.Time | Time |
 | Snippets.Insert.Clipboard | Clipboard |
 | Snippets.Insert.Cursor | Cursor position |
+| Snippets.Preview | Inserts as: |
+| Snippets.Preview.Clipboard | (what you copied last) |
 | Snippets.Saved | Saved |
 | Snippets.Delete | Delete snippet |
 | Snippets.DeleteConfirm | Delete "{Name}"? You can't undo this. |
@@ -96,6 +98,8 @@ Placeholders use `{Name}`.
 | ID | Text |
 |---|---|
 | Palette.Filter | Type to filter… |
+| Palette.Snippets | Snippets |
+| Palette.Snippets.Empty | No snippets match. |
 | Palette.CustomPlaceholder | What should I do with the selected text? |
 | Palette.AiOff.Title | Offline AI is off |
 | Palette.AiOff.Body | Turn it on to rewrite selected text on this PC. |
@@ -110,6 +114,7 @@ Placeholders use `{Name}`.
 | Pill.TooLong | That's too much text for one rewrite. Select up to about 1,000 words. |
 | Pill.BadOutput | The AI's answer didn't look right, so your text is unchanged. Try again or pick another action. |
 | Pill.AdminApp | Wordwright can't type into apps running as administrator. Run Wordwright as administrator too, or use another app. |
+| Pill.AdminApp.Copied | Copied the rewrite. Wordwright can't type into apps running as administrator, so paste it yourself. |
 | Pill.HotkeyTaken | {Hotkey} is used by another app. Choose a different one in Wordwright. |
 | Pill.AiOff | Offline AI is off. Open Wordwright to turn it on. |
 
