@@ -150,6 +150,8 @@ Placeholders use `{Name}`.
 | Ai.Rec.Primary | Download and turn on |
 | Ai.Rec.Secondary | Not now |
 | Ai.Rec.Import | Import model file instead |
+| Ai.Import.NotModel | That file isn't a GGUF model. Pick the .gguf file you downloaded. |
+| Ai.Import.Failed | Wordwright couldn't read that file. Copy it somewhere else and import it again. |
 | Ai.Dl.Title | Downloading {ModelName} |
 | Ai.Dl.Progress | {Done} of {Total}, {Speed}, about {TimeLeft} left |
 | Ai.Dl.Cancel | Cancel download |

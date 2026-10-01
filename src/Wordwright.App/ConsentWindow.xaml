@@ -104,9 +104,19 @@
                        Margin="0,16,0,0"
                        Visibility="Collapsed" />
 
+            <!-- Importing a file the user already has is always available: it is
+                 the only way forward when no model can be offered
+                 (docs/PLAN.md P5.4). -->
+            <ui:Button x:Name="ImportButton"
+                       Margin="0,16,0,0"
+                       HorizontalAlignment="Left"
+                       Padding="10,4"
+                       Content="{res:Str Ai.Rec.Import}"
+                       Click="OnImportClicked" />
+
             <!-- The two buttons change with the state (docs/PLAN.md P5.3): agree
                  and close, then cancel or resume once a download is running. -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
                 <ui:Button x:Name="SecondaryButton"
                            Margin="0,0,8,0"
                            Content="{res:Str Ai.Rec.Secondary}"
