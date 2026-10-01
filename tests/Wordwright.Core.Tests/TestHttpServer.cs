@@ -38,7 +38,7 @@ internal sealed class TestHttpServer : IDisposable
         _ = Task.Run(ServeAsync);
     }
 
-    public string Url { get; }
+    public string Url { get; private set; } = "";
 
     /// <summary>What the server hands out.</summary>
     public byte[] Content { get; set; } = [];

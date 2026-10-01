@@ -31,6 +31,15 @@ public partial class ConsentWindow : FluentWindow
     /// (docs/MODELS.md → Hardware tiers).</summary>
     private const ulong GpuMemoryFloor = 6_000_000_000;
 
+    /// <summary>The downloader, one per dialogue, so its HttpClient is reused.</summary>
+    private readonly ModelDownloader _downloader = new();
+
+    private CatalogEntry? _model;
+    private ModelRecommendation? _recommendation;
+    private HardwareProfile? _profile;
+    private CancellationTokenSource? _download;
+    private DateTimeOffset _startedAt;
+
     public ConsentWindow()
     {
         InitializeComponent();
@@ -58,6 +67,10 @@ public partial class ConsentWindow : FluentWindow
     private void Show(ModelRecommendation recommendation, HardwareProfile profile)
     {
         Recommendation.Visibility = Visibility.Visible;
+
+        _recommendation = recommendation;
+        _profile = profile;
+        _model = recommendation.Model;
 
         var model = recommendation.Model;
         var tier = recommendation.Tier.ToCatalogName();
@@ -201,14 +214,162 @@ public partial class ConsentWindow : FluentWindow
     private static string Format(double gigabytes) =>
         gigabytes.ToString("0.#", CultureInfo.CurrentCulture) + " GB";
 
-    private void OnNotNowClicked(object sender, RoutedEventArgs e) => Close();
+    private void OnPrimaryClicked(object sender, RoutedEventArgs e) => _ = StartDownloadAsync();
 
-    private void OnPrimaryClicked(object sender, RoutedEventArgs e)
+    /// <summary>"Not now" and "Cancel download" both leave, and a download in
+    /// flight stops with its part file kept.</summary>
+    private void OnSecondaryClicked(object sender, RoutedEventArgs e)
     {
-        // The download flow takes over this button in P5.3; until then, agreeing
-        // simply closes the dialogue rather than pretending to fetch anything.
-        Debug.WriteLine("consent: agreed to download (the download itself arrives in P5.3)");
+        _download?.Cancel();
         Close();
+    }
+
+    /// <summary>
+    /// Fetches the model the dialogue is offering, showing how far it has got
+    /// (docs/PLAN.md P5.3). A download that stops keeps its part file, so the
+    /// button it leaves behind offers to resume; one that arrives unverified is
+    /// gone, so that button offers to start again.
+    /// </summary>
+    private async Task StartDownloadAsync()
+    {
+        if (_model is not { } model)
+        {
+            return;
+        }
+
+        _download?.Dispose();
+        _download = new CancellationTokenSource();
+
+        // Speed and time left are worked out from the clock, not from the
+        // progress reports, which arrive unevenly.
+        _startedAt = DateTimeOffset.Now;
+
+        Recommendation.Visibility = Visibility.Collapsed;
+        Problem.Visibility = Visibility.Collapsed;
+        Busy.Visibility = Visibility.Collapsed;
+
+        DownloadTitle.Text = Strings.Get("Ai.Dl.Title", ("ModelName", model.DisplayName));
+        DownloadLine.Text = "";
+        DownloadBar.Value = 0;
+        Downloading.Visibility = Visibility.Visible;
+        PrimaryButton.Visibility = Visibility.Collapsed;
+        SecondaryButton.Content = Strings.Get("Ai.Dl.Cancel");
+        SecondaryButton.IsEnabled = true;
+
+        var folder = ((App)Application.Current).ModelsFolder;
+        var progress = new Progress<DownloadProgress>(Report);
+
+        DownloadFailure failure;
+        try
+        {
+            failure = await _downloader.DownloadAsync(model, folder, progress, _download.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // Cancelled by the user: back to the offer, with the part file kept.
+            ShowOffer();
+            return;
+        }
+
+        Downloading.Visibility = Visibility.Collapsed;
+
+        if (failure == DownloadFailure.None)
+        {
+            // Downloaded and verified. Turning AI on and measuring this PC's
+            // speed is the calibration step, which arrives in P7.1.
+            Debug.WriteLine($"consent: {model.Id} downloaded and verified");
+            Close();
+            return;
+        }
+
+        ShowProblem(failure);
+    }
+
+    private void Report(DownloadProgress progress)
+    {
+        DownloadBar.Value = progress.TotalBytes > 0 ? progress.Fraction * 100 : 0;
+
+        var done = progress.BytesDone;
+        var total = progress.TotalBytes > 0 ? progress.TotalBytes : done;
+        var secondsLeft = SecondsLeft(progress);
+
+        DownloadLine.Text = Strings.Get(
+            "Ai.Dl.Progress",
+            ("Done", Size(done)),
+            ("Total", Size(total)),
+            ("Speed", Speed(progress)),
+            ("TimeLeft", Duration(secondsLeft)));
+    }
+
+    /// <summary>The average speed so far, from the time the download has taken.</summary>
+    private string Speed(DownloadProgress progress)
+    {
+        var seconds = (DateTimeOffset.Now - _startedAt).TotalSeconds;
+        if (seconds <= 0 || progress.BytesDone <= 0)
+        {
+            return Size(0) + "/s";
+        }
+
+        return Size((long)(progress.BytesDone / seconds)) + "/s";
+    }
+
+    private double SecondsLeft(DownloadProgress progress)
+    {
+        var seconds = (DateTimeOffset.Now - _startedAt).TotalSeconds;
+        if (seconds <= 0 || progress.BytesDone <= 0 || progress.TotalBytes <= 0)
+        {
+            return 0;
+        }
+
+        var perByte = seconds / progress.BytesDone;
+
+        return perByte * (progress.TotalBytes - progress.BytesDone);
+    }
+
+    /// <summary>A size as people write it: "1.6 GB", "48 MB".</summary>
+    private static string Size(long bytes) => bytes switch
+    {
+        >= 1_000_000_000 => (bytes / 1_000_000_000.0).ToString("0.#", CultureInfo.CurrentCulture) + " GB",
+        >= 1_000_000 => (bytes / 1_000_000.0).ToString("0.#", CultureInfo.CurrentCulture) + " MB",
+        >= 1_000 => (bytes / 1_000.0).ToString("0.#", CultureInfo.CurrentCulture) + " KB",
+        _ => bytes + " bytes",
+    };
+
+    private static string Duration(double seconds) => seconds switch
+    {
+        <= 0 => "a moment",
+        < 60 => $"{Math.Max(1, Math.Round(seconds)):0} seconds",
+        _ => $"{Math.Max(1, Math.Round(seconds / 60)):0} minutes",
+    };
+
+    /// <summary>Back to the recommendation, as it was.</summary>
+    private void ShowOffer()
+    {
+        if (_recommendation is { } recommendation)
+        {
+            Show(recommendation, _profile!);
+        }
+
+        Downloading.Visibility = Visibility.Collapsed;
+        Busy.Visibility = Visibility.Collapsed;
+        Problem.Visibility = Visibility.Collapsed;
+        Recommendation.Visibility = Visibility.Visible;
+        PrimaryButton.Visibility = Visibility.Visible;
+        SecondaryButton.Content = Strings.Get("Ai.Rec.Secondary");
+    }
+
+    private void ShowProblem(DownloadFailure failure)
+    {
+        var corrupt = failure == DownloadFailure.Corrupt;
+
+        Problem.Text = Strings.Get(corrupt ? "Ai.Verify.Failed" : "Ai.Dl.Failed");
+        Problem.Visibility = Visibility.Visible;
+
+        // A stopped download has a part file to carry on from; a corrupt one
+        // was deleted, so there is nothing to resume.
+        PrimaryButton.Content = Strings.Get(corrupt ? "Ai.Rec.Primary" : "Ai.Dl.Resume");
+        PrimaryButton.Visibility = Visibility.Visible;
+        SecondaryButton.Content = Strings.Get(corrupt ? "Ai.Rec.Secondary" : "Ai.Dl.Cancel");
     }
 
     /// <summary>One line under "Show other options".</summary>
