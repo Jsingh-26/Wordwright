@@ -16,6 +16,8 @@ The intermittent fixture failure has since been fixed: `HttpListener` disposes i
 
 ### Gates before starting P7
 
+**These can only be confirmed on the maintainer's 16 GB laptop.** The 4 GB build laptop does not have the memory for any catalog model and is documented below as never running one, so P4/P5/P6 cannot be completed there; anything attempted on it will show the intended refusal, not a defect. The exact remaining steps, with the model to import and its verified hash, are the hand-off checklist in [issue #3](https://github.com/Jsingh-26/Wordwright/issues/3).
+
 - [ ] **P4 human check confirmed by maintainer:** compare the debug Hardware page with this laptop's memory, processor, graphics and disk readings. The release dialogue currently hides those details when there is no approved model, so its no-offer message is not a hardware validation.
 - [ ] **P5 human check confirmed by maintainer:** import a real GGUF; confirm its installed-model record and file survive restart. Exercise download interruption/resume and tamper rejection using controlled test data through the existing downloader tests, and record separately which installed-app checks remain blocked by the unapproved catalog. Do not mark the full human check passed from unit tests alone.
 - [ ] **P6 human checks confirmed by maintainer:** publish a release containing P6.1–P6.8, install it on the 16 GB laptop, and walk the P6 human checks in this file (palette in Notepad, snippet picker, `Ctrl+Alt+G`, elevated-window copy fallback, in-use hotkey, built-in actions in Word/Outlook/Chrome/Teams, `Ctrl+Z`, Esc, and no user text in the log).
