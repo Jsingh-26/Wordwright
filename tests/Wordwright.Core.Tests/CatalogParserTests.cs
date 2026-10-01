@@ -106,6 +106,23 @@ public class CatalogParserTests
     }
 
     [Fact]
+    public void TheEmbeddedCatalog_carriesProvisionalLoadTimes()
+    {
+        // The consent dialogue's "first rewrite takes about N seconds longer"
+        // needs one per tier; docs/MODELS.md says calibration replaces them.
+        var catalog = CatalogParser.Embedded();
+
+        foreach (var model in catalog.Models)
+        {
+            foreach (var (tier, speed) in model.Speed)
+            {
+                speed.LoadSeconds.Should().BeGreaterThan(0, $"{model.Id} on {tier} needs a load time");
+                speed.Provisional.Should().BeTrue($"{model.Id} on {tier} has not been measured yet");
+            }
+        }
+    }
+
+    [Fact]
     public void TheEmbeddedCatalog_isAlwaysUsable()
     {
         var catalog = CatalogParser.Embedded();

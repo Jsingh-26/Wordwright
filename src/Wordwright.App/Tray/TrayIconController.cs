@@ -94,10 +94,10 @@ internal sealed class TrayIconController : IDisposable
             return;
         }
 
-        // AI is not downloadable yet (phase P5); until the consent dialogue exists,
-        // opening the window is the nearest honest action.
+        // AI is off, so ask first: the dialogue says what would be downloaded and
+        // what it costs in time before anything is fetched (docs/PLAN.md P5.1).
         _aiItem.IsChecked = false;
-        _app.ShowMainWindow();
+        new ConsentWindow().Show();
     }
 
     public void Dispose()

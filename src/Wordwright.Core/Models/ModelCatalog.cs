@@ -92,6 +92,10 @@ public sealed record CatalogSpeed
     /// <summary>Generated tokens per second, slowest and fastest.</summary>
     public IReadOnlyList<double> GenTps { get; init; } = [];
 
+    /// <summary>How much longer the first rewrite after a cold start takes while
+    /// the weights are read in (docs/MODELS.md → Speed estimate).</summary>
+    public int LoadSeconds { get; init; }
+
     /// <summary>True while these are estimates rather than measurements.</summary>
     public bool Provisional { get; init; }
 
