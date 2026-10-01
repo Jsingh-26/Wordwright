@@ -8,6 +8,10 @@ Reviewed baseline: latest release **v0.1.2**; GitHub main at `edf7323`. P0–P6 
 
 The [Windows installation and AI setup report](WINDOWS_TEST_2026-10-01.md) records a successful install and launch on the 16 GB laptop, the no-approved-model dialogue, both placeholder AI pages, and **196 passing Core tests** at the pre-P6 baseline `62d588e`. Since that test, **P6.1–P6.8 (on-device rewriting: engine, prompt/cleaner, actions, hotkeys, palette, pill and snippet picker) have been implemented and pushed**; the Core suite now reports **258 passing tests** and the solution builds with zero warnings. The report is a record of the v0.1.2 release and does **not** confirm live inference, model import/download in the installed app, calibration, the full build at that time, or the P4/P5/P6 human checks. No build containing P6 has been released yet, so the P6 human checks are blocked on a new release.
 
+### Latest 16 GB laptop validation (2026-10-02)
+
+See [the v0.1.3 desktop validation report](WINDOWS_VALIDATION_2026-10-02.md) and [GitHub issue #2](https://github.com/Jsingh-26/Wordwright/issues/2). The release is installed and its version verified. Hardware readings were compared with Windows; consent, invalid-GGUF rejection and the occupied-action-hotkey warning were observed. Release and Debug builds pass. A full 258-test run passes, but other runs expose an intermittent disposed-HttpListener test-fixture failure. Real-model import/persistence, physical hotkeys and live rewriting remain unverified; only about 0.8–0.9 GB RAM was free. **P4/P5/P6 gate confirmations remain outstanding; P7 is not cleared.** The earlier no-P6-release statements below describe the old baseline and are superseded by the v0.1.3 release record and this report.
+
 ### Gates before starting P7
 
 - [ ] **P4 human check confirmed by maintainer:** compare the debug Hardware page with this laptop's memory, processor, graphics and disk readings. The release dialogue currently hides those details when there is no approved model, so its no-offer message is not a hardware validation.
