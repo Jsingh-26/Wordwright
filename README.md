@@ -2,12 +2,12 @@
 
 [github.com/Jsingh-26/Wordwright](https://github.com/Jsingh-26/Wordwright)
 
-A free, open-source text expander for Windows with a planned AI writing assistant that runs entirely on your own computer.
+A free, open-source text expander for Windows with an AI writing assistant that runs entirely on your own computer.
 
-**Current release: [v0.1.2](https://github.com/Jsingh-26/Wordwright/releases/tag/v0.1.2).** Snippets and model import/download handling are implemented. No catalog model is approved yet, so automatic model download is unavailable. **On-device rewriting (P6) is implemented in the source but is not in a release yet**, and AI calibration is not implemented; the AI actions and Offline AI screens in v0.1.2 are still placeholders.
+**Current release: [v0.1.3](https://github.com/Jsingh-26/Wordwright/releases/tag/v0.1.3).** Snippets, model import/download handling and the on-device rewriting engine are implemented. No catalog model is approved yet, so automatic model download is unavailable and **Turn on offline AI** reports that there is no model to offer — import a GGUF by hand to try rewriting. Calibration (P7.1) and the Offline AI page (P7.2) are not built yet, so the Offline AI screen is still a placeholder.
 
 - **Snippets.** Type `;sig` and your signature appears, in any app. No limits on how many snippets you keep or how long they are.
-- **Rewrite anything with a hotkey (in source, next release).** Select text and press `Ctrl + Alt + G` to fix grammar instantly, or `Ctrl + Alt + Space` to pick from *Make it clearer*, *Shorten*, *More formal* and more. Give any action its own hotkey. The text is rewritten in place.
+- **Rewrite anything with a hotkey.** Select text and press `Ctrl + Alt + G` to fix grammar instantly, or `Ctrl + Alt + Space` to pick from *Make it clearer*, *Shorten*, *More formal* and more. Give any action its own hotkey. The text is rewritten in place. Needs an imported model while the catalogue is unapproved.
 - **Private by design.** The AI model runs on your device. No account, no API key, no cloud. Your text never leaves your PC.
 
 > A *wright* is a maker: a shipwright builds ships, a wheelwright builds wheels. Wordwright builds your words.
@@ -24,7 +24,7 @@ Internet is used only when you choose to download a model, or to check for a bet
 
 ## Status
 
-P0–P6 implementation tasks are complete; P7 (calibration and the Offline AI page) is next, pending the P4/P5/P6 human checks. See the current handoff and verification gates in [`docs/PLAN.md`](docs/PLAN.md), and the [Windows test report](docs/WINDOWS_TEST_2026-10-01.md).
+P0–P6 implementation tasks are complete and [v0.1.3](https://github.com/Jsingh-26/Wordwright/releases/tag/v0.1.3) is the first release containing the P6 rewriting work. P7 (calibration and the Offline AI page) is next, pending the P4/P5/P6 human checks. See the current handoff and verification gates in [`docs/PLAN.md`](docs/PLAN.md), and the [Windows test report](docs/WINDOWS_TEST_2026-10-01.md).
 
 ## Documentation
 
