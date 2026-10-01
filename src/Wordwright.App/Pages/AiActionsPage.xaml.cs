@@ -13,6 +13,10 @@ public partial class AiActionsPage : Page
         ViewModel = new AiActionsViewModel((App)Application.Current);
         DataContext = ViewModel;
 
+        // The recorder asks the view model about clashes with the palette hotkey
+        // and the other actions (docs/UX_COPY.md → Actions.Hotkey.*).
+        HotkeyBox.Validate = ViewModel.ValidateHotkey;
+
         // The AI-on state may have changed while another page was showing, so
         // ask again whenever this page appears.
         Loaded += (_, _) => ViewModel.RefreshAiState();
@@ -33,4 +37,6 @@ public partial class AiActionsPage : Page
     }
 
     private void OnResetClicked(object sender, RoutedEventArgs e) => ViewModel.ResetSelected();
+
+    private void OnClearHotkeyClicked(object sender, RoutedEventArgs e) => ViewModel.Hotkey = null;
 }

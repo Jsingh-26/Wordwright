@@ -15,6 +15,10 @@ public partial class SettingsPage : Page
 
         ViewModel = new SettingsViewModel((App)Application.Current);
         DataContext = ViewModel;
+
+        // The recorder clashes against an action's own hotkey; the palette hotkey
+        // may not take one of those either (docs/UX_COPY.md → Actions.Hotkey.Duplicate).
+        PaletteHotkeyBox.Validate = ViewModel.ValidatePaletteHotkey;
     }
 
     internal SettingsViewModel ViewModel { get; }

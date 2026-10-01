@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Wordwright.App.Resources;
+using Wordwright.Core.Actions;
 using Wordwright.Core.Snippets;
 
 namespace Wordwright.App.ViewModels;
@@ -24,6 +25,7 @@ internal sealed partial class SettingsViewModel : ObservableObject
         _loading = true;
         StartWithWindows = app.Settings.StartWithWindows;
         SnippetPrefix = app.Snippets.TriggerPrefix;
+        PaletteHotkey = app.Settings.PaletteHotkey;
         foreach (var executable in app.Settings.ExcludedApps)
         {
             ExcludedApps.Add(executable);
@@ -39,6 +41,9 @@ internal sealed partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty]
     private string _snippetPrefix = "";
+
+    [ObservableProperty]
+    private string? _paletteHotkey;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasMessage))]
@@ -65,6 +70,40 @@ internal sealed partial class SettingsViewModel : ObservableObject
         }
 
         _app.UpdateSnippets(_app.Snippets with { TriggerPrefix = value.Trim() });
+    }
+
+    partial void OnPaletteHotkeyChanged(string? value)
+    {
+        if (_loading)
+        {
+            return;
+        }
+
+        _app.UpdateSettings(_app.Settings with { PaletteHotkey = value ?? "" });
+    }
+
+    /// <summary>Checks a palette-hotkey candidate for a clash with an action's own
+    /// hotkey, for the recorder to show.</summary>
+    public (bool Accepted, string? Message) ValidatePaletteHotkey(HotkeySpec candidate)
+    {
+        var text = candidate.ToString();
+
+        if (HotkeyRules.Validate(text) != HotkeyValidation.Ok)
+        {
+            return (false, Strings.Get("Actions.Hotkey.Invalid"));
+        }
+
+        foreach (var action in _app.Actions.Actions.Where(action => action.Hotkey is not null))
+        {
+            if (HotkeySpec.Parse(action.Hotkey) is { } spec
+                && spec.Modifiers == candidate.Modifiers
+                && string.Equals(spec.Key, candidate.Key, StringComparison.Ordinal))
+            {
+                return (false, Strings.Get("Actions.Hotkey.Duplicate", ("Hotkey", text), ("Action", action.Name)));
+            }
+        }
+
+        return (true, null);
     }
 
     public void AddExcludedApp(string executable)

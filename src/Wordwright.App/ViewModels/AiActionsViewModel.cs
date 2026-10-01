@@ -58,6 +58,15 @@ internal sealed partial class AiActionsViewModel : ObservableObject
     private string _instruction = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasHotkeyMessage))]
+    private string? _hotkeyMessage;
+
+    [ObservableProperty]
+    private string? _hotkey;
+
+    public bool HasHotkeyMessage => !string.IsNullOrEmpty(HotkeyMessage);
+
+    [ObservableProperty]
     private bool _showSaved;
 
     /// <summary>The text the "Try it" box holds; never persisted.</summary>
@@ -160,6 +169,8 @@ internal sealed partial class AiActionsViewModel : ObservableObject
             Name = value?.Action.Name ?? string.Empty;
             Letter = value?.Action.ShortcutKey ?? string.Empty;
             Instruction = value?.Action.Instruction ?? string.Empty;
+            Hotkey = value?.Action.Hotkey;
+            HotkeyMessage = null;
             TryItMessage = null;
         }
         finally
@@ -180,6 +191,55 @@ internal sealed partial class AiActionsViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(CanTryIt));
         OnFieldChanged();
+    }
+
+    partial void OnHotkeyChanged(string? value)
+    {
+        if (!_loadingFields)
+        {
+            HotkeyMessage = null;
+            OnFieldChanged();
+        }
+    }
+
+    /// <summary>Checks a candidate hotkey for a clash, for the recorder to show.
+    /// Returns whether it is accepted and the message when it is not.</summary>
+    public (bool Accepted, string? Message) ValidateHotkey(HotkeySpec candidate)
+    {
+        var text = candidate.ToString();
+
+        if (HotkeyRules.Validate(text) != HotkeyValidation.Ok)
+        {
+            return (false, Strings.Get("Actions.Hotkey.Invalid"));
+        }
+
+        // The palette hotkey and every other action's hotkey share one space.
+        var taken = new List<(string Owner, HotkeySpec Spec)>();
+
+        if (HotkeySpec.Parse(_app.Settings.PaletteHotkey) is { } palette)
+        {
+            taken.Add((Strings.Get("Settings.PaletteHotkey"), palette));
+        }
+
+        foreach (var action in _app.Actions.Actions.Where(action =>
+                     action.Id != SelectedAction?.Id && action.Hotkey is not null))
+        {
+            if (HotkeySpec.Parse(action.Hotkey) is { } spec)
+            {
+                taken.Add((action.Name, spec));
+            }
+        }
+
+        var clash = taken.FirstOrDefault(entry =>
+            entry.Spec.Modifiers == candidate.Modifiers
+            && string.Equals(entry.Spec.Key, candidate.Key, StringComparison.Ordinal));
+
+        if (clash.Spec is not null)
+        {
+            return (false, Strings.Get("Actions.Hotkey.Duplicate", ("Hotkey", text), ("Action", clash.Owner)));
+        }
+
+        return (true, null);
     }
 
     partial void OnTryItTextChanged(string value) => OnPropertyChanged(nameof(CanTryIt));
@@ -253,6 +313,7 @@ internal sealed partial class AiActionsViewModel : ObservableObject
             Name = Name,
             ShortcutKey = Letter.Trim(),
             Instruction = Instruction,
+            Hotkey = Hotkey,
         };
 
         var document = _app.Actions with
