@@ -45,6 +45,7 @@ public class SettingsStoreTests : IDisposable
         settings.LastCatalogCheckUtc.Should().BeNull();
         settings.ExcludedApps.Should().Equal("KeePass.exe", "KeePassXC.exe", "1Password.exe", "Bitwarden.exe");
         settings.Theme.Should().Be("system");
+        settings.Window.Should().BeNull("the window has not been closed yet on a first run");
     }
 
     [Fact]
@@ -72,6 +73,14 @@ public class SettingsStoreTests : IDisposable
             LastCatalogCheckUtc = new DateTimeOffset(2026, 10, 1, 9, 30, 0, TimeSpan.Zero),
             ExcludedApps = ["KeePass.exe", "vault.exe"],
             Theme = "system",
+            Window = new WindowPlacement
+            {
+                Left = 140,
+                Top = 60,
+                Width = 1200,
+                Height = 800,
+                Maximized = true,
+            },
         };
 
         store.Save(saved);
@@ -79,6 +88,24 @@ public class SettingsStoreTests : IDisposable
 
         // BeEquivalentTo, not Be: records can't value-compare the ExcludedApps collection.
         loaded.Should().BeEquivalentTo(saved);
+        loaded.Window.Should().Be(saved.Window);
+    }
+
+    [Fact]
+    public void Save_writesTheWindowPlacementAsTheDocumentedWindowObject()
+    {
+        CreateStore().Save(new AppSettings
+        {
+            Window = new WindowPlacement { Left = 100, Top = 50, Maximized = false },
+        });
+
+        var window = JsonDocument.Parse(File.ReadAllText(SettingsPath)).RootElement.GetProperty("window");
+
+        window.GetProperty("left").GetDouble().Should().Be(100);
+        window.GetProperty("top").GetDouble().Should().Be(50);
+        window.GetProperty("width").GetDouble().Should().Be(WindowPlacement.DefaultWidth);
+        window.GetProperty("height").GetDouble().Should().Be(WindowPlacement.DefaultHeight);
+        window.GetProperty("maximized").GetBoolean().Should().BeFalse();
     }
 
     [Fact]
@@ -119,6 +146,7 @@ public class SettingsStoreTests : IDisposable
         json.GetProperty("excludedApps").EnumerateArray().Select(e => e.GetString())
             .Should().Equal("KeePass.exe", "KeePassXC.exe", "1Password.exe", "Bitwarden.exe");
         json.GetProperty("theme").GetString().Should().Be("system");
+        json.GetProperty("window").ValueKind.Should().Be(JsonValueKind.Null);
     }
 
     [Fact]

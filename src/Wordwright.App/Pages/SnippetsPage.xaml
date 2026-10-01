@@ -68,7 +68,8 @@
 
             <!-- The list -->
             <DockPanel Grid.Column="0">
-                <ui:TextBox DockPanel.Dock="Top"
+                <ui:TextBox x:Name="SearchBox"
+                            DockPanel.Dock="Top"
                             Margin="0,0,0,8"
                             PlaceholderText="{res:Str Snippets.Search}"
                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
@@ -183,8 +184,5 @@
                            Click="OnDeleteSnippetClicked" />
             </Grid>
         </Grid>
-
-        <!-- Hosts the delete confirmation over the whole page. -->
-        <ui:ContentDialogHost x:Name="DialogHost" Grid.RowSpan="2" />
     </Grid>
 </Page>
