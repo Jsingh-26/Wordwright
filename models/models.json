@@ -20,8 +20,8 @@
       "weaknesses": ["Tone changes", "Longer text", "Languages other than English"],
       "promptHints": { "disableThinking": "TODO: check chat template" },
       "speed": {
-        "minimal": { "promptTps": [60, 150], "genTps": [15, 35], "provisional": true },
-        "cpu8":    { "promptTps": [150, 300], "genTps": [35, 60], "provisional": true }
+        "minimal": { "promptTps": [60, 150], "genTps": [15, 35], "loadSeconds": 7, "provisional": true },
+        "cpu8":    { "promptTps": [150, 300], "genTps": [35, 60], "loadSeconds": 7, "provisional": true }
       },
       "evalScores": null,
       "status": "candidate"
@@ -43,9 +43,9 @@
       "weaknesses": ["Nuanced rewrites of long paragraphs", "Translation"],
       "promptHints": { "disableThinking": "TODO" },
       "speed": {
-        "cpu8":  { "promptTps": [60, 150], "genTps": [15, 30], "provisional": true },
-        "cpu16": { "promptTps": [80, 200], "genTps": [20, 40], "provisional": true },
-        "gpu":   { "promptTps": [800, 2500], "genTps": [70, 150], "provisional": true }
+        "cpu8":  { "promptTps": [60, 150], "genTps": [15, 30], "loadSeconds": 7, "provisional": true },
+        "cpu16": { "promptTps": [80, 200], "genTps": [20, 40], "loadSeconds": 6, "provisional": true },
+        "gpu":   { "promptTps": [800, 2500], "genTps": [70, 150], "loadSeconds": 3, "provisional": true }
       },
       "evalScores": null,
       "status": "candidate"
@@ -67,8 +67,8 @@
       "weaknesses": ["Slower on older CPUs"],
       "promptHints": { "disableThinking": "TODO" },
       "speed": {
-        "cpu16": { "promptTps": [30, 80], "genTps": [8, 18], "provisional": true },
-        "gpu":   { "promptTps": [400, 1500], "genTps": [40, 90], "provisional": true }
+        "cpu16": { "promptTps": [30, 80], "genTps": [8, 18], "loadSeconds": 9, "provisional": true },
+        "gpu":   { "promptTps": [400, 1500], "genTps": [40, 90], "loadSeconds": 4, "provisional": true }
       },
       "evalScores": null,
       "status": "candidate"
@@ -90,8 +90,8 @@
       "weaknesses": ["Languages other than English"],
       "promptHints": { "disableThinking": null },
       "speed": {
-        "cpu16": { "promptTps": [30, 90], "genTps": [8, 20], "provisional": true },
-        "gpu":   { "promptTps": [400, 1500], "genTps": [40, 90], "provisional": true }
+        "cpu16": { "promptTps": [30, 90], "genTps": [8, 20], "loadSeconds": 9, "provisional": true },
+        "gpu":   { "promptTps": [400, 1500], "genTps": [40, 90], "loadSeconds": 4, "provisional": true }
       },
       "evalScores": null,
       "status": "candidate"
@@ -113,8 +113,8 @@
       "weaknesses": ["To be measured"],
       "promptHints": { "disableThinking": "TODO" },
       "speed": {
-        "cpu8":  { "promptTps": [40, 110], "genTps": [10, 24], "provisional": true },
-        "cpu16": { "promptTps": [50, 140], "genTps": [12, 28], "provisional": true }
+        "cpu8":  { "promptTps": [40, 110], "genTps": [10, 24], "loadSeconds": 9, "provisional": true },
+        "cpu16": { "promptTps": [50, 140], "genTps": [12, 28], "loadSeconds": 8, "provisional": true }
       },
       "evalScores": null,
       "status": "candidate"

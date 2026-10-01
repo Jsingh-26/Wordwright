@@ -1,7 +1,6 @@
 using System.Windows;
 using System.Windows.Automation;
 using Wpf.Ui.Controls;
-using Wordwright.App.Pages;
 using Wordwright.App.Resources;
 
 namespace Wordwright.App;
@@ -67,6 +66,6 @@ public partial class WelcomeWindow : FluentWindow
     private void OnTurnOnAiClicked(object sender, RoutedEventArgs e)
     {
         Close();
-        _app.ShowMainWindow(typeof(OfflineAiPage));
+        new ConsentWindow().Show();
     }
 }

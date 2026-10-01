@@ -33,7 +33,7 @@ Two reference jobs, used both before download (catalog ranges) and after calibra
 
 `seconds = promptTokens / promptTokensPerSec + outputTokens / genTokensPerSec`
 
-Before download, compute with both ends of the catalog's `speed[tier]` ranges and show a range rounded to whole seconds ("2–4 seconds"). Show model loading separately ("The first rewrite after starting your PC takes about N seconds longer while the model loads"). After calibration, show single numbers rounded to the nearest half second.
+Before download, compute with both ends of the catalog's `speed[tier]` ranges and show a range rounded to whole seconds ("2–4 seconds"). Show model loading separately ("The first rewrite after starting your PC takes about N seconds longer while the model loads") — that N is the tier's `loadSeconds` beside the two rates, provisional until calibration measures it. After calibration, show single numbers rounded to the nearest half second.
 
 Worked example (2B model, `cpu8`, prompt 60–150 tok/s, generation 15–30 tok/s): one line ≈ 2–4 s, short paragraph ≈ 4–9 s.
 

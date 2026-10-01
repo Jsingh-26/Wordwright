@@ -134,6 +134,9 @@ Placeholders use `{Name}`.
 | Ai.Rec.OneLine | One line |
 | Ai.Rec.Paragraph | Short paragraph |
 | Ai.Rec.Range | {Min}–{Max} seconds |
+| Ai.Rec.RangeOver | {Max}+ seconds |
+| Ai.Rec.NoRam | There isn't enough free memory to run a model right now. Close some other apps and try again. |
+| Ai.Rec.None | There's no model ready to offer yet. Wordwright will check again later. |
 | Ai.Rec.GoodAt | Good at: {Strengths} |
 | Ai.Rec.NotSoGood | Not so good at: {Weaknesses} |
 | Ai.Rec.LoadNote | The first rewrite after starting your PC takes about {LoadSeconds} seconds longer while the model loads. |

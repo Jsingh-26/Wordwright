@@ -1,0 +1,98 @@
+<ui:FluentWindow x:Class="Wordwright.App.ConsentWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:controls="clr-namespace:Wordwright.App.Controls"
+                 xmlns:res="clr-namespace:Wordwright.App.Resources"
+                 Title="Wordwright"
+                 Width="560"
+                 SizeToContent="Height"
+                 ResizeMode="NoResize"
+                 WindowStartupLocation="CenterScreen"
+                 ExtendsContentIntoTitleBar="True"
+                 WindowBackdropType="Mica">
+    <!-- The consent dialogue of docs/DESIGN.md §5: what Wordwright would
+         download, what it will cost in time, and what it is good at, before
+         anything is fetched. -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="Wordwright" CloseWindowByDoubleClickOnIcon="True" />
+
+        <StackPanel Grid.Row="1" Margin="28,8,28,24">
+            <TextBlock FontFamily="{StaticResource Zodiak}"
+                       FontSize="20"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                       Text="{res:Str Ai.Rec.Title}" />
+
+            <TextBlock x:Name="Checking"
+                       Style="{StaticResource SecondaryText}"
+                       Margin="0,12,0,0"
+                       Text="{res:Str Ai.Checking}" />
+
+            <!-- The recommendation, once the hardware has been read. -->
+            <StackPanel x:Name="Recommendation" Visibility="Collapsed">
+                <TextBlock x:Name="ModelName" Style="{StaticResource BodyText}" Margin="0,12,0,0" />
+                <TextBlock x:Name="MetaLine" Style="{StaticResource SecondaryText}" Margin="0,2,0,0" />
+                <TextBlock x:Name="YourPc" Style="{StaticResource SecondaryText}" Margin="0,8,0,0" />
+
+                <controls:TimeRuler x:Name="Ruler"
+                                    Margin="0,16,0,0"
+                                    AutomationProperties.Name="{res:Str Ai.Rec.EstimateNote}" />
+                <TextBlock Style="{StaticResource SecondaryText}"
+                           Margin="0,8,0,0"
+                           Text="{res:Str Ai.Rec.EstimateNote}" />
+
+                <TextBlock x:Name="GoodAt" Style="{StaticResource BodyText}" Margin="0,12,0,0" />
+                <TextBlock x:Name="NotSoGood" Style="{StaticResource BodyText}" Margin="0,4,0,0" />
+                <TextBlock x:Name="LoadNote" Style="{StaticResource SecondaryText}" Margin="0,12,0,0" />
+                <TextBlock Style="{StaticResource SecondaryText}"
+                           Margin="0,4,0,0"
+                           Text="{res:Str Ai.Rec.Privacy}" />
+                <TextBlock x:Name="Note"
+                           Style="{StaticResource BodyText}"
+                           Foreground="{DynamicResource CautionBrush}"
+                           Margin="0,8,0,0"
+                           Visibility="Collapsed" />
+
+                <ui:CardExpander x:Name="OtherOptions"
+                                 Margin="0,16,0,0"
+                                 CornerRadius="4"
+                                 Header="{res:Str Ai.Rec.Other}"
+                                 AutomationProperties.Name="{res:Str Ai.Rec.Other}"
+                                 Visibility="Collapsed">
+                    <ItemsControl x:Name="OtherList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,0,0,8">
+                                    <TextBlock Style="{StaticResource BodyText}" Text="{Binding Label}" />
+                                    <TextBlock Style="{StaticResource SecondaryText}" Text="{Binding Detail}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ui:CardExpander>
+            </StackPanel>
+
+            <!-- Nothing to offer: said plainly, with no download button. -->
+            <TextBlock x:Name="NoOffer"
+                       Style="{StaticResource BodyText}"
+                       Margin="0,12,0,0"
+                       Visibility="Collapsed" />
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                <ui:Button Margin="0,0,8,0"
+                           Content="{res:Str Ai.Rec.Secondary}"
+                           Click="OnNotNowClicked" />
+                <ui:Button x:Name="PrimaryButton"
+                           Appearance="Primary"
+                           Content="{res:Str Ai.Rec.Primary}"
+                           Click="OnPrimaryClicked" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</ui:FluentWindow>

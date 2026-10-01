@@ -38,10 +38,37 @@
   <data name="Snippets.Title" xml:space="preserve"><value>Snippets</value></data>
   <data name="Actions.Title" xml:space="preserve"><value>AI actions</value></data>
   <data name="Ai.Off.Title" xml:space="preserve"><value>Offline AI</value></data>
+  <data name="Ai.Off.Body" xml:space="preserve"><value>Rewrite selected text with an AI model that runs on this PC. There's no account, no API key and no cloud. Your text never leaves this computer. Wordwright downloads the model once, only after you agree.</value></data>
+  <data name="Ai.Off.Button" xml:space="preserve"><value>Turn on offline AI</value></data>
+  <data name="Ai.Checking" xml:space="preserve"><value>Checking what this PC can run…</value></data>
+  <data name="Ai.Rec.Title" xml:space="preserve"><value>Recommended for your PC</value></data>
+  <data name="Ai.Rec.ModelLine" xml:space="preserve"><value>{ModelName}</value></data>
+  <data name="Ai.Rec.MetaLine" xml:space="preserve"><value>{Size} download, {License} licence</value></data>
+  <data name="Ai.Rec.YourPc" xml:space="preserve"><value>Your PC: {Ram} memory, {Cpu}, {GpuSummary}</value></data>
+  <data name="Ai.Rec.GpuNone" xml:space="preserve"><value>no graphics card suitable for AI</value></data>
+  <data name="Ai.Rec.GpuYes" xml:space="preserve"><value>{GpuName} with {Vram} for AI</value></data>
+  <data name="Ai.Rec.OneLine" xml:space="preserve"><value>One line</value></data>
+  <data name="Ai.Rec.Paragraph" xml:space="preserve"><value>Short paragraph</value></data>
+  <data name="Ai.Rec.Range" xml:space="preserve"><value>{Min}–{Max} seconds</value></data>
+  <data name="Ai.Rec.RangeOver" xml:space="preserve"><value>{Max}+ seconds</value></data>
+  <data name="Ai.Rec.GoodAt" xml:space="preserve"><value>Good at: {Strengths}</value></data>
+  <data name="Ai.Rec.NotSoGood" xml:space="preserve"><value>Not so good at: {Weaknesses}</value></data>
+  <data name="Ai.Rec.LoadNote" xml:space="preserve"><value>The first rewrite after starting your PC takes about {LoadSeconds} seconds longer while the model loads.</value></data>
+  <data name="Ai.Rec.EstimateNote" xml:space="preserve"><value>These are estimates. Wordwright measures the real speed after downloading.</value></data>
+  <data name="Ai.Rec.Privacy" xml:space="preserve"><value>After this one download, rewriting works with no internet connection.</value></data>
+  <data name="Ai.Rec.Other" xml:space="preserve"><value>Show other options</value></data>
+  <data name="Ai.Rec.OtherSlow" xml:space="preserve"><value>May be slow on this PC</value></data>
+  <data name="Ai.Rec.StepDownRam" xml:space="preserve"><value>We picked a smaller model because only {FreeRam} of memory is free right now.</value></data>
+  <data name="Ai.Rec.Minimal" xml:space="preserve"><value>This PC can run only a very small model. It fixes basic grammar and may be slow. You can skip AI and keep using snippets.</value></data>
+  <data name="Ai.Rec.NoDisk" xml:space="preserve"><value>You need {Needed} of free space on {Drive}. Free up space and try again.</value></data>
+  <data name="Ai.Rec.NoRam" xml:space="preserve"><value>There isn't enough free memory to run a model right now. Close some other apps and try again.</value></data>
+  <data name="Ai.Rec.None" xml:space="preserve"><value>There's no model ready to offer yet. Wordwright will check again later.</value></data>
+  <data name="Ai.Rec.Primary" xml:space="preserve"><value>Download and turn on</value></data>
+  <data name="Ai.Rec.Secondary" xml:space="preserve"><value>Not now</value></data>
+  <data name="Ai.Rec.Import" xml:space="preserve"><value>Import model file instead</value></data>
   <data name="Settings.Title" xml:space="preserve"><value>Settings</value></data>
 
-  <!-- About -->
-  <data name="About.Body" xml:space="preserve"><value>Wordwright is free and open source (MIT). Snippets and AI rewriting run entirely on this PC.</value></data>
+  <!-- About -->  <data name="About.Body" xml:space="preserve"><value>Wordwright is free and open source (MIT). Snippets and AI rewriting run entirely on this PC.</value></data>
   <data name="About.Privacy" xml:space="preserve"><value>Wordwright has no telemetry. It uses the internet only to download a model you chose, or to check for updates if you turned that on.</value></data>
   <data name="About.Version" xml:space="preserve"><value>Version {Version}</value></data>
   <data name="About.Source" xml:space="preserve"><value>View source on GitHub</value></data>
