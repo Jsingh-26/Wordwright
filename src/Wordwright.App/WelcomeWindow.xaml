@@ -30,6 +30,18 @@
             <TextBlock x:Name="BodyText"
                        Style="{StaticResource BodyText}"
                        Margin="0,12,0,0" />
+
+            <!-- The playground (docs/PLAN.md → P3.4c): a plain text box in a
+                 window Wordwright is not excluded from, so the snippet engine
+                 expands in it exactly as it would in any other app. Its text is
+                 never saved anywhere. -->
+            <TextBlock x:Name="TryHereLabel"
+                       Style="{StaticResource SecondaryText}"
+                       Margin="0,16,0,0" />
+            <ui:TextBox x:Name="TryHereBox"
+                        Margin="0,4,0,0"
+                        FontSize="14" />
+
             <TextBlock Style="{StaticResource SecondaryText}"
                        Margin="0,12,0,0"
                        Text="{res:Str Welcome.AiHint}" />

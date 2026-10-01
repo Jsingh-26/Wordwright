@@ -200,6 +200,10 @@ public partial class App : Application
     /// <summary>The user's data folder, for "Open data folder" and the stores.</summary>
     internal string UserDataFolder => _settingsStore.DirectoryPath;
 
+    /// <summary>The snippet engine, so a window can tell when a snippet expanded.
+    /// It is rebuilt when the excluded apps change, so read it each time.</summary>
+    internal SnippetEngine? SnippetEngine => _snippetEngine;
+
     /// <summary>Rebuilds the keystroke watching after the excluded apps change:
     /// the hook takes its list once, when it is built.</summary>
     internal void ApplyExcludedApps()

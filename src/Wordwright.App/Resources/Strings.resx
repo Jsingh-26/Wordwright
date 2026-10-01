@@ -24,6 +24,8 @@
   <data name="Welcome.AiHint" xml:space="preserve"><value>Want AI rewriting too? It runs on this PC, with no account and no cloud. You can turn it on any time.</value></data>
   <data name="Welcome.Primary" xml:space="preserve"><value>Show my snippets</value></data>
   <data name="Welcome.Secondary" xml:space="preserve"><value>Turn on offline AI</value></data>
+  <data name="Welcome.TryHere" xml:space="preserve"><value>Try it: type {Prefix}date here</value></data>
+  <data name="Welcome.TryHere.Done" xml:space="preserve"><value>That works everywhere: Word, Outlook, your browser, any app.</value></data>
 
   <!-- Navigation -->
   <data name="Nav.Snippets" xml:space="preserve"><value>Snippets</value></data>
@@ -54,6 +56,9 @@
   <data name="Snippets.New" xml:space="preserve"><value>New snippet</value></data>
   <data name="Snippets.Search" xml:space="preserve"><value>Search snippets</value></data>
   <data name="Snippets.Empty" xml:space="preserve"><value>No snippets yet. Create one, then type {Prefix} and its shortcut in any app.</value></data>
+  <data name="Snippets.Empty.TryHere" xml:space="preserve"><value>Or try an example first: type {Prefix}date here</value></data>
+  <data name="Snippets.Preview" xml:space="preserve"><value>Inserts as:</value></data>
+  <data name="Snippets.Preview.Clipboard" xml:space="preserve"><value>(what you copied last)</value></data>
   <data name="Snippets.Field.Name" xml:space="preserve"><value>Name</value></data>
   <data name="Snippets.Field.Shortcut" xml:space="preserve"><value>Shortcut</value></data>
   <data name="Snippets.Field.ShortcutHelp" xml:space="preserve"><value>Type {Prefix}{Shortcut} in any app to insert this text.</value></data>

@@ -24,6 +24,12 @@ internal sealed partial class SnippetsViewModel : ObservableObject
     private readonly DispatcherTimer _savedTimer;
     private readonly List<SnippetListItem> _all = [];
 
+    /// <summary>Builds the preview line. It never reads the clipboard: a
+    /// <c>{clipboard}</c> variable shows the placeholder instead, so opening a
+    /// snippet cannot disturb what the user copied (docs/PLAN.md → P3.4c).</summary>
+    private readonly VariableExpander _previewExpander =
+        new(() => DateTimeOffset.Now, () => Strings.Get("Snippets.Preview.Clipboard"));
+
     /// <summary>True while the editor is being filled from the list, so the
     /// change handlers stay quiet.</summary>
     private bool _loadingFields;
@@ -97,6 +103,18 @@ internal sealed partial class SnippetsViewModel : ObservableObject
 
     public string EmptyMessage => Strings.Get("Snippets.Empty", ("Prefix", Prefix));
 
+    /// <summary>The playground label of the empty state (docs/PLAN.md → P3.4c).</summary>
+    public string EmptyTryHere => Strings.Get("Snippets.Empty.TryHere", ("Prefix", Prefix));
+
+    /// <summary>What the body would insert: its variables resolved, with
+    /// <c>{cursor}</c> shown as the caret bar. Empty when there is nothing to
+    /// resolve, which is when the preview line stays out of the way.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasPreview))]
+    private string _preview = string.Empty;
+
+    public bool HasPreview => Preview.Length > 0;
+
     /// <summary>Starts a snippet and puts the editor on it.</summary>
     public SnippetListItem AddNew()
     {
@@ -156,6 +174,7 @@ internal sealed partial class SnippetsViewModel : ObservableObject
 
         OnPropertyChanged(nameof(IsEmpty));
         OnPropertyChanged(nameof(EmptyMessage));
+        OnPropertyChanged(nameof(EmptyTryHere));
         OnPropertyChanged(nameof(Prefix));
     }
 
@@ -190,7 +209,36 @@ internal sealed partial class SnippetsViewModel : ObservableObject
         OnFieldChanged();
     }
 
-    partial void OnBodyChanged(string value) => OnFieldChanged();
+    partial void OnBodyChanged(string value)
+    {
+        // Outside the OnFieldChanged guard: the preview follows the body even
+        // while the editor is being filled from the list.
+        Preview = BuildPreview(value);
+
+        OnFieldChanged();
+    }
+
+    /// <summary>Turns a body into its preview line, or nothing when it holds no
+    /// variable to resolve.</summary>
+    private string BuildPreview(string body)
+    {
+        if (!body.Contains('{'))
+        {
+            return string.Empty;
+        }
+
+        var expanded = _previewExpander.Expand(body);
+
+        // The caret marker is shown as a bar, but only where the body had one:
+        // CharactersAfterCursor is also zero when a marker sits at the very end.
+        var preview = body.Contains(SnippetVariables.Cursor, StringComparison.Ordinal)
+            ? expanded.Text.Insert(expanded.Text.Length - expanded.CharactersAfterCursor, "|")
+            : expanded.Text;
+
+        // Variables that resolved to exactly what was typed leave nothing to
+        // show, so the line stays collapsed.
+        return preview == body ? string.Empty : preview;
+    }
 
     private void OnFieldChanged()
     {
