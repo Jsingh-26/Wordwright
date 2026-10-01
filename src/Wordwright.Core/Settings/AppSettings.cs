@@ -33,4 +33,8 @@ public sealed record AppSettings
 
     /// <summary>"system", or a fixed theme name once the settings UI allows one.</summary>
     public string Theme { get; init; } = "system";
+
+    /// <summary>Where the main window was when it last closed, so the next launch
+    /// puts it back. Null until the window has been closed once.</summary>
+    public WindowPlacement? Window { get; init; }
 }

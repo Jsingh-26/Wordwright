@@ -28,6 +28,8 @@ models/
 eval/                  Python evaluation harness (not shipped)
 ```
 
+WPF-UI allows one `ContentDialogHost` per window and throws when a second one registers. It belongs on `MainWindow`, never on a page: WPF-UI builds a page again every time the user navigates back to it, so a host on a page takes the app down on the second visit.
+
 ## Dependencies (the complete allowed list)
 
 | Package | Used in | Why |

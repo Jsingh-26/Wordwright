@@ -6,9 +6,24 @@
                  xmlns:pages="clr-namespace:Wordwright.App.Pages"
                  Title="Wordwright"
                  Height="720" Width="1040"
+                 MinWidth="800" MinHeight="600"
                  WindowStartupLocation="CenterScreen"
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="Mica">
+    <!-- The window's accelerators (docs/DESIGN.md §2): a new snippet, the search
+         box, and deleting the selected snippet. They live on the window, not on
+         the page, so they also work while the focus is on the navigation rail.
+         A text box handles Delete itself, so typing in a field is unaffected. -->
+    <ui:FluentWindow.InputBindings>
+        <KeyBinding Command="New" Modifiers="Control" Key="N" />
+        <KeyBinding Command="Find" Modifiers="Control" Key="F" />
+        <KeyBinding Command="Delete" Key="Delete" />
+    </ui:FluentWindow.InputBindings>
+    <ui:FluentWindow.CommandBindings>
+        <CommandBinding Command="New" Executed="OnNewSnippetCommand" />
+        <CommandBinding Command="Find" Executed="OnFindCommand" />
+        <CommandBinding Command="Delete" Executed="OnDeleteSnippetCommand" />
+    </ui:FluentWindow.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -72,5 +87,11 @@
                 </ui:NavigationViewItem>
             </ui:NavigationView.MenuItems>
         </ui:NavigationView>
+
+        <!-- WPF-UI allows one dialog host per window ("attempting to register
+             multiple instances will result in an exception"). It lives here, not
+             on a page: a page is created again whenever the user navigates back
+             to it, and the second host would take the app down. -->
+        <ui:ContentDialogHost Grid.RowSpan="2" />
     </Grid>
 </ui:FluentWindow>
