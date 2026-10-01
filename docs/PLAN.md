@@ -27,6 +27,8 @@ Everything AI-facing is therefore tested on the maintainer's **16 GB laptop**, w
 
 The laptop stays useful as the **minimum-spec machine**: it proves the app installs, expands snippets and refuses AI in the way the docs describe, which the release checklist wants ("works on an 8 GB machine with the `cpu8` recommendation" is the same check one tier down).
 
+**No catalogue model is approved yet** — that happens in P9.4 — so until then the dialogue on that laptop says "no model ready to offer yet" and the catalogue download path cannot be exercised there. **Import model file** works now: download any GGUF by hand, import it, and P6's rewriting can be tested with it. Calibration (P7.1) measures it like any other model.
+
 **Getting a build onto that machine:** publish a GitHub release (`scripts/pack-release.ps1` then `vpk upload github`), install it there, and report back. A release is worth publishing after any change the check depends on — the assistant should offer.
 
 ## Phase P0: Repository and solution (day 1)
