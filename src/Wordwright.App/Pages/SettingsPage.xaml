@@ -7,23 +7,35 @@
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     </Page.Resources>
 
+    <!-- Grouped rows (docs/DESIGN.md §8): a heading, then one CardControl per row
+         with its label left and its control right. Rows are 4 px cards and never
+         nest, so each is spaced by its own margin. Later phases add their rows
+         inside the existing groups rather than appending to the page. -->
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="32,24" MaxWidth="620" HorizontalAlignment="Left">
             <TextBlock Style="{StaticResource PageTitle}" Text="{res:Str Settings.Title}" />
 
+            <TextBlock Style="{StaticResource GroupHeading}"
+                       Margin="0,24,0,8"
+                       Text="{res:Str Settings.Group.Snippets}" />
+
             <!-- Snippet prefix -->
-            <TextBlock Style="{StaticResource SecondaryText}"
-                       Margin="0,24,0,0"
-                       Text="{res:Str Settings.Prefix}" />
-            <ui:TextBox x:Name="PrefixBox"
-                        Width="120"
-                        Margin="0,4,0,0"
-                        HorizontalAlignment="Left"
-                        Text="{Binding SnippetPrefix, UpdateSourceTrigger=PropertyChanged}" />
+            <ui:CardControl CornerRadius="4"
+                            AutomationProperties.Name="{res:Str Settings.Prefix}">
+                <ui:CardControl.Header>
+                    <TextBlock Style="{StaticResource BodyText}"
+                               VerticalAlignment="Center"
+                               Text="{res:Str Settings.Prefix}" />
+                </ui:CardControl.Header>
+                <ui:TextBox x:Name="PrefixBox"
+                            Width="120"
+                            AutomationProperties.Name="{res:Str Settings.Prefix}"
+                            Text="{Binding SnippetPrefix, UpdateSourceTrigger=PropertyChanged}" />
+            </ui:CardControl>
 
             <!-- Apps Wordwright stays quiet in -->
-            <TextBlock Style="{StaticResource SecondaryText}"
-                       Margin="0,24,0,0"
+            <TextBlock Style="{StaticResource BodyText}"
+                       Margin="0,16,0,0"
                        Text="{res:Str Settings.ExcludedApps}" />
             <TextBlock Style="{StaticResource SecondaryText}"
                        Margin="0,2,0,0"
@@ -31,20 +43,20 @@
             <ItemsControl ItemsSource="{Binding ExcludedApps}" Margin="0,8,0,0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid Margin="0,0,0,4">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0"
-                                       VerticalAlignment="Center"
-                                       Text="{Binding}" />
-                            <ui:Button Grid.Column="1"
-                                       Padding="10,2"
+                        <!-- The Remove button sits inside the app's own row. -->
+                        <ui:CardControl Margin="0,0,0,4"
+                                        CornerRadius="4"
+                                        AutomationProperties.Name="{Binding}">
+                            <ui:CardControl.Header>
+                                <TextBlock Style="{StaticResource BodyText}"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding}" />
+                            </ui:CardControl.Header>
+                            <ui:Button Padding="10,2"
                                        Content="{res:Str Settings.ExcludedApps.Remove}"
                                        Tag="{Binding}"
                                        Click="OnRemoveExcludedAppClicked" />
-                        </Grid>
+                        </ui:CardControl>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -55,15 +67,12 @@
                        Click="OnAddExcludedAppClicked" />
 
             <!-- Snippets in and out -->
-            <StackPanel Orientation="Horizontal" Margin="0,24,0,0">
+            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
                 <ui:Button Margin="0,0,8,0"
                            Content="{res:Str Settings.Export}"
                            Click="OnExportClicked" />
-                <ui:Button Margin="0,0,8,0"
-                           Content="{res:Str Settings.Import}"
+                <ui:Button Content="{res:Str Settings.Import}"
                            Click="OnImportClicked" />
-                <ui:Button Content="{res:Str Settings.OpenDataFolder}"
-                           Click="OnOpenDataFolderClicked" />
             </StackPanel>
             <TextBlock Margin="2,6,0,0"
                        TextWrapping="Wrap"
@@ -71,10 +80,35 @@
                        Text="{Binding Message}"
                        Visibility="{Binding HasMessage, Converter={StaticResource BoolToVisibility}}" />
 
+            <TextBlock Style="{StaticResource GroupHeading}"
+                       Margin="0,24,0,8"
+                       Text="{res:Str Settings.Group.Wordwright}" />
+
             <!-- Start with Windows -->
-            <ui:ToggleSwitch Margin="0,24,0,0"
-                             Content="{res:Str Settings.StartWithWindows}"
-                             IsChecked="{Binding StartWithWindows}" />
+            <ui:CardControl CornerRadius="4"
+                            AutomationProperties.Name="{res:Str Settings.StartWithWindows}">
+                <ui:CardControl.Header>
+                    <TextBlock Style="{StaticResource BodyText}"
+                               VerticalAlignment="Center"
+                               Text="{res:Str Settings.StartWithWindows}" />
+                </ui:CardControl.Header>
+                <ui:ToggleSwitch IsChecked="{Binding StartWithWindows}"
+                                 AutomationProperties.Name="{res:Str Settings.StartWithWindows}" />
+            </ui:CardControl>
+
+            <!-- Open data folder. The whole row is the button (docs/DESIGN.md §8
+                 shows no separate control in it), so there is no second copy of
+                 the label to read out. -->
+            <ui:CardControl Margin="0,8,0,0"
+                            CornerRadius="4"
+                            AutomationProperties.Name="{res:Str Settings.OpenDataFolder}"
+                            Click="OnOpenDataFolderClicked">
+                <ui:CardControl.Header>
+                    <TextBlock Style="{StaticResource BodyText}"
+                               VerticalAlignment="Center"
+                               Text="{res:Str Settings.OpenDataFolder}" />
+                </ui:CardControl.Header>
+            </ui:CardControl>
         </StackPanel>
     </ScrollViewer>
 </Page>

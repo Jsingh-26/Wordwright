@@ -43,6 +43,16 @@
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
+    <!-- Group heading above a block of settings rows (docs/DESIGN.md §8):
+         Segoe UI Variable Semibold 14, deliberately not Zodiak — that is for
+         page titles only. -->
+    <Style x:Key="GroupHeading" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource AppText}" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+    </Style>
+
     <Style x:Key="SecondaryText" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource AppText}" />
         <Setter Property="FontSize" Value="12" />
