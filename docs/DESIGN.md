@@ -1,6 +1,19 @@
 # Design
 
-Follows the maintainer's `craft-studio` playbook: two-pass direction, the 13 anti-slop rules, free resources only.
+Follows the maintainer's `craft-studio` playbook (`playbooks/desktop-app.md`): study the product and its niche first, two-pass direction, one signature move, the 13 anti-slop rules read for an app, free resources only.
+
+## Study note (craft-studio §0, 2026-10-01, build after P3.4)
+
+- **Medium / platform:** Windows 11 desktop app, WPF + WPF-UI (Fluent, Mica), tray-resident. Playbook: desktop-app.
+- **What it is:** a text expander plus an offline AI rewrite tool. A wright shapes rough material into something that works; Wordwright shapes rough text into clean text, in any app, on your own PC.
+- **Who, where, how long:** non-technical people who write all day at work. The window is opened rarely (set up snippets, turn AI on); the daily surface is the palette and the pill inside other apps. They must trust it with their keyboard.
+- **Keep (verified in the running build):** Forge ink / Ink light accent, Zodiak + Segoe UI Variable, Phosphor Regular, Mica, the left rail with the two-line wordmark, the split list/editor on Snippets, the plain voice of the copy.
+- **Platform conventions to honour:** grouped settings rows (Fluent), a minimum window size and remembered size, keyboard accelerators, UI Automation names, high-contrast themes, 100–200 % scaling, no marketing styling inside the app.
+- **Niche references:** Text Blaze (the closest: snippets plus "AI Blaze" in a Windows Store app, but cloud-synced, account required, free plan capped at 20 snippets of 2,500 characters, AI in the cloud), Beeftext, TextExpander, PhraseExpress, Espanso, Writing Tools (theJayTea). **Shared:** tray-resident; list left, editor right; a palette hotkey; a prefix character (`/`, `;`, `:`); seeded example snippets; dynamic fields (date, clipboard, forms). **Nobody does:** snippets and rewrite in one app with the AI on the device and no account; no cap on snippet count or length; a first run you can *try inside the app* (Espanso's welcome window comes closest); privacy stated plainly as the headline. Text Blaze's forms and formulas are the feature gap Wordwright accepts for v1 (out of scope: fill-in snippets).
+- **What is unique (the design hook):** *the promise becomes real on your PC.* Wordwright measures itself on your machine and tells you the truth: estimated times, then measured times, nothing leaving the computer.
+- **Candidate signature moves (desktop playbook menu):** (1) *progressive onboarding empty state*: a "Try it here" box on the welcome window and the empty Snippets page where typing `;date` expands in place; (2) *ambient status*: the progress pill shows a hairline ruler that fills against the promised time, so every rewrite echoes the signature screen; (3) *command palette*: the action palette, already planned. **Chosen:** the time ruler stays the one bold visual (§5); the "Try it here" playground becomes the flagship interaction of the window, because the window's only job is to make a non-technical person trust the app in thirty seconds. The pill's ruler tick is a cheap echo worth keeping if it stays under 32 px. Both approved on 2026-10-01 (PLAN.md P3.4c and P6.6).
+- **Found in the build:** no minimum window size and no remembered size; no keyboard accelerators; Settings is a flat list with Remove buttons far from their rows; About uses the system-blue hyperlink (rule 7 of AGENTS.md) and shows no version; 4 of 5 interactive controls on About have no automation name (confirmed by automation id: WPF-UI's three title-bar buttons and the navigation toggle). DESIGN.md had no sketch for Settings or About; §8 and §9 below add them.
+- **Open questions:** Zodiak embedding licence (confirm before release). The welcome playground is also the empty state of the Snippets list (decided with D1).
 
 ## Pass 1: direction
 
@@ -127,7 +140,38 @@ Each estimate: a Steel band for the range with a Forge-ink stroke along it, draw
 Right column shows the letter and, if set, the action's own hotkey, so users learn the direct shortcuts.
 
 ### 7. Progress pill (floating, 32 px tall, never takes focus)
-Ember dot + "Rewriting… 3 s   Esc to cancel" → check mark + "Done. Ctrl+Z undoes it." (3 s). Short errors use the same pill.
+Ember dot + "Rewriting… 3 s   Esc to cancel" → check mark + "Done. Ctrl+Z undoes it." (3 s). Short errors use the same pill. Under the text, a 1 px Steel track with an accent fill that grows over the expected time for this input (the ruler tick, decision D2); past the estimate it continues in Ember. Skipped when Windows animations are off.
 
-## Polish checklist (run before each release, craft-studio §7)
-Hierarchy and spacing; type scale respected; AA contrast in light and dark; visible focus everywhere; keyboard-only use of every screen; automation names for screen readers; empty states invite action; Windows reduced-motion and text-size honoured; no leftover placeholder text; anti-slop list re-checked.
+### 8. Settings page (grouped Fluent rows; each row is a WPF-UI `CardControl`: label and help text left, control right)
+```
+Settings
+Snippets
+  Snippet prefix                                             [ ;  ]
+  Turn Wordwright off in these apps
+  Wordwright can't always tell when you're typing a password…
+    KeePass.exe                                             [Remove]
+    KeePassXC.exe                                           [Remove]   ← Remove sits inside the row, 8 px from the name
+  [Add app]
+  Export snippets   Import snippets
+AI                                      (from P6: Hotkey for all AI actions [recorder], per-action hotkeys note)
+Wordwright
+  Start Wordwright when I sign in                            (toggle)
+  Theme                                                      System ▾
+  Check weekly for Wordwright updates                        (toggle, P8)
+  Open data folder
+```
+Group headings in Segoe UI Variable Semibold 14, not Zodiak (Zodiak is for page titles only). Rows keep 4 px radius; no card-in-card.
+
+### 9. About page
+```
+[hero.svg, P10.0, max 320 px wide, left-aligned]
+Wordwright                     (Zodiak 26)
+Version 1.0.0                  (secondary)
+About.Body
+About.Privacy
+View source on GitHub          (accent colour, not the system blue)
+Third-party licences ▸         (Zodiak, Phosphor, WPF-UI, H.NotifyIcon, LLamaSharp, Velopack; expands in place)
+```
+
+## Polish checklist (run before each release, craft-studio §7 and the desktop playbook's verify list)
+Hierarchy and spacing; type scale respected; AA contrast in light, dark **and a Windows high-contrast theme**; visible focus everywhere; keyboard-only use of every screen; automation names for screen readers (`scripts/check-screens.ps1` counts unnamed controls; Accessibility Insights for Windows for the full pass); **100 %, 150 % and 200 % scaling; 800×600 and maximised**; launch to tray under 1 s; empty states invite action; Windows reduced-motion and text-size honoured; no leftover placeholder text; anti-slop list re-checked with the app readings (no hero, no marketing styling, texture is Mica).
