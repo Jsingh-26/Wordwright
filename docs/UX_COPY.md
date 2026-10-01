@@ -197,6 +197,7 @@ Group headings sit above their rows (docs/DESIGN.md §8).
 |---|---|
 | Settings.Title | Settings |
 | Settings.Group.Snippets | Snippets |
+| Settings.Group.Ai | AI |
 | Settings.Group.Wordwright | Wordwright |
 | Settings.PaletteHotkey | Hotkey for all AI actions |
 | Settings.ActionHotkeysHelp | Give single actions their own hotkeys on the AI actions page. |

@@ -154,6 +154,9 @@
   <!-- Settings page -->
   <data name="Settings.Group.Snippets" xml:space="preserve"><value>Snippets</value></data>
   <data name="Settings.Group.Wordwright" xml:space="preserve"><value>Wordwright</value></data>
+  <data name="Settings.Group.Ai" xml:space="preserve"><value>AI</value></data>
+  <data name="Settings.PaletteHotkey" xml:space="preserve"><value>Hotkey for all AI actions</value></data>
+  <data name="Settings.ActionHotkeysHelp" xml:space="preserve"><value>Give single actions their own hotkeys on the AI actions page.</value></data>
   <data name="Settings.Prefix" xml:space="preserve"><value>Snippet prefix</value></data>
   <data name="Settings.ExcludedApps" xml:space="preserve"><value>Turn Wordwright off in these apps</value></data>
   <data name="Settings.ExcludedAppsHelp" xml:space="preserve"><value>Wordwright can't always tell when you're typing a password. List apps where it should stay quiet, such as password managers.</value></data>

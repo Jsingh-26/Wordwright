@@ -2,7 +2,8 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-      xmlns:res="clr-namespace:Wordwright.App.Resources">
+      xmlns:res="clr-namespace:Wordwright.App.Resources"
+      xmlns:controls="clr-namespace:Wordwright.App.Controls">
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
 
@@ -81,87 +82,112 @@
             </ListBox>
 
             <!-- The editor -->
-            <Grid Grid.Column="1"
-                  Margin="24,0,0,0"
-                  IsEnabled="{Binding HasSelection}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+            <ScrollViewer Grid.Column="1"
+                          Margin="24,0,0,0"
+                          VerticalScrollBarVisibility="Auto">
+                <Grid IsEnabled="{Binding HasSelection}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0">
-                    <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Actions.Field.Name}" />
-                    <ui:TextBox x:Name="NameBox"
-                                Margin="0,4,0,0"
-                                AutomationProperties.Name="{res:Str Actions.Field.Name}"
-                                Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
-                </StackPanel>
-
-                <StackPanel Grid.Row="1" Margin="0,16,0,0">
-                    <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Actions.Field.Letter}" />
-                    <ui:TextBox x:Name="LetterBox"
-                                Width="80"
-                                HorizontalAlignment="Left"
-                                Margin="0,4,0,0"
-                                MaxLength="1"
-                                AutomationProperties.Name="{res:Str Actions.Field.Letter}"
-                                Text="{Binding Letter, UpdateSourceTrigger=PropertyChanged}" />
-                </StackPanel>
-
-                <StackPanel Grid.Row="2" Margin="0,16,0,0">
-                    <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Actions.Field.Instruction}" />
-                    <ui:TextBox x:Name="InstructionBox"
-                                Margin="0,4,0,0"
-                                MinHeight="120"
-                                AcceptsReturn="True"
-                                TextWrapping="Wrap"
-                                VerticalContentAlignment="Top"
-                                VerticalScrollBarVisibility="Auto"
-                                AutomationProperties.Name="{res:Str Actions.Field.Instruction}"
-                                Text="{Binding Instruction, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Style="{StaticResource SecondaryText}"
-                               Margin="2,4,0,0"
-                               Text="{res:Str Actions.Field.InstructionHelp}" />
-                </StackPanel>
-
-                <!-- Try it: runs this action over text pasted here, in place. -->
-                <StackPanel Grid.Row="3" Margin="0,16,0,0">
-                    <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Actions.TryIt}" />
-                    <ui:TextBox x:Name="TryItBox"
-                                Margin="0,4,0,0"
-                                MinHeight="72"
-                                AcceptsReturn="True"
-                                TextWrapping="Wrap"
-                                VerticalContentAlignment="Top"
-                                VerticalScrollBarVisibility="Auto"
-                                AutomationProperties.Name="{res:Str Actions.TryIt}"
-                                PlaceholderText="{res:Str Actions.TryItPlaceholder}"
-                                Text="{Binding TryItText, UpdateSourceTrigger=PropertyChanged}" />
-                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                        <ui:Button Appearance="Primary"
-                                   Margin="0,0,8,0"
-                                   Content="{res:Str Actions.TryIt}"
-                                   IsEnabled="{Binding CanTryIt}"
-                                   Click="OnTryItClicked" />
-                        <ui:Button Content="{res:Str Actions.ResetBuiltIn}"
-                                   Visibility="{Binding CanReset, Converter={StaticResource BoolToVisibility}}"
-                                   Click="OnResetClicked" />
+                    <StackPanel Grid.Row="0">
+                        <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Actions.Field.Name}" />
+                        <ui:TextBox x:Name="NameBox"
+                                    Margin="0,4,0,0"
+                                    AutomationProperties.Name="{res:Str Actions.Field.Name}"
+                                    Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
-                    <TextBlock Style="{StaticResource SecondaryText}"
-                               Margin="2,8,0,0"
-                               TextWrapping="Wrap"
-                               Text="{Binding TryItHint}"
-                               Visibility="{Binding HasTryItHint, Converter={StaticResource BoolToVisibility}}" />
-                    <TextBlock Margin="2,4,0,0"
-                               TextWrapping="Wrap"
-                               Foreground="{DynamicResource CautionBrush}"
-                               Text="{Binding TryItMessage}"
-                               Visibility="{Binding HasTryItMessage, Converter={StaticResource BoolToVisibility}}" />
-                </StackPanel>
-            </Grid>
+
+                    <StackPanel Grid.Row="1" Margin="0,16,0,0">
+                        <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Actions.Field.Letter}" />
+                        <ui:TextBox x:Name="LetterBox"
+                                    Width="80"
+                                    HorizontalAlignment="Left"
+                                    Margin="0,4,0,0"
+                                    MaxLength="1"
+                                    AutomationProperties.Name="{res:Str Actions.Field.Letter}"
+                                    Text="{Binding Letter, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+
+                    <!-- The hotkey recorder: click, press the keys, see them. -->
+                    <StackPanel Grid.Row="2" Margin="0,16,0,0">
+                        <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Actions.Field.Hotkey}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                            <controls:HotkeyRecorder x:Name="HotkeyBox"
+                                                     MinWidth="180"
+                                                     HorizontalAlignment="Left"
+                                                     AutomationProperties.Name="{res:Str Actions.Field.Hotkey}"
+                                                     Hotkey="{Binding Hotkey, UpdateSourceTrigger=PropertyChanged}" />
+                            <ui:Button Margin="8,0,0,0"
+                                       Content="{res:Str Actions.Hotkey.Clear}"
+                                       Click="OnClearHotkeyClicked" />
+                        </StackPanel>
+                        <TextBlock Margin="2,4,0,0"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource CautionBrush}"
+                                   Text="{Binding HotkeyMessage}"
+                                   Visibility="{Binding HasHotkeyMessage, Converter={StaticResource BoolToVisibility}}" />
+                        <TextBlock Style="{StaticResource SecondaryText}"
+                                   Margin="2,4,0,0"
+                                   Text="{res:Str Actions.Field.HotkeyHelp}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="3" Margin="0,16,0,0">
+                        <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Actions.Field.Instruction}" />
+                        <ui:TextBox x:Name="InstructionBox"
+                                    Margin="0,4,0,0"
+                                    MinHeight="120"
+                                    AcceptsReturn="True"
+                                    TextWrapping="Wrap"
+                                    VerticalContentAlignment="Top"
+                                    VerticalScrollBarVisibility="Auto"
+                                    AutomationProperties.Name="{res:Str Actions.Field.Instruction}"
+                                    Text="{Binding Instruction, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock Style="{StaticResource SecondaryText}"
+                                   Margin="2,4,0,0"
+                                   Text="{res:Str Actions.Field.InstructionHelp}" />
+                    </StackPanel>
+
+                    <!-- Try it: runs this action over text pasted here, in place. -->
+                    <StackPanel Grid.Row="4" Margin="0,16,0,0">
+                        <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Actions.TryIt}" />
+                        <ui:TextBox x:Name="TryItBox"
+                                    Margin="0,4,0,0"
+                                    MinHeight="72"
+                                    AcceptsReturn="True"
+                                    TextWrapping="Wrap"
+                                    VerticalContentAlignment="Top"
+                                    VerticalScrollBarVisibility="Auto"
+                                    AutomationProperties.Name="{res:Str Actions.TryIt}"
+                                    PlaceholderText="{res:Str Actions.TryItPlaceholder}"
+                                    Text="{Binding TryItText, UpdateSourceTrigger=PropertyChanged}" />
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <ui:Button Appearance="Primary"
+                                       Margin="0,0,8,0"
+                                       Content="{res:Str Actions.TryIt}"
+                                       IsEnabled="{Binding CanTryIt}"
+                                       Click="OnTryItClicked" />
+                            <ui:Button Content="{res:Str Actions.ResetBuiltIn}"
+                                       Visibility="{Binding CanReset, Converter={StaticResource BoolToVisibility}}"
+                                       Click="OnResetClicked" />
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource SecondaryText}"
+                                   Margin="2,8,0,0"
+                                   TextWrapping="Wrap"
+                                   Text="{Binding TryItHint}"
+                                   Visibility="{Binding HasTryItHint, Converter={StaticResource BoolToVisibility}}" />
+                        <TextBlock Margin="2,4,0,0"
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource CautionBrush}"
+                                   Text="{Binding TryItMessage}"
+                                   Visibility="{Binding HasTryItMessage, Converter={StaticResource BoolToVisibility}}" />
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
         </Grid>
     </Grid>
 </Page>
