@@ -1,17 +1,33 @@
 # Wordwright
 
-[github.com/Jsingh-26/Wordwright](https://github.com/Jsingh-26/Wordwright)
+A free, open-source text expander for Windows: type a shortcut like `;sig` and your saved text appears, in any app. No account, no sign-in, no network access.
 
-A free, open-source text expander for Windows. Type a shortcut and your text appears, in any app.
+[![CI](https://github.com/Jsingh-26/Wordwright/actions/workflows/ci.yml/badge.svg)](https://github.com/Jsingh-26/Wordwright/actions/workflows/ci.yml)
 
-**Current release: [v0.2.0](https://github.com/Jsingh-26/Wordwright/releases/tag/v0.2.0).** Snippets, and nothing else: no account, no sign-in, no network access of any kind.
+**Current release: [v0.2.0](https://github.com/Jsingh-26/Wordwright/releases/tag/v0.2.0)** (installer and portable zip).
 
-- **Snippets.** Type `;sig` and your signature appears, in any app. No limit on how many you keep or how long they are.
+![The Snippets page: a searchable list of shortcuts on the left and the editor for the selected snippet on the right.](docs/screenshot.png)
+
+- **Snippets.** No limit on how many you keep or how long they are.
 - **Variables.** `{date}`, `{time}`, `{clipboard}` and `{cursor}` fill themselves in as the snippet expands.
 - **Private by design.** Nothing you type is written to disk or to a log, and the app makes no network connections of its own.
-- **Your data, in one place.** Everything lives in `%AppData%\Wordwright`, and your snippets export and import as JSON.
+- **Your data, in one place.** Everything lives in `%AppData%\Wordwright`, and snippets export and import as JSON.
 
 > A *wright* is a maker: a shipwright builds ships, a wheelwright builds wheels. Wordwright builds your words.
+
+## How it works
+
+- A low-level keyboard hook runs on its own thread and only queues each key, so typing is never slowed down.
+- Typed characters go into an in-memory buffer of at most 64 characters. Enter, Esc, arrows, mouse clicks, switching windows or a 5-second pause clear it. It is never saved.
+- After each character, a matcher checks whether the buffer ends with a shortcut on a word boundary. If `;s` and `;sig` both exist, it waits for the next space or punctuation before choosing.
+- On a match it deletes the typed shortcut, fills in the variables, and pastes the text through the clipboard, then puts your clipboard back. The pasted text is marked so it stays out of Windows clipboard history (Win+V).
+- The code is split into `Wordwright.Core` (pure .NET, no UI, unit-tested), `Wordwright.Platform` (Windows hook, clipboard, input) and `Wordwright.App` (WPF tray app). Details: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## Decisions
+
+- **The AI rewriter was parked, not shipped untested.** See the next section.
+- **A 5-second typing gap resets the shortcut.** A shortcut typed with a long pause in the middle of it never expands (decision D3 in [`docs/PLAN.md`](docs/PLAN.md)).
+- **Users choose apps to switch it off in.** Windows does not reliably tell other apps when a password field has focus, so instead of guessing, an excluded-apps list turns Wordwright off in the programs you pick.
 
 ## What is not here, and why
 
@@ -20,6 +36,18 @@ An earlier Wordwright also had an **on-device AI writing assistant**: select tex
 It is not part of this application. It needs a machine with enough free memory to load a model, and a range of devices to judge speed and quality on — neither of which was available to test it properly. Rather than ship an untested feature that downloads a multi-gigabyte model, it was parked.
 
 **All of it is preserved**, and the whole story — what was planned, how it was built, what was proven and what never was, and how to pick it up again — is in [`docs/AI_REWRITING.md`](docs/AI_REWRITING.md). The code is on the [`ai-rewriting`](https://github.com/Jsingh-26/Wordwright/tree/ai-rewriting) branch, and releases **v0.1.3–v0.1.5** contain it.
+
+## Tests and running locally
+
+Needs Windows and the .NET 10 SDK.
+
+```bash
+dotnet build -c Release
+dotnet test -c Release                      # 140 xUnit tests for Wordwright.Core
+dotnet run --project src/Wordwright.App     # starts the tray app
+```
+
+CI runs the build and the tests on Windows for every push to `main` and every pull request.
 
 ## Status
 
