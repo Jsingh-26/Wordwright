@@ -65,7 +65,7 @@ Upload `Releases/Wordwright-1.0.0.msixbundle`. Device family: **Desktop** only.
 
 **What's new in this version**
 
-> First release on the Microsoft Store.
+> First release on the Microsoft Store. New since the last GitHub release: works with German, French, Spanish and UK keyboard layouts; sharp on mixed-scaling monitors; safer, faster clipboard handling; keeps working after sleep and lock; the editor never loses an edit.
 
 **Product features** (one per line)
 

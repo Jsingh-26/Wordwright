@@ -36,11 +36,19 @@ Windows may show *"Windows protected your PC"* the first time, because the insta
 - **Half the download:** the installer drops from 160 MB to 78 MB. Leftover native libraries from the parked AI feature were still being packaged; they are gone.
 - **Brand:** a new illustration on the About page and the installer, the app's mark on the window and taskbar, and the publisher name, Unbound Kite.
 - **About page** now says exactly what the app does on the network: nothing.
+- **Works with your keyboard layout:** shortcuts expand on German, French, Spanish and UK layouts, with Caps Lock on, with AltGr characters, and with a prefix that needs Shift, such as `:`.
+- **Sharp on every screen:** text and icons stay crisp when monitors use different scaling, and the window reopens on the monitor where you closed it and fits small screens.
+- **Safer pasting:** your clipboard is put back without slowing the paste down, even after copying a large Excel range, and slow apps get time to read the snippet first. If another program is holding the clipboard, the shortcut is left as you typed it rather than pasting the wrong thing.
+- **Multi-line snippets** keep their line breaks in every app.
+- **Keeps working after sleep and lock:** the shortcut listener comes back on its own after the PC resumes or unlocks, and the tray says so if Windows refuses it.
+- **Edits are never lost:** the editor saves when you switch snippets, change page or quit, and a shortcut prefix that cannot work is not applied.
+- **One data folder:** the Microsoft Store and installer versions both keep your snippets in `%AppData%\Wordwright`, and the portable zip no longer adds itself to Start with Windows.
+- **A small, content-free event log** in `%AppData%\Wordwright\logs` records only events such as "started", never what you type, so a problem can be reported without sharing your text.
 
 ### Verification
 
 - `dotnet build -c Release`: 0 warnings, 0 errors.
-- `dotnet test -c Release`: ___ passed, 0 failed.
+- `dotnet test -c Release`: 181 passed, 0 failed.
 - Every page captured at 800×600 and maximised, in light and dark: zero controls without an accessible name.
 - Manual pass on a real Windows machine: ___ (P10.2 and the release checklist in `docs/PLAN.md`).
 
