@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Wordwright.Platform.Keyboard;
 
-// Probe 1: does Shift / Caps Lock reach the hook's ToUnicodeEx translation?
+// Probe 1: does Shift / Caps Lock / AltGr (German layout) reach the hook's ToUnicodeEx translation?
 // Probe 2: does the hook survive a garbage collection? (Is the hook delegate rooted?)
 // Printable keys are only injected when our own form owns the foreground, so
 // nothing is typed into another window. The GC probe uses a bare Ctrl tap,
@@ -14,6 +14,7 @@ internal static class Program
 static void Main(string[] args)
 {
     var gcOnly = args.Contains("--gc-only");
+    var wasLoaded = GetLayouts().Any(h => ((long)h & 0xFFFF) == 0x0407);
     var received = new List<char>();
     var clears = 0;
     using var hook = new KeyboardHook([], ignoreInjectedInput: false);
@@ -63,6 +64,34 @@ static void Main(string[] args)
             Key(0x53, down: true); Key(0x53, down: false); Pump(100);
             Key(0x14, down: true); Key(0x14, down: false); Pump(500);
             Console.WriteLine($"Caps+s  -> hook saw [{string.Concat(received)}], textbox has [{box.Text}]");
+
+            // German layout, for this thread only and unloaded afterwards:
+            // ; is Shift+, and @ is AltGr+Q (AltGr arrives as LCtrl + RAlt).
+            var german = LoadKeyboardLayout("00000407", 0);
+            if (german == IntPtr.Zero)
+            {
+                Console.WriteLine("German layout unavailable; skipping");
+            }
+            else
+            {
+                var previous = ActivateKeyboardLayout(german, 0);
+                Pump(200);
+
+                received.Clear(); box.Clear();
+                Key(0xA0, down: true); Pump(30);
+                Key(0xBC, down: true); Key(0xBC, down: false); Pump(30);
+                Key(0xA0, down: false); Pump(500);
+                Console.WriteLine($"DE Shift+, -> hook saw [{string.Concat(received)}], textbox has [{box.Text}]");
+
+                received.Clear(); box.Clear();
+                Key(0xA2, down: true); Key(0xA5, down: true, extended: true); Pump(30);
+                Key(0x51, down: true); Key(0x51, down: false); Pump(30);
+                Key(0xA5, down: false, extended: true); Key(0xA2, down: false); Pump(500);
+                Console.WriteLine($"DE AltGr+Q -> hook saw [{string.Concat(received)}], textbox has [{box.Text}]");
+
+                ActivateKeyboardLayout(previous, 0);
+                if (!wasLoaded) _ = UnloadKeyboardLayout(german);
+            }
         }
         form.Close();
     }
@@ -82,14 +111,21 @@ static void Main(string[] args)
 
 static void Pump(int ms) { var end = Environment.TickCount64 + ms; while (Environment.TickCount64 < end) { Application.DoEvents(); Thread.Sleep(10); } }
 
-static void Key(ushort vk, bool down)
+static void Key(ushort vk, bool down, bool extended = false)
 {
     var scan = (ushort)MapVirtualKey(vk, 0);
-    var input = new INPUT { Type = 1, U = new U { K = new KEYBDINPUT { Vk = vk, Scan = scan, Flags = down ? 0u : 2u } } };
+    var flags = (down ? 0u : 2u) | (extended ? 1u : 0u);
+    var input = new INPUT { Type = 1, U = new U { K = new KEYBDINPUT { Vk = vk, Scan = scan, Flags = flags } } };
     _ = SendInput(1, [input], Marshal.SizeOf<INPUT>());
     Thread.Sleep(20);
 }
 
+static IntPtr[] GetLayouts() { var list = new IntPtr[64]; var n = GetKeyboardLayoutList(list.Length, list); return list[..n]; }
+
+[DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern IntPtr LoadKeyboardLayout(string id, uint flags);
+[DllImport("user32.dll")] static extern IntPtr ActivateKeyboardLayout(IntPtr hkl, uint flags);
+[DllImport("user32.dll")] static extern bool UnloadKeyboardLayout(IntPtr hkl);
+[DllImport("user32.dll")] static extern int GetKeyboardLayoutList(int n, IntPtr[] list);
 [DllImport("user32.dll")] static extern IntPtr GetForegroundWindow();
 [DllImport("user32.dll")] static extern bool SetForegroundWindow(IntPtr h);
 [DllImport("user32.dll")] static extern uint MapVirtualKey(uint c, uint t);

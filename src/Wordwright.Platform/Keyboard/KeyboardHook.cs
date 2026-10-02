@@ -57,6 +57,15 @@ public sealed class KeyboardHook : IDisposable
     private const uint VK_RMENU = 0xA5;
     private const uint VK_LWIN = 0x5B;
     private const uint VK_RWIN = 0x5C;
+    private const int VK_SHIFT = 0x10;
+    private const int VK_CONTROL = 0x11;
+    private const int VK_MENU = 0x12;
+    private const int VK_CAPITAL = 0x14;
+
+    // ToUnicodeEx flag (Windows 10 1607+): translate without touching the
+    // kernel's keyboard state, so a dead key the user is typing (^ or ´ on many
+    // European layouts) still reaches the app intact.
+    private const uint ToUnicodeKeepState = 0x4;
 
     private readonly IReadOnlyList<string> _excludedApps;
     private readonly ManualResetEventSlim _hookReady = new(false);
@@ -203,7 +212,9 @@ public sealed class KeyboardHook : IDisposable
             if (!IsInjected(data.Flags, LLKHF_INJECTED))
             {
                 // Our own typing (backspaces, the paste) is injected and never lands here.
-                _ = _events.TryAdd(HookEvent.Key(data.VirtualKey, data.ScanCode));
+                // The modifiers are read now: by the time the worker translates the
+                // key the user may have let go of Shift.
+                _ = _events.TryAdd(HookEvent.Key(data.VirtualKey, data.ScanCode, ReadModifiers()));
             }
         }
 
@@ -239,7 +250,7 @@ public sealed class KeyboardHook : IDisposable
                 }
                 else
                 {
-                    HandleKey(item.VirtualKey, item.ScanCode);
+                    HandleKey(item.VirtualKey, item.ScanCode, item.Modifiers);
                 }
             }
             catch (Exception exception)
@@ -250,7 +261,7 @@ public sealed class KeyboardHook : IDisposable
         }
     }
 
-    private void HandleKey(uint virtualKey, uint scanCode)
+    private void HandleKey(uint virtualKey, uint scanCode, Modifiers modifiers)
     {
         var foreground = GetForegroundWindow();
 
@@ -288,30 +299,40 @@ public sealed class KeyboardHook : IDisposable
             return;
         }
 
-        if (Translate(virtualKey, scanCode, foreground) is { } character)
+        if (Translate(virtualKey, scanCode, modifiers, foreground) is { } character)
         {
             CharacterTyped?.Invoke(this, character);
         }
     }
 
     /// <summary>Turns a key into the character it would produce in the foreground
-    /// window, using that window's keyboard layout. Control characters (a Ctrl
-    /// combination, say) and dead keys produce nothing.</summary>
-    private char? Translate(uint virtualKey, uint scanCode, IntPtr foreground)
+    /// window, using that window's keyboard layout and the modifiers held when it
+    /// was pressed. Control characters (a Ctrl combination, say) and dead keys
+    /// produce nothing.</summary>
+    private char? Translate(uint virtualKey, uint scanCode, Modifiers modifiers, IntPtr foreground)
     {
         var threadId = GetWindowThreadProcessId(foreground, out _);
         var layout = GetKeyboardLayout(threadId);
-        var keyboardState = new byte[256];
 
-        if (!GetKeyboardState(keyboardState))
+        // GetKeyboardState cannot be used here: this thread has no input of its
+        // own, so its key state never shows Shift, Caps Lock or AltGr. Build the
+        // state from what the hook saw instead.
+        var keyboardState = new byte[256];
+        SetDown(keyboardState, modifiers.HasFlag(Modifiers.LeftShift), VK_LSHIFT, VK_SHIFT);
+        SetDown(keyboardState, modifiers.HasFlag(Modifiers.RightShift), VK_RSHIFT, VK_SHIFT);
+        SetDown(keyboardState, modifiers.HasFlag(Modifiers.LeftControl), VK_LCONTROL, VK_CONTROL);
+        SetDown(keyboardState, modifiers.HasFlag(Modifiers.RightControl), VK_RCONTROL, VK_CONTROL);
+        SetDown(keyboardState, modifiers.HasFlag(Modifiers.LeftAlt), VK_LMENU, VK_MENU);
+        SetDown(keyboardState, modifiers.HasFlag(Modifiers.RightAlt), VK_RMENU, VK_MENU);
+        if (modifiers.HasFlag(Modifiers.CapsLock))
         {
-            return null;
+            keyboardState[VK_CAPITAL] = 0x01;
         }
 
-        // ToUnicodeEx can return two characters for a ligature or a negative value
-        // for a dead key; neither is a plain typed character.
+        // A negative value is a dead key; two characters are a ligature. Only a
+        // single character is a plain typed character.
         var written = ToUnicodeEx(
-            virtualKey, scanCode, keyboardState, _translation, _translation.Length, 0, layout);
+            virtualKey, scanCode, keyboardState, _translation, _translation.Length, ToUnicodeKeepState, layout);
 
         if (written != 1)
         {
@@ -321,6 +342,32 @@ public sealed class KeyboardHook : IDisposable
         var character = _translation[0];
         return char.IsControl(character) ? null : character;
     }
+
+    private static void SetDown(byte[] state, bool down, uint sideKey, int key)
+    {
+        if (down)
+        {
+            state[sideKey] = 0x80;
+            state[key] = 0x80;
+        }
+    }
+
+    /// <summary>Runs on the hook thread, where the asynchronous key state already
+    /// includes every key pressed before this one.</summary>
+    private static Modifiers ReadModifiers()
+    {
+        var modifiers = Modifiers.None;
+        if (IsDown(VK_LSHIFT)) modifiers |= Modifiers.LeftShift;
+        if (IsDown(VK_RSHIFT)) modifiers |= Modifiers.RightShift;
+        if (IsDown(VK_LCONTROL)) modifiers |= Modifiers.LeftControl;
+        if (IsDown(VK_RCONTROL)) modifiers |= Modifiers.RightControl;
+        if (IsDown(VK_LMENU)) modifiers |= Modifiers.LeftAlt;
+        if (IsDown(VK_RMENU)) modifiers |= Modifiers.RightAlt;
+        if ((GetKeyState(VK_CAPITAL) & 0x0001) != 0) modifiers |= Modifiers.CapsLock;
+        return modifiers;
+    }
+
+    private static bool IsDown(uint virtualKey) => (GetAsyncKeyState((int)virtualKey) & 0x8000) != 0;
 
     private bool IsInjected(uint flags, uint injectedFlag)
         => IgnoreInjectedInput && (flags & injectedFlag) != 0;
@@ -368,11 +415,25 @@ public sealed class KeyboardHook : IDisposable
         VK_LSHIFT or VK_RSHIFT or VK_LCONTROL or VK_RCONTROL
         or VK_LMENU or VK_RMENU or VK_LWIN or VK_RWIN;
 
-    private readonly record struct HookEvent(uint VirtualKey, uint ScanCode, bool IsForget)
+    [Flags]
+    private enum Modifiers
     {
-        public static HookEvent Key(uint virtualKey, uint scanCode) => new(virtualKey, scanCode, false);
+        None = 0,
+        LeftShift = 1,
+        RightShift = 2,
+        LeftControl = 4,
+        RightControl = 8,
+        LeftAlt = 16,
+        RightAlt = 32,
+        CapsLock = 64,
+    }
 
-        public static HookEvent Forget() => new(0, 0, true);
+    private readonly record struct HookEvent(uint VirtualKey, uint ScanCode, Modifiers Modifiers, bool IsForget)
+    {
+        public static HookEvent Key(uint virtualKey, uint scanCode, Modifiers modifiers)
+            => new(virtualKey, scanCode, modifiers, false);
+
+        public static HookEvent Forget() => new(0, 0, Modifiers.None, true);
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -417,7 +478,10 @@ public sealed class KeyboardHook : IDisposable
     private static extern IntPtr GetKeyboardLayout(uint threadId);
 
     [DllImport("user32.dll")]
-    private static extern bool GetKeyboardState(byte[] state);
+    private static extern short GetAsyncKeyState(int virtualKey);
+
+    [DllImport("user32.dll")]
+    private static extern short GetKeyState(int virtualKey);
 
     // CharSet.Unicode matters: ToUnicodeEx writes UTF-16, and the default ANSI
     // marshalling of a char[] would turn every character into garbage.

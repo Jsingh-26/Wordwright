@@ -11,7 +11,8 @@
     bare Ctrl, which types nothing anywhere. Nothing typed is ever written out.
 
     Run it with:  dotnet run (with the project argument) scripts/HookProbe
-    Expected after P12.1:  Shift+S seen as [S], Shift+1 as [!], Caps+s as [S]
+    Expected after P12.1:  Shift+S seen as [S], Shift+1 as [!], Caps+s as [S],
+    and on the German layout Shift+, as [;] and AltGr+Q as [@]
   -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
