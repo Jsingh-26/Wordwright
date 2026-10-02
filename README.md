@@ -4,7 +4,7 @@
 
 A free, open-source text expander for Windows with an AI writing assistant that runs entirely on your own computer.
 
-**Current release: [v0.1.4](https://github.com/Jsingh-26/Wordwright/releases/tag/v0.1.4).** Snippets, model import/download handling and the on-device rewriting engine are implemented. **Offline AI appears only when this PC has the memory and disk for a model** — Wordwright measures at startup and again before a model is set up, imported or loaded, and never asks you to close anything to qualify. No catalog model is approved yet, so automatic model download is unavailable and **Turn on offline AI** reports that there is no model to offer — import a GGUF by hand to try rewriting. Calibration (P7.1) and the Offline AI page (P7.2) are not built yet, so the Offline AI screen is still a placeholder.
+**Current release: [v0.1.5](https://github.com/Jsingh-26/Wordwright/releases/tag/v0.1.5).** Snippets, model import/download handling and the on-device rewriting engine are implemented. **Offline AI appears only when this PC has the memory and disk for a model** — Wordwright measures at startup and again before a download starts or resumes, before an import, and before a model loads, and never asks you to close anything to qualify. The model being set up is judged as itself, never on the strength of a smaller one that happens to fit. No catalog model is approved yet, so automatic model download is unavailable and **Turn on offline AI** reports that there is no model to offer — import a GGUF by hand to try rewriting. Calibration (P7.1) and the Offline AI page (P7.2) are not built yet, so the Offline AI screen is still a placeholder.
 
 - **Snippets.** Type `;sig` and your signature appears, in any app. No limits on how many snippets you keep or how long they are.
 - **Rewrite anything with a hotkey.** Select text and press `Ctrl + Alt + G` to fix grammar instantly, or `Ctrl + Alt + Space` to pick from *Make it clearer*, *Shorten*, *More formal* and more. Give any action its own hotkey. The text is rewritten in place. Needs an imported model while the catalogue is unapproved.
@@ -24,7 +24,7 @@ Internet is used only when you choose to download a model, or to check for a bet
 
 ## Status
 
-P0–P6 are complete, along with the Microsoft Store package (P3.6) and the evaluation set-up (P9.1–P9.3, P9.5); [v0.1.4](https://github.com/Jsingh-26/Wordwright/releases/tag/v0.1.4) is the current release. P7 (calibration and the Offline AI page) is next, pending the P4/P5/P6 human checks. See the current handoff and verification gates in [`docs/PLAN.md`](docs/PLAN.md), and the [Windows test report](docs/WINDOWS_TEST_2026-10-01.md).
+P0–P6 are complete, along with the Microsoft Store package (P3.6) and the evaluation set-up (P9.1–P9.3, P9.5); [v0.1.5](https://github.com/Jsingh-26/Wordwright/releases/tag/v0.1.5) is the current release. P7 (calibration and the Offline AI page) is next, pending the P4/P5/P6 human checks. See the current handoff and verification gates in [`docs/PLAN.md`](docs/PLAN.md), and the [Windows test report](docs/WINDOWS_TEST_2026-10-01.md).
 
 ## Documentation
 
