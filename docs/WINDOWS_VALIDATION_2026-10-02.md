@@ -1,5 +1,7 @@
 # 16 GB laptop validation — 2026-10-01–02
 
+> **Historical.** A validation report from 2026-10-01–02, largely about the parked AI writing assistant ([AI_REWRITING.md](AI_REWRITING.md)). It does not describe the current app.
+
 GitHub handoff: https://github.com/Jsingh-26/Wordwright/issues/2
 
 Validation on the maintainer's 16 GB laptop, 2026-10-01–02 (Asia/Kolkata).

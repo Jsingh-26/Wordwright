@@ -1,5 +1,7 @@
 # UI review and craft pass — 2026-10-02
 
+> **Historical.** The UI review of 2026-10-02 that led to Phase P11; its findings are done. The current design is in [DESIGN.md](DESIGN.md).
+
 A craft-studio review of the shipping (snippets-only) UI, run against `docs/DESIGN.md`, `docs/UX_COPY.md` and the desktop-app playbook. Method: read the code, build and run the app, capture every page with `scripts/check-screens.ps1`, compare against the spec. Screenshots: `scripts/ui-check-Snippets.png`, `ui-check-Settings.png`, `ui-check-About.png` (fresh, current build, dark theme).
 
 ## Study note (refresh of the 2026-10-01 one, for the shipping app)

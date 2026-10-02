@@ -97,6 +97,8 @@ Snippets only, and heading for the Microsoft Store. The plan and what is left ar
 | [`docs/UX_COPY.md`](docs/UX_COPY.md) | Every piece of user-facing text |
 | [`brand/`](brand/) | Logo and icon files |
 
+Historical records, kept for reference and not describing the current app: [`EVAL.md`](docs/EVAL.md) and [`MODELS.md`](docs/MODELS.md) (the parked AI feature), [`UI_REVIEW.md`](docs/UI_REVIEW.md) and [`P11_CRAFT_PASS.md`](docs/P11_CRAFT_PASS.md) (the finished craft pass), and the test reports [`WINDOWS_TEST_2026-10-01.md`](docs/WINDOWS_TEST_2026-10-01.md) and [`WINDOWS_VALIDATION_2026-10-02.md`](docs/WINDOWS_VALIDATION_2026-10-02.md).
+
 ## License
 
 MIT.

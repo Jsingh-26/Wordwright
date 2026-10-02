@@ -1,5 +1,7 @@
 # Windows installation and AI setup test — 2026-10-01
 
+> **Historical.** A test report from 2026-10-01, when Wordwright still had the parked AI writing assistant ([AI_REWRITING.md](AI_REWRITING.md)). It does not describe the current app.
+
 ## Build and scope
 
 Tested the latest published Windows installer, [v0.1.2](https://github.com/Jsingh-26/Wordwright/releases/tag/v0.1.2), and reviewed a fresh clone of GitHub main at `62d588e841091acf4fa1d272771c5083fe1aa928`. Existing laptop source was not used or modified. Tests used the desktop execution environment on Windows 11 x64; this was not a clean Windows user account or a Microsoft Store package test.

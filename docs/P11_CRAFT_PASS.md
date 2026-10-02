@@ -1,5 +1,7 @@
 # Phase P11 — Craft pass: detailed implementation plan
 
+> **Historical.** The implementation plan for Phase P11, which is complete. The current design is in [DESIGN.md](DESIGN.md) and the plan in [PLAN.md](PLAN.md).
+
 Companion to the checklist in `docs/PLAN.md` (Phase P11) and the reasoning in `docs/UI_REVIEW.md`. This is the *how*: exact files, code sketches, acceptance criteria and risks, one task at a time, in order. All decisions (D7–D11) were approved 2026-10-02 and are recorded in DESIGN.md.
 
 Guardrails that apply to every task below (AGENTS.md hard rules): no network, no user text to disk or logs, nothing new written inline — all strings already exist in `UX_COPY.md`/`Strings.resx`, no new colours or fonts, no new NuGet dependencies. If any sketch below turns out to need one of those, stop and ask.
