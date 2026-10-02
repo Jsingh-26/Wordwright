@@ -18,6 +18,8 @@ The application is a text expander: snippets with `{date}`, `{time}`, `{clipboar
 - [ ] **P10.3** Release **v1.0.0** on GitHub with notes.
 - [ ] **P10.4** Publish the MSIX package (P3.6) to the Microsoft Store.
 
+**Added on 2026-10-02:** the **Phase P11 craft pass** (from the UI review in `docs/UI_REVIEW.md`), inserted below before the release phase — it finishes before P10.2 so the release verification covers the final UI.
+
 **Human checks still open** — the maintainer runs these on a real Windows machine, and they are the only thing gating the release:
 
 - [ ] Install the release on a fresh user account: create, edit and delete snippets; everything persists after a restart; nothing is left outside `%AppData%\Wordwright`.
@@ -67,6 +69,14 @@ Two product changes the study recommended. Both approved by the maintainer on 20
 - [x] **D5 Copy as the fallback** (from AI Blaze). → folded into **P6.6**.
 - [x] **D6 Snippet picker in the palette** (every expander has one). Pulled into v1 → **P6.8**.
 - [x] **D2 Pill ruler tick.** The progress pill (DESIGN.md §7) shows a hairline ruler that fills against the measured estimate, so every rewrite echoes the time ruler. Must stay inside the 32 px pill and skip when Windows animations are off. → folded into **P6.6**.
+
+### Craft-pass decisions (from the 2026-10-02 UI review in docs/UI_REVIEW.md)
+All five approved by the maintainer on 2026-10-02; details in DESIGN.md and the **Phase P11** tasks below the release phase.
+- [x] **D7 Motion for the shipping app.** The time ruler is parked with the AI feature; the signature move becomes the connected animation from the snippet list to the editor, plus one system-wide entrance/exit pattern, everything gated on Windows animations being on. → **P11.4, P11.5, P11.6**.
+- [x] **D8 Panel radius.** Apply DESIGN.md's 6 px panel radius (cards, snippet-list selection); controls stay 4 px. → **P11.1**.
+- [x] **D9 Error colour.** True validation errors use the system critical fill; Ochre stays caution-only; Ember stays reserved for the parked feature. → **P11.1**.
+- [x] **D10 Tray menu.** Style the tray context menu to Fluent (palette, 4 px radius, light/dark following the taskbar). → **P11.3**.
+- [x] **D11 Theme setting.** Build the Settings "Theme" row (System / Light / Dark); the copy already exists in UX_COPY.md. → **P11.2**.
 
 ## Phase P3: Snippet manager UI (day 4–5)
 - [x] **P3.1** Snippets page: searchable list + editor (DESIGN.md §2), auto-save, "Saved" indicator, validation messages, delete with confirmation.
@@ -124,6 +134,23 @@ Two product changes the study recommended. Both approved by the maintainer on 20
 - [x] **P9.3** Fill real `source`, `sizeBytes`, `sha256`, `license` for each candidate from Hugging Face; drop any that are gated or not permissively licensed.
 - [ ] **P9.4** Run the eval, spot-check, generate `REPORT.md`, set `evalScores`, measured speeds and `status: approved` for the winners.
 - [x] **P9.5** `.github/workflows/model-watch.yml`: weekly job that opens an issue for new GGUF releases from the watched publishers. Never edits the catalog.
+
+## Phase P11: Craft pass (2026-10-02; finish before P10.2)
+
+From the UI review in `docs/UI_REVIEW.md`; per-task implementation detail (files, code sketches, acceptance criteria, risks) is in `docs/P11_CRAFT_PASS.md`. Fixes the gaps where the build diverged from DESIGN.md and gives the shipping app the motion spec the parked AI feature took with it. No new dependencies, no new pages, no new copy beyond what UX_COPY.md already holds. **The hero illustration stays P10.0** (it fills the About slot during this pass, but it is generated and recoloured by hand per `brand/HERO_BRIEF.md`).
+
+- [x] **P11.0** Record decisions D7–D11 (below) in DESIGN.md and this plan.
+- [ ] **P11.1** Theme tokens (D8, D9): add `PanelRadius` (6 px) and apply it to the Settings cards and the snippet-list selection (fields, buttons, menu items stay 4 px); show validation errors in the Fluent critical fill (`SystemFillColorCriticalBrush`, theme-following) via a trigger on `ShortcutMessageIsError` — cautions stay Ochre.
+  *Done when:* `check-screens.ps1` shows panels at 6 px; an "already used" error reads as an error and the very-long warning stays Ochre.
+- [ ] **P11.2** Settings "Theme" row (D11): System / Light / Dark in the Wordwright group (copy exists: `Settings.Theme`), persisted in `settings.json`, applied through the existing accent-swap path in `App.xaml.cs`; the OS watcher only applies in System. Core test for the persisted value.
+  *Human check:* each choice re-skins the window immediately and survives a restart.
+- [ ] **P11.3** Tray menu theming (D10): Fluent-styled context menu (palette brushes, 4 px radius, light/dark following the taskbar via the tray icon's `SystemTheme` logic). No new dependency.
+  *Human check:* the menu matches the taskbar theme in both modes.
+- [ ] **P11.4** `Motion.cs` (D7): one entrance factory (fade + 8 px slide, 200 ms decelerate `cubic-bezier(0,0,0,1)`), one exit (fade, 120 ms accelerate), both strict no-ops when `SystemParameters.ClientAreaAnimation` is false. All later motion goes through it.
+- [ ] **P11.5** Signature move (D7): connected animation from snippet list to editor (a proxy of the shortcut chip glides from the selected row into the Shortcut field, 200 ms), a choreographed editor settle, page-entrance transitions on navigation, the "Saved" fade-in/out, and list add/remove transitions.
+  *Human check:* with "Show animations in Windows" on and off — off must behave exactly as before.
+- [ ] **P11.6** Playground completion moment: the first expansion in the welcome window and the Snippets empty state reveals `Welcome.TryHere.Done` with the entrance animation and a small accent check mark. Copy already exists.
+- [ ] **P11.7** Housekeeping: drop the parked "AI actions"/"Offline AI" pages from `check-screens.ps1`; gitignore `scripts/ui-check-*.png` and untrack the checked-in captures.
 
 ## Phase P10: Release (day 13–14)
 - [ ] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and the About page slot from DESIGN.md §9.

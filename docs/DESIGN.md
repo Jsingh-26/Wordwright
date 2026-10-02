@@ -35,8 +35,8 @@ Design: a web dashboard in red/white with a panda mascot and feature GIFs; folde
 - **Subject.** A *wright* is a maker who shapes raw material into something that works. Wordwright takes rough text and shapes it into clean text, in any app, on your own PC.
 - **Audience.** People who write all day at work and are not technical. They must trust it with their keyboard.
 - **Primary job.** Be invisible while typing, fast when called, and completely clear at the one moment that needs a decision: turning on offline AI.
-- **Signature moment (spend boldness only here).** The *time ruler* in the "Turn on offline AI" dialogue: estimated rewrite times drawn as forged ink strokes on a ruler, and redrawn with the real measured times after calibration.
-- **Motion idea.** A stroke being drawn: left to right, ease-out, once.
+- **Signature moment (spend boldness only here).** The *time ruler* in the "Turn on offline AI" dialogue: estimated rewrite times drawn as forged ink strokes on a ruler, and redrawn with the real measured times after calibration. **Parked with the AI feature.** The shipping app's signature move is the connected animation from the snippet list to the editor — see *Motion (shipping app)* below.
+- **Motion idea (parked with the ruler).** A stroke being drawn: left to right, ease-out, once.
 
 ### Palette (named, tinted toward ink; no flat greys)
 | Name | Hex | Role |
@@ -46,7 +46,10 @@ Design: a web dashboard in red/white with a panda mascot and feature GIFs; folde
 | Steel | `#E9ECF3` | Tinted neutral: panels and list selection in light theme |
 | Anvil | `#1A2030` | Tinted near-black: body text in light theme, panels in dark theme |
 | Ember | `#C7621E` | Used only for "working" states: the dot in the progress pill while rewriting, the live download bar |
-| Ochre | `#9A5B00` (dark theme `#E8B45A`) | Caution notes: "may be slow on this PC", low disk or memory |
+| Ochre | `#9A5B00` (dark theme `#E8B45A`) | Caution notes: "may be slow on this PC", low disk or memory, the "very long snippet" warning |
+| Errors | system critical fill (WPF-UI `SystemFillColorCriticalBrush`) | Validation errors only: "shortcut already used", "invalid characters" (decision D9, 2026-10-02). Cautions stay Ochre |
+
+Ember is reserved: its two jobs (the progress pill, the download bar) are parked with the AI feature, and nothing in the snippets-only app uses it (2026-10-02 review, finding F9).
 
 Window backgrounds use the Windows 11 Mica material. No gradients anywhere.
 
@@ -61,7 +64,17 @@ Why: a sharp, crafted serif for the maker's voice; the system face for everythin
 Scale (px, modular ~1.25): 32 wordmark / 26 page title / 20 dialogue title / 14 body / 12 secondary. Sentence case everywhere. No all-caps labels, no single-word accent in titles, tabular figures for numbers.
 
 ### Layout
-Left-aligned throughout. Structure varies by screen (split list/editor, a single-column dialogue, a floating palette) rather than a grid of identical cards. Corner radius follows hierarchy: window 8 (system), panels 6, controls 4, the pill fully rounded. System shadows only.
+Left-aligned throughout. Structure varies by screen (split list/editor, a single-column dialogue, a floating palette) rather than a grid of identical cards. Corner radius follows hierarchy: window 8 (system), panels 6, controls 4, the pill fully rounded. Cards and the snippet-list selection take the 6 px panel radius; fields, buttons and menu items stay 4 px (decision D8, 2026-10-02). System shadows only.
+
+## Motion (shipping app — decision D7, 2026-10-02)
+
+The time ruler's drawn stroke was the motion idea, and it is parked with the AI feature. The shipping app gets **one system, one pattern** instead, with the connected animation as its flagship (desktop playbook menu item 3):
+
+- **Signature move:** selecting a snippet glides a proxy of its shortcut chip from the list row into the editor's Shortcut field (200 ms, decelerate), while the editor fields settle in a single choreographed stagger.
+- **Entrances** (page navigation, "Saved", playground completion, list add): fade plus an 8 px slide, 200 ms, decelerate `cubic-bezier(0,0,0,1)`.
+- **Exits** (list remove, dismissed indicators): fade, 120 ms, accelerate.
+- Nothing loops and nothing animates on a timer; motion responds to the user's own actions only.
+- Everything goes through one helper (`Motion.cs`) and is a strict no-op when Windows animations are off (`SystemParameters.ClientAreaAnimation`), honouring reduced motion. With animations off, behaviour is identical to having no motion code at all.
 
 ## Pass 2: rejected defaults
 | First instinct | Why rejected | Replaced with |
@@ -85,11 +98,10 @@ Files in `brand/`.
 ```
 Open Wordwright
 Snippets on                    ✓
-Offline AI on                  ✓   (or "Turn on offline AI…")
 ───────────────────────────────
 Quit Wordwright
 ```
-An Ember dot on the tray icon means a better model is available.
+(The "Offline AI on" row is parked with the AI feature.) Styled to Fluent: palette brushes, 4 px radius, light or dark following the taskbar theme through the same `SystemTheme` check as the tray icon (decision D10, 2026-10-02). The tray menu is the most-seen surface of the app — the window is opened rarely — so stock WPF chrome is not acceptable here. An Ember dot on the tray icon means a better model is available (parked with the AI feature).
 
 ### 2. Main window (NavigationView, left rail)
 ```
