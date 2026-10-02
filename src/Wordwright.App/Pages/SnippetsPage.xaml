@@ -72,11 +72,21 @@
                            Opacity="0"
                            Text="{res:Str Snippets.Saved}" />
             </StackPanel>
-            <ui:Button Appearance="Primary"
-                       Content="{res:Str Snippets.New}"
-                       HorizontalAlignment="Right"
-                       VerticalAlignment="Center"
-                       Click="OnNewSnippetClicked" />
+            <!-- Delete lives beside New, not at the foot of the editor, so it is
+                 on screen at every window size: at 800x600 the editor column is
+                 taller than its view (docs/PLAN.md P13.18). 8 px between
+                 buttons (Windows content basics). -->
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center">
+                <ui:Button Margin="0,0,8,0"
+                           Content="{res:Str Snippets.Delete}"
+                           IsEnabled="{Binding HasSelection}"
+                           Click="OnDeleteSnippetClicked" />
+                <ui:Button Appearance="Primary"
+                           Content="{res:Str Snippets.New}"
+                           Click="OnNewSnippetClicked" />
+            </StackPanel>
         </Grid>
 
         <Grid Grid.Row="1" Margin="32,0,32,24">
@@ -167,7 +177,6 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <StackPanel x:Name="NameGroup" Grid.Row="0">
@@ -270,11 +279,6 @@
                                Visibility="{Binding HasBodyMessage, Converter={StaticResource BoolToVisibility}}" />
                 </StackPanel>
 
-                <ui:Button Grid.Row="3"
-                           Margin="0,16,0,0"
-                           HorizontalAlignment="Left"
-                           Content="{res:Str Snippets.Delete}"
-                           Click="OnDeleteSnippetClicked" />
             </Grid>
             </ScrollViewer>
         </Grid>

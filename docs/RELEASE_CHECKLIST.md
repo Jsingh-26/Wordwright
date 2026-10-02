@@ -64,6 +64,7 @@ Rows marked *machine* need the maintainer's real Windows PC (typing on a real ke
 | S5 | Resize below 800×600 is refused; close and reopen, the window is where it was | | Gate, machine | | | |
 | S6 | Hovering Maximise shows the Snap Layouts flyout, on the main and the welcome window | Windows 11 | Polish, machine | | | |
 | S7 | Tray menu matches the taskbar theme, light and dark; on Windows 11 22H2+ it is on Acrylic with rounded corners | right-click the tray icon | Gate, machine | | | |
+| S7a | Tray glyph dims to half strength when Snippets is switched off in the tray menu, and comes back when it is switched on; same on a light and a dark taskbar (D19) | right-click the tray icon, untick Snippets on | Polish, machine | | | |
 | S8 | Theme setting re-skins the window at once and survives a restart | Settings → Theme | Gate, machine | | | |
 | S9 | "Show animations in Windows" off: no motion at all, nothing else changes | Windows → Accessibility → Visual effects | Gate, machine | | | |
 | S10 | DESIGN.md polish list: hierarchy and spacing, type scale, visible focus, empty states, no placeholder text, anti-slop list | read every page | Polish, machine | | | |

@@ -28,6 +28,7 @@ internal sealed class TrayIconController : IDisposable
     private readonly ResourceDictionary _menuResources;
     private readonly AcrylicContextMenu _menu;
     private Icon? _currentIcon;
+    private bool _iconPaused;
 
     public TrayIconController(App app)
     {
@@ -79,14 +80,24 @@ internal sealed class TrayIconController : IDisposable
         _trayIcon.ForceCreate(false);
     }
 
-    /// <summary>Shows the current prefix in the tooltip, or says that snippets
-    /// are not working when Windows refused the keyboard hook (P12.6).</summary>
-    internal void RefreshTooltip()
+    /// <summary>Brings the tray up to date with whether snippets are working.
+    /// The tooltip shows the current prefix, or says that snippets are not
+    /// working when Windows refused the keyboard hook (P12.6); the glyph dims
+    /// while snippets are off or the hook was refused (decision D19).</summary>
+    internal void RefreshStatus()
     {
         _trayIcon.ToolTipText = _app.HookRefused
             ? Strings.Get("Tray.Tooltip.HookRefused")
             : Strings.Get("Tray.Tooltip", ("Prefix", _app.Snippets.TriggerPrefix));
+
+        if (IsPaused != _iconPaused)
+        {
+            RefreshIcon();
+        }
     }
+
+    /// <summary>True when typing a shortcut would do nothing right now.</summary>
+    private bool IsPaused => !_app.Settings.SnippetsEnabled || _app.HookRefused;
 
     /// <summary>Re-skins the glyph and the menu after the taskbar theme changes.</summary>
     internal void RefreshTheme()
@@ -100,6 +111,14 @@ internal sealed class TrayIconController : IDisposable
         var glyph = SystemTheme.TaskbarUsesLightTheme()
             ? MarkRenderer.LightTaskbarGlyph
             : MarkRenderer.DarkTaskbarGlyph;
+
+        // Paused reads as the same mark at half strength: Anvil at 50 % on a
+        // light taskbar, white at 50 % on a dark one. No new colour (D19).
+        _iconPaused = IsPaused;
+        if (_iconPaused)
+        {
+            glyph = WithAlpha(glyph, 0x80);
+        }
 
         var icoBytes = MarkRenderer.RenderTrayIconIco(glyph);
         using var stream = new MemoryStream(icoBytes);

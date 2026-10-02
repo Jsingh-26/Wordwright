@@ -101,12 +101,12 @@ Snippets on                    ✓
 ───────────────────────────────
 Quit Wordwright
 ```
-(The "Offline AI on" row is parked with the AI feature.) Styled to Fluent: palette brushes, 8 px outer radius (it is a window unto itself) and 4 px items, light or dark following the taskbar theme through the same `SystemTheme` check as the tray icon (decision D10, 2026-10-02). The tray menu is the most-seen surface of the app — the window is opened rarely — so stock WPF chrome is not acceptable here. On Windows 11 22H2 and later it sits on the transient Acrylic material like the system's own menus (P13.14): a 60 % Anvil or Steel tint over the backdrop, with Windows drawing the corners, border and shadow; on older builds it stays solid. An Ember dot on the tray icon means a better model is available (parked with the AI feature).
+(The "Offline AI on" row is parked with the AI feature.) Styled to Fluent: palette brushes, 8 px outer radius (it is a window unto itself) and 4 px items, light or dark following the taskbar theme through the same `SystemTheme` check as the tray icon (decision D10, 2026-10-02). The tray menu is the most-seen surface of the app — the window is opened rarely — so stock WPF chrome is not acceptable here. On Windows 11 22H2 and later it sits on the transient Acrylic material like the system's own menus (P13.14): a 60 % Anvil or Steel tint over the backdrop, with Windows drawing the corners, border and shadow; on older builds it stays solid. While Snippets are off, or Windows refused the keyboard hook, the glyph shows at 50 % (Anvil on a light taskbar, white on a dark one), so the paused state reads at a glance without opening anything (decision D19, 2026-10-03). An Ember dot on the tray icon means a better model is available (parked with the AI feature).
 
 ### 2. Main window (NavigationView, left rail)
 ```
 ┌─────────────┬──────────────────────────────────────────────┐
-│ [W] Word-   │ Snippets                        [New snippet] │
+│ [W] Word-   │ Snippets      [Delete snippet] [New snippet] │
 │     wright  │ ┌──────────────────┐ ┌─────────────────────┐ │
 │ Snippets    │ │ Search snippets  │ │ Name                 │ │
 │ AI actions  │ │──────────────────│ │ Shortcut   ;sig      │ │
@@ -117,7 +117,7 @@ Quit Wordwright
 │ About       │                      │ Insert: Date Time …  │ │
 └─────────────┴──────────────────────────────────────────────┘
 ```
-Page titles in Zodiak. Auto-save with a quiet "Saved" beside the title.
+Page titles in Zodiak. Auto-save with a quiet "Saved" beside the title. Delete sits in the header beside New, enabled while a snippet is selected, so it is on screen at every window size down to 800×600 (P13.18).
 
 ### 3. AI actions page
 Same split layout. Editor fields: Name, Letter (palette shortcut), **Hotkey** (a hotkey recorder: click, press the combination, shows it or the "already in use" error), Instruction, Enabled. A "Try it" box below.

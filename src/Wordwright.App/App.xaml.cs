@@ -175,7 +175,7 @@ public partial class App : Application
         {
             _keyboardHook.Restart();
             _log?.Write(_keyboardHook.IsInstalled ? "hook reinstalled" : "hook refused");
-            _trayIcon?.RefreshTooltip();
+            _trayIcon?.RefreshStatus();
         }
     }
 
@@ -415,7 +415,7 @@ public partial class App : Application
             _keyboardHook.Stop();
         }
 
-        _trayIcon?.RefreshTooltip();
+        _trayIcon?.RefreshStatus();
     }
 
     /// <summary>Replaces the snippets the engine matches against.</summary>
@@ -428,7 +428,7 @@ public partial class App : Application
 
         if (prefixChanged)
         {
-            _trayIcon?.RefreshTooltip();
+            _trayIcon?.RefreshStatus();
         }
     }
 
