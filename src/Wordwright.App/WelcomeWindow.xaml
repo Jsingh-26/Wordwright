@@ -35,9 +35,19 @@
                  window Wordwright is not excluded from, so the snippet engine
                  expands in it exactly as it would in any other app. Its text is
                  never saved anywhere. -->
-            <TextBlock x:Name="TryHereLabel"
-                       Style="{StaticResource SecondaryText}"
-                       Margin="0,16,0,0" />
+            <!-- The completion moment (P11.6): the check-circle sits to the left
+                 of the line once a snippet has expanded here. -->
+            <StackPanel x:Name="TryHereRow" Orientation="Horizontal" Margin="0,16,0,0">
+                <ui:ImageIcon x:Name="TryHereCheck"
+                              Width="16" Height="16"
+                              Margin="0,0,6,0"
+                              VerticalAlignment="Center"
+                              Visibility="Collapsed"
+                              Source="{StaticResource IconCheckCircle}" />
+                <TextBlock x:Name="TryHereLabel"
+                           Style="{StaticResource SecondaryText}"
+                           VerticalAlignment="Center" />
+            </StackPanel>
             <ui:TextBox x:Name="TryHereBox"
                         Margin="0,4,0,0"
                         FontSize="14" />

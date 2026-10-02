@@ -96,8 +96,20 @@
                 <StackPanel DockPanel.Dock="Top"
                             Margin="0,12,0,0"
                             Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVisibility}}">
-                    <TextBlock Style="{StaticResource SecondaryText}"
-                               Text="{Binding EmptyTryHere}" />
+                    <!-- The completion moment (P11.6): the check-circle joins the
+                         line once a snippet has expanded in the box below. -->
+                    <StackPanel x:Name="EmptyTryHereRow" Orientation="Horizontal">
+                        <ui:ImageIcon x:Name="EmptyTryHereCheck"
+                                      Width="16" Height="16"
+                                      Margin="0,0,6,0"
+                                      VerticalAlignment="Center"
+                                      Visibility="Collapsed"
+                                      Source="{StaticResource IconCheckCircle}" />
+                        <TextBlock x:Name="EmptyTryHereLabel"
+                                   Style="{StaticResource SecondaryText}"
+                                   VerticalAlignment="Center"
+                                   Text="{Binding EmptyTryHere}" />
+                    </StackPanel>
                     <ui:TextBox x:Name="TryHereBox"
                                 Margin="0,4,0,0"
                                 AutomationProperties.Name="{Binding EmptyTryHere}" />

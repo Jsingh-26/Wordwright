@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Wpf.Ui.Controls;
 using Wordwright.App.Resources;
+using Wordwright.App.Snippets;
 using Wordwright.App.ViewModels;
 
 namespace Wordwright.App.Pages;
@@ -25,6 +26,7 @@ public partial class SnippetsPage : Page
         ViewModel.PropertyChanged += OnViewModelPropertyChanged;
 
         Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
     }
 
     internal SnippetsViewModel ViewModel { get; }
@@ -41,6 +43,35 @@ public partial class SnippetsPage : Page
 
         // Page entrance (docs/PLAN.md → P11.5).
         Motion.Enter(this);
+
+        // The empty state's playground acknowledges its first expansion (P11.6).
+        if (((App)Application.Current).SnippetEngine is { } engine)
+        {
+            engine.Expanded += OnSnippetExpanded;
+        }
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        if (((App)Application.Current).SnippetEngine is { } engine)
+        {
+            engine.Expanded -= OnSnippetExpanded;
+        }
+    }
+
+    /// <summary>The completion moment: the first snippet expanded in the empty
+    /// state's box reveals the done line, with the check-circle to its left,
+    /// through the one entrance animation (docs/PLAN.md → P11.6).</summary>
+    private void OnSnippetExpanded(object? sender, EventArgs e)
+    {
+        if (!TryHereBox.IsKeyboardFocusWithin)
+        {
+            return;
+        }
+
+        EmptyTryHereCheck.Visibility = Visibility.Visible;
+        EmptyTryHereLabel.Text = Strings.Get("Welcome.TryHere.Done");
+        Motion.Enter(EmptyTryHereRow);
     }
 
     /// <summary>Adds an empty snippet and puts the caret in its Name field.</summary>

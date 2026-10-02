@@ -40,12 +40,15 @@ public partial class WelcomeWindow : FluentWindow
     }
 
     /// <summary>Once a snippet has expanded in the box itself, the user has seen
-    /// it work, so the label says so.</summary>
+    /// it work, so the line says so — arriving with the check-circle and the one
+    /// entrance animation rather than snapping (docs/PLAN.md → P11.6).</summary>
     private void OnSnippetExpanded(object? sender, EventArgs e)
     {
         if (TryHereBox.IsKeyboardFocusWithin)
         {
+            TryHereCheck.Visibility = Visibility.Visible;
             TryHereLabel.Text = Strings.Get("Welcome.TryHere.Done");
+            Motion.Enter(TryHereRow);
         }
     }
 
