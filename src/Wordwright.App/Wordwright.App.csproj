@@ -8,6 +8,8 @@
          error messages for 13 other languages would only add size. -->
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <ApplicationIcon Condition="Exists('..\..\brand\icon.ico')">..\..\brand\icon.ico</ApplicationIcon>
+    <!-- Per-monitor DPI awareness (docs/PLAN.md P12.3). -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
