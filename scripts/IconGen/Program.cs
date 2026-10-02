@@ -42,6 +42,11 @@ internal static class Program
 
     private static readonly int[] Scales = [100, 150, 200, 400];
 
+    /// <summary>The taskbar, Start list and Alt+Tab ask for the app icon at these
+    /// exact pixel sizes; the "unplated" variants are drawn as they are, so the
+    /// mark shows instead of the 44x44 tile on an accent-coloured plate.</summary>
+    private static readonly int[] TargetSizes = [16, 24, 32, 48, 256];
+
     [STAThread]
     private static int Main(string[] args)
     {
@@ -129,6 +134,13 @@ internal static class Program
                     File.WriteAllBytes(Path.Combine(directory, $"{name}.png"), bytes);
                 }
             }
+        }
+
+        foreach (var size in TargetSizes)
+        {
+            var fileName = $"Square44x44Logo.targetsize-{size}_altform-unplated.png";
+            File.WriteAllBytes(Path.Combine(directory, fileName), RenderTile(size, size));
+            Console.WriteLine($"Wrote {fileName}");
         }
     }
 

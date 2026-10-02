@@ -87,6 +87,23 @@ Write-Output "Packaging version $Version (manifest identity $identityVersion)"
 Copy-Item (Join-Path $root "packaging/Assets") (Join-Path $stage "Assets") -Recurse
 New-Item -ItemType Directory -Path $output -Force | Out-Null
 
+# Windows picks scale-NNN and targetsize-NN_altform-unplated assets through the
+# package's resources.pri; without one it only ever uses the unqualified file,
+# so the taskbar would show the tile on a plate instead of the mark.
+$makepri = Join-Path (Split-Path -Parent $makeappx) "makepri.exe"
+$priConfig = Join-Path $root "packaging/stage-priconfig.xml"
+& $makepri createconfig /cf $priConfig /dq en-US /o | Out-Null
+if ($LASTEXITCODE -ne 0) { throw "makepri createconfig failed" }
+# The default config splits each scale into its own resources.scale-NNN.pri for
+# separate resource packs; this package is a single one, so keep one index.
+[xml]$config = Get-Content $priConfig
+$packagingNode = $config.SelectSingleNode("//packaging")
+if ($packagingNode) { [void]$packagingNode.ParentNode.RemoveChild($packagingNode) }
+$config.Save($priConfig)
+& $makepri new /pr $stage /cf $priConfig /mn $manifestPath /of (Join-Path $stage "resources.pri") /o | Out-Null
+if ($LASTEXITCODE -ne 0) { throw "makepri new failed" }
+Remove-Item $priConfig
+
 
 & $makeappx pack /o /d $stage /p (Join-Path $output $packageName)
 if ($LASTEXITCODE -ne 0) { throw "makeappx pack failed" }

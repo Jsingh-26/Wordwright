@@ -7,9 +7,9 @@ namespace Wordwright.Platform.Packaging;
 /// allowed the <c>HKCU</c> Run key the installer build uses, so the two builds
 /// differ in how they start with Windows (docs/PLAN.md P3.6).
 /// <para>
-/// Note for the P3.6 hand check: Windows may redirect a packaged app's AppData
-/// into the package's own store, which would put the two builds' snippets in
-/// different places. The check confirms where the packaged build's data lands.
+/// Both builds keep their data in the real <c>%AppData%\Wordwright</c>: the
+/// package turns file-system write virtualisation off (packaging/AppxManifest.xml,
+/// docs/PLAN.md P12.2), so Windows does not redirect it into the package's store.
 /// </para>
 /// </summary>
 public static class PackageIdentity

@@ -10,13 +10,20 @@
   forbids the HKCU Run key that the installer build uses. It starts disabled and
   the app turns it on when the user's "Start Wordwright when I sign in" setting
   says so. Description matches docs/UX_COPY.md About.Body.
+
+  File-system write virtualisation is off (docs/PLAN.md P12.2), so the packaged
+  build reads and writes the real %AppData%\Wordwright like the installer build:
+  "Open data folder" shows the user's actual files, both builds share snippets,
+  and uninstalling the Store app does not delete them. It needs the
+  unvirtualizedResources capability below.
 -->
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  IgnorableNamespaces="uap desktop rescap">
+  IgnorableNamespaces="uap desktop desktop6 rescap">
 
   <Identity
     Name="Jsingh26.Wordwright"
@@ -28,6 +35,7 @@
     <DisplayName>Wordwright</DisplayName>
     <PublisherDisplayName>Unbound Kite</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
+    <desktop6:FileSystemWriteVirtualization>disabled</desktop6:FileSystemWriteVirtualization>
   </Properties>
 
   <Dependencies>
@@ -61,5 +69,7 @@
     <!-- Required by any packaged app that leaves the sandbox, which Wordwright's
          global keyboard hook and SendInput do. -->
     <rescap:Capability Name="runFullTrust" />
+    <!-- Required by FileSystemWriteVirtualization above. -->
+    <rescap:Capability Name="unvirtualizedResources" />
   </Capabilities>
 </Package>
