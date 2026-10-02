@@ -65,6 +65,50 @@ public static class AiEligibility
         };
     }
 
+    /// <summary>
+    /// Whether this PC can carry one <b>specific</b> model right now.
+    ///
+    /// A model the catalog knows is judged on its own numbers. A model it does
+    /// not know — a hand-imported GGUF — has no measured requirement, and its
+    /// file size is no substitute for one, so it is held to the strictest
+    /// requirement the catalog defines for a PC of this size. That way an
+    /// unmeasured file can never be admitted merely because some smaller catalog
+    /// entry happens to fit.
+    /// </summary>
+    public static AiAvailability CheckFor(ModelCatalog catalog, HardwareProfile profile, CatalogEntry? model)
+    {
+        if (model is not null)
+        {
+            return Verdict(Recommender.HasRam(model, profile), Recommender.HasDisk(model, profile));
+        }
+
+        // Nothing to compare an unknown file against: there is no basis on which
+        // to say it would run, so it is refused rather than guessed at.
+        return UnknownRequirement(catalog, profile) is { } strictest
+            ? Verdict(Recommender.HasRam(strictest, profile), Recommender.HasDisk(strictest, profile))
+            : new AiAvailability { IsAvailable = false, Reason = StepDownReason.None };
+    }
+
+    private static AiAvailability Verdict(bool fitsMemory, bool fitsDisk) => new()
+    {
+        IsAvailable = fitsMemory && fitsDisk,
+        Reason = fitsMemory && fitsDisk
+            ? StepDownReason.None
+            : fitsMemory ? StepDownReason.NotEnoughDisk : StepDownReason.NotEnoughRam,
+    };
+
+    /// <summary>The most demanding entry the catalog lists for a PC of this size.</summary>
+    private static CatalogEntry? UnknownRequirement(ModelCatalog catalog, HardwareProfile profile)
+    {
+        var usable = Usable(catalog, profile);
+
+        return usable.Count == 0
+            ? null
+            : usable.OrderByDescending(model => model.RamRequiredGB)
+                .ThenByDescending(model => model.SizeBytes)
+                .First();
+    }
+
     /// <summary>The catalog entries listed for this PC's own tier or a smaller one.</summary>
     private static List<CatalogEntry> Usable(ModelCatalog catalog, HardwareProfile profile)
     {

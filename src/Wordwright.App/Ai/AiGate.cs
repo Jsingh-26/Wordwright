@@ -19,9 +19,23 @@ internal static class AiGate
     public static Task<AiAvailability> CheckAsync(CancellationToken cancellationToken = default) =>
         Task.Run(() => Check(HardwareProbe.Read()), cancellationToken);
 
+    /// <summary>One specific model, for the moment it is about to be used.</summary>
+    public static Task<AiAvailability> CheckForAsync(
+        CatalogEntry? model,
+        CancellationToken cancellationToken = default) =>
+        Task.Run(() => CheckFor(HardwareProbe.Read(), model), cancellationToken);
+
     /// <summary>The same check for a profile the caller has just read.</summary>
     public static AiAvailability Check(HardwareProfile profile) =>
         AiEligibility.Check(CatalogParser.Embedded(), profile);
+
+    /// <summary>
+    /// One specific model against a profile the caller has just read. A model the
+    /// catalog does not know is judged by <see cref="AiEligibility.CheckFor"/>'s
+    /// strictest-entry rule, not by its file size.
+    /// </summary>
+    public static AiAvailability CheckFor(HardwareProfile profile, CatalogEntry? model) =>
+        AiEligibility.CheckFor(CatalogParser.Embedded(), profile, model);
 
     /// <summary>The refusal in the user's words (docs/UX_COPY.md → Ai.Unavailable.*).</summary>
     public static string Refusal(AiAvailability availability) => availability.Reason switch

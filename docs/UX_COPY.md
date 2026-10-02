@@ -206,6 +206,9 @@ Group headings sit above their rows (docs/DESIGN.md §8).
 | Settings.Group.Ai | AI |
 | Settings.Group.Wordwright | Wordwright |
 | Settings.PaletteHotkey | Hotkey for all AI actions |
+| Settings.AiTurnOff | Offline AI is on |
+| Settings.AiTurnOffHelp | This PC hasn't the memory or disk a model needs, so Wordwright won't load it. Turn it off here if you don't want it any more. |
+| Settings.AiTurnOffButton | Turn off |
 | Settings.ActionHotkeysHelp | Give single actions their own hotkeys on the AI actions page. |
 | Settings.Prefix | Snippet prefix |
 | Settings.StartWithWindows | Start Wordwright when I sign in |

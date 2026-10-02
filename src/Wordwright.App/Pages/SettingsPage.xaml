@@ -104,6 +104,31 @@
                                          Hotkey="{Binding PaletteHotkey, UpdateSourceTrigger=PropertyChanged}" />
             </ui:CardControl>
 
+            <!-- Turning offline AI off. It lives on Settings because the Offline
+                 AI page is hidden whenever this PC cannot carry a model, so a
+                 user who already had AI on would otherwise have no way to switch
+                 it off (docs/PLAN.md -> startup resource eligibility). P7.2
+                 builds that page properly and must give management the same
+                 reach; this cannot gain a model, so it is not a bypass. -->
+            <ui:CardControl CornerRadius="4"
+                            Visibility="{Binding CanTurnOffAi, Converter={StaticResource BoolToVisibility}}"
+                            AutomationProperties.Name="{res:Str Settings.AiTurnOff}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock Style="{StaticResource BodyText}"
+                                   VerticalAlignment="Center"
+                                   Text="{res:Str Settings.AiTurnOff}" />
+                        <TextBlock Style="{StaticResource SecondaryText}"
+                                   Margin="0,2,0,0"
+                                   TextWrapping="Wrap"
+                                   Text="{res:Str Settings.AiTurnOffHelp}" />
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:Button Padding="10,4"
+                           Content="{res:Str Settings.AiTurnOffButton}"
+                           Click="OnTurnOffAiClicked" />
+            </ui:CardControl>
+
             <TextBlock Style="{StaticResource GroupHeading}"
                        Margin="0,24,0,8"
                        Text="{res:Str Settings.Group.Wordwright}" />

@@ -83,6 +83,11 @@ public partial class ConsentWindow : FluentWindow
     /// </summary>
     private void ShowUnavailable(AiAvailability availability)
     {
+        Checking.Visibility = Visibility.Collapsed;
+        Recommendation.Visibility = Visibility.Collapsed;
+        Downloading.Visibility = Visibility.Collapsed;
+        Busy.Visibility = Visibility.Collapsed;
+
         NoOffer.Text = AiGate.Refusal(availability);
         NoOffer.Visibility = Visibility.Visible;
 
@@ -264,6 +269,18 @@ public partial class ConsentWindow : FluentWindow
             return;
         }
 
+        // Measured immediately before the transfer, and this is the resume path
+        // too: a PC that lost memory or disk while the dialogue sat open must not
+        // go on downloading (docs/PLAN.md -> resource eligibility). The model is
+        // judged as itself, not as "something in the catalog fits".
+        var availability = await AiGate.CheckForAsync(model);
+
+        if (!availability.IsAvailable)
+        {
+            ShowUnavailable(availability);
+            return;
+        }
+
         _download?.Dispose();
         _download = new CancellationTokenSource();
 
@@ -437,17 +454,6 @@ public partial class ConsentWindow : FluentWindow
     /// <summary>The import itself, once a file has been chosen.</summary>
     private void Import(string path)
     {
-        // Measured again here rather than trusting the window's own probe: the
-        // dialogue can sit open for a while, and the requirement is that a change
-        // since then cannot be bypassed (docs/PLAN.md → resource eligibility).
-        if (!AiGate.Check(HardwareProbe.Read()).IsAvailable)
-        {
-            Busy.Visibility = Visibility.Collapsed;
-            Problem.Text = Strings.Get("Ai.Unavailable.Import");
-            Problem.Visibility = Visibility.Visible;
-            return;
-        }
-
         Busy.Text = Strings.Get("Ai.Verify");
         Busy.Visibility = Visibility.Visible;
         Problem.Visibility = Visibility.Collapsed;
@@ -459,6 +465,22 @@ public partial class ConsentWindow : FluentWindow
         switch (outcome)
         {
             case ImportOutcome.Imported:
+                // Judged now that the file has been identified: a known model on
+                // its own requirement, an unmeasured one on the strictest entry
+                // the catalog has for a PC this size. Measured here rather than
+                // trusting the probe that opened the dialogue, which may have been
+                // minutes ago. When it does not fit, nothing is registered, AI
+                // stays off, and the copy that was just made is removed rather
+                // than left behind to be found later.
+                if (!AiGate.CheckFor(HardwareProbe.Read(), catalogEntry).IsAvailable)
+                {
+                    File.Delete(Path.Combine(app.ModelsFolder, model!.File));
+                    Busy.Visibility = Visibility.Collapsed;
+                    Problem.Text = Strings.Get("Ai.Unavailable.Import");
+                    Problem.Visibility = Visibility.Visible;
+                    return;
+                }
+
                 new InstalledModelStore(app.ModelsFolder).Add(model!);
                 app.UpdateSettings(app.Settings with { AiEnabled = true, ActiveModelId = model!.Id });
                 Debug.WriteLine(

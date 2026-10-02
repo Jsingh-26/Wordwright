@@ -158,4 +158,88 @@ public class AiEligibilityTests
         result.IsAvailable.Should().BeFalse();
         result.Reason.Should().Be(StepDownReason.None);
     }
+
+    // The four cases the 2026-10-02 source review asked to have pinned down.
+
+    [Fact]
+    public void A_larger_model_is_refused_even_though_a_smaller_one_fits()
+    {
+        // The review's example: 2.6 GB free admits the tiny entry, but the 1.7B
+        // entry needs 2.5 GB plus the 1 GB headroom. Asking only "does anything
+        // fit" would let the bigger model through.
+        var tiny = Model("tiny", ["cpu8"], ramGB: 0.5, sizeBytes: 400_000_000);
+        var bigger = Model("bigger", ["cpu8"], ramGB: 2.5, sizeBytes: 1_800_000_000);
+        var catalog = Catalog(tiny, bigger);
+        var profile = Profile(available: 2_600_000_000, ram: 8 * Gigabyte);
+
+        AiEligibility.Check(catalog, profile).IsAvailable.Should().BeTrue("the tiny entry does fit");
+
+        var result = AiEligibility.CheckFor(catalog, profile, bigger);
+
+        result.IsAvailable.Should().BeFalse("the model actually being set up is judged as itself");
+        result.Reason.Should().Be(StepDownReason.NotEnoughRam);
+    }
+
+    [Fact]
+    public void A_known_model_that_fits_is_allowed()
+    {
+        var model = Model("tiny", ["cpu8"], ramGB: 0.5, sizeBytes: 400_000_000);
+
+        var result = AiEligibility.CheckFor(
+            Catalog(model), Profile(available: 2 * Gigabyte, ram: 8 * Gigabyte), model);
+
+        result.IsAvailable.Should().BeTrue();
+        result.Reason.Should().Be(StepDownReason.None);
+    }
+
+    [Fact]
+    public void An_unknown_file_is_held_to_the_strictest_entry_for_this_pc()
+    {
+        // A hand-imported GGUF has no measured requirement, and its file size is
+        // no substitute for one, so it is judged by the most demanding entry the
+        // catalog has for a PC this size — never admitted merely because some
+        // smaller entry happens to fit.
+        var catalog = Catalog(
+            Model("small", ["cpu8"], ramGB: 0.5, sizeBytes: 400_000_000),
+            Model("large", ["cpu8"], ramGB: 3.0, sizeBytes: 2_000_000_000));
+
+        // Room for the small entry, not for the large one.
+        AiEligibility.CheckFor(catalog, Profile(available: 2_000_000_000, ram: 8 * Gigabyte), null)
+            .IsAvailable.Should().BeFalse();
+
+        // Room for both, so an unmeasured file is not refused outright.
+        AiEligibility.CheckFor(catalog, Profile(available: 5 * Gigabyte, ram: 8 * Gigabyte), null)
+            .IsAvailable.Should().BeTrue();
+    }
+
+    [Fact]
+    public void An_unknown_file_is_refused_when_nothing_is_listed_for_this_pc()
+    {
+        var catalog = Catalog(Model("gpu-only", ["gpu"], ramGB: 2));
+
+        var result = AiEligibility.CheckFor(catalog, Profile(ram: 4 * Gigabyte), null);
+
+        result.IsAvailable.Should().BeFalse();
+        result.Reason.Should().Be(StepDownReason.None);
+    }
+
+    [Fact]
+    public void An_unknown_file_is_refused_against_an_empty_catalog()
+    {
+        AiEligibility.CheckFor(Catalog(), Profile(), null).IsAvailable.Should().BeFalse();
+    }
+
+    [Fact]
+    public void The_same_model_can_pass_and_then_fail_when_the_machine_changes()
+    {
+        // Resource loss while a dialogue sits open: the same model, measured
+        // again, must answer for the machine as it is now.
+        var model = Model("tiny", ["cpu8"], ramGB: 0.5, sizeBytes: 400_000_000);
+        var catalog = Catalog(model);
+
+        AiEligibility.CheckFor(catalog, Profile(available: 2 * Gigabyte, ram: 8 * Gigabyte), model)
+            .IsAvailable.Should().BeTrue();
+        AiEligibility.CheckFor(catalog, Profile(available: 500_000_000, ram: 8 * Gigabyte), model)
+            .IsAvailable.Should().BeFalse();
+    }
 }

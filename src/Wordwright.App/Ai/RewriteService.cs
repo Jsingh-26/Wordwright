@@ -93,14 +93,21 @@ internal sealed class RewriteService : IDisposable
         }
 
         // Loading is the moment the memory is actually claimed, so the machine is
-        // measured again here rather than trusting the startup result: a PC that
-        // has run out of room since then must not be made to load a model it
-        // cannot carry (docs/PLAN.md → resource eligibility). A model that is
-        // already loaded keeps working — its memory is already committed.
-        if (!IsLoaded
-            && !(await AiGate.CheckAsync(cancellationToken).ConfigureAwait(false)).IsAvailable)
+        // measured again here rather than trusting the startup result, and the
+        // model is judged as itself: a PC that could only carry the smallest
+        // catalog entry must not be allowed to load a larger one, and an imported
+        // file the catalog does not know is judged on the strictest entry the
+        // catalog has for a PC this size (docs/PLAN.md → resource eligibility).
+        // A model that is already loaded keeps working — its memory is committed.
+        if (!IsLoaded)
         {
-            return new RewriteOutcome(RewriteStatus.NotEnoughResources);
+            var active = ActiveModel()!;
+            var entry = CatalogParser.Embedded().Models.FirstOrDefault(model => model.Id == active.Id);
+
+            if (!(await AiGate.CheckForAsync(entry, cancellationToken).ConfigureAwait(false)).IsAvailable)
+            {
+                return new RewriteOutcome(RewriteStatus.NotEnoughResources);
+            }
         }
 
         try

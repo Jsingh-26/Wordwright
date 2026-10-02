@@ -24,6 +24,7 @@ internal sealed partial class SettingsViewModel : ObservableObject
 
         _loading = true;
         StartWithWindows = app.Settings.StartWithWindows;
+        AiEnabled = app.Settings.AiEnabled;
         SnippetPrefix = app.Snippets.TriggerPrefix;
         PaletteHotkey = app.Settings.PaletteHotkey;
         foreach (var executable in app.Settings.ExcludedApps)
@@ -53,6 +54,32 @@ internal sealed partial class SettingsViewModel : ObservableObject
     public bool HasMessage => !string.IsNullOrEmpty(Message);
 
     public bool HasExcludedApps => ExcludedApps.Count > 0;
+
+    /// <summary>
+    /// Whether offline AI is on. Drives the Settings row that can turn it off.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanTurnOffAi))]
+    private bool _aiEnabled;
+
+    public bool CanTurnOffAi => AiEnabled;
+
+    /// <summary>
+    /// Turns offline AI off.
+    ///
+    /// This is the only model-management action that exists before P7.2 builds
+    /// the Offline AI page, and it lives on Settings because that page is hidden
+    /// whenever this PC cannot carry a model: someone who already had AI on must
+    /// not be stranded with no way to switch it off. It cannot gain a model, so
+    /// it does not bypass the eligibility rule (docs/PLAN.md → "Maintainer
+    /// requirement: startup resource eligibility").
+    /// </summary>
+    public void TurnOffAi()
+    {
+        _app.UpdateSettings(_app.Settings with { AiEnabled = false });
+        _app.Rewrite.Unload();
+        AiEnabled = false;
+    }
 
     partial void OnStartWithWindowsChanged(bool value)
     {

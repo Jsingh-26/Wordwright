@@ -64,23 +64,19 @@ public partial class MainWindow : FluentWindow
     /// Decides whether the Offline AI item belongs in the sidebar
     /// (docs/PLAN.md → "Maintainer requirement: startup resource eligibility",
     /// 2026-10-02). It is shown when this PC has the memory and disk for
-    /// something in the catalog, and hidden otherwise — but a PC that already
-    /// has AI on always keeps it, because that page is where the installed model
-    /// is changed or removed and hiding it would strand the user with no way
-    /// back. New downloads and imports are refused either way, so a PC short of
-    /// resources can never gain a model it cannot run.
+    /// something in the catalog, and hidden otherwise.
+    ///
+    /// Deliberately blind to whether AI is already on: a PC that can no longer
+    /// carry a model must not keep offering the page because a model happened to
+    /// be activated while it still could. Managing what is installed stays
+    /// reachable from Settings, which can turn AI off but cannot gain a model,
+    /// so it does not bypass eligibility.
     ///
     /// The probe reads WMI and DXGI, so it runs off the UI thread and the item
     /// starts hidden in XAML rather than blinking into view and out again.
     /// </summary>
     private async Task UpdateOfflineAiItemAsync()
     {
-        if (((App)Application.Current).Settings.AiEnabled)
-        {
-            OfflineAiItem.Visibility = Visibility.Visible;
-            return;
-        }
-
         var availability = await Task.Run(
             () => AiEligibility.Check(CatalogParser.Embedded(), HardwareProbe.Read()));
 

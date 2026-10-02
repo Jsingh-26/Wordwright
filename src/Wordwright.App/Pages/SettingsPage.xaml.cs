@@ -97,6 +97,11 @@ public partial class SettingsPage : Page
         }
     }
 
+    private void OnTurnOffAiClicked(object sender, RoutedEventArgs e)
+    {
+        ViewModel.TurnOffAi();
+    }
+
     private void OnOpenDataFolderClicked(object sender, RoutedEventArgs e)
     {
         ViewModel.OpenDataFolder();
