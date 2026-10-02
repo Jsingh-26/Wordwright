@@ -55,6 +55,12 @@ To continue, click **More info**, then **Run anyway**. If you would rather check
 - **A 5-second typing gap resets the shortcut.** A shortcut typed with a long pause in the middle of it never expands (decision D3 in [`docs/PLAN.md`](docs/PLAN.md)).
 - **Users choose apps to switch it off in.** Windows does not reliably tell other apps when a password field has focus, so instead of guessing, an excluded-apps list turns Wordwright off in the programs you pick.
 
+## Limitations
+
+- **Not in apps running as administrator.** Windows does not let a normal program watch or type into a window that runs elevated, so shortcuts typed there (an admin terminal, say) never expand. Wordwright runs as you, never elevated, on purpose.
+- **Store apps can't be switched off by name.** The excluded-apps list matches the program's file name. Microsoft Store (UWP) apps all run inside `ApplicationFrameHost.exe`, so excluding one would exclude them all.
+- **No East Asian input methods.** Text typed through an IME composition window (Chinese, Japanese, Korean) is not seen as typed characters, so shortcuts typed that way do not expand.
+
 ## What is not here, and why
 
 An earlier Wordwright also had an **on-device AI writing assistant**: select text, press a hotkey, and a model running entirely on your PC rewrote it in place. It was built, it worked, and three releases contained it.
