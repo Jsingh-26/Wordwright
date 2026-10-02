@@ -353,7 +353,7 @@ public partial class App : Application
     {
         _clipboard = new ClipboardService();
         _keyboardHook = new KeyboardHook(Settings.ExcludedApps);
-        _snippetEngine = new SnippetEngine(_keyboardHook, _clipboard, Dispatcher);
+        _snippetEngine = new SnippetEngine(_keyboardHook, _clipboard, Dispatcher, _log);
         _snippetEngine.Apply(Snippets);
 
         ApplySnippetsEnabled();

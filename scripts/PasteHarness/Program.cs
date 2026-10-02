@@ -13,9 +13,25 @@ internal static class Program
 {
     private static readonly List<string> Failures = [];
 
+    /// <summary>How long the second process holds the clipboard: longer than the
+    /// capture's own retries plus our ten attempts to open it.</summary>
+    private const int HoldMilliseconds = 2500;
+
     [STAThread]
-    private static void Main()
+    private static void Main(string[] args)
     {
+        if (args is ["--hold-clipboard"])
+        {
+            // Another program holding the clipboard, opened for its own window
+            // as real programs do.
+            using var owner = new Form();
+            _ = OpenClipboard(owner.Handle);
+            Console.WriteLine("held");
+            Thread.Sleep(HoldMilliseconds);
+            _ = CloseClipboard();
+            return;
+        }
+
         ApplicationConfiguration.Initialize();
 
         using var form = new Form { Text = "Wordwright paste harness", Width = 520, Height = 200 };
@@ -109,6 +125,18 @@ internal static class Program
             }
 
             Check("two arrows cross y and the line break", box.Text == "xZ\r\ny");
+
+            // 8. While another program holds the clipboard, our text cannot go on;
+            // the caller is told so and leaves the clipboard alone (P13.1).
+            Clipboard.SetText("theirs");
+            using (var holder = HoldClipboardElsewhere())
+            {
+                Check("a held clipboard is reported", !clipboard.PutTextForPaste("ours"));
+                holder.WaitForExit();
+            }
+
+            clipboard.RestoreSaved();
+            Check("a held clipboard keeps its text", Clipboard.GetText() == "theirs");
         }
         finally
         {
@@ -134,6 +162,20 @@ internal static class Program
 
         form.Close();
         Environment.Exit(Failures.Count == 0 ? 0 : 1);
+    }
+
+    /// <summary>Starts this harness again as a second process that opens the
+    /// clipboard and keeps it, and returns once it has.</summary>
+    private static System.Diagnostics.Process HoldClipboardElsewhere()
+    {
+        var start = new System.Diagnostics.ProcessStartInfo(Environment.ProcessPath!, "--hold-clipboard")
+        {
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+        };
+        var process = System.Diagnostics.Process.Start(start)!;
+        _ = process.StandardOutput.ReadLine();
+        return process;
     }
 
     private static bool HasHistoryExclusionMarkers()

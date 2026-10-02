@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Windows.Threading;
+using EventLog = Wordwright.Core.Diagnostics.EventLog;
 using Wordwright.Core.Keystrokes;
 using Wordwright.Core.Snippets;
 using Wordwright.Platform.Input;
@@ -25,14 +26,16 @@ internal sealed class SnippetEngine : IDisposable
     private readonly KeyboardHook _hook;
     private readonly ClipboardService _clipboard;
     private readonly Dispatcher _dispatcher;
+    private readonly EventLog? _log;
     private readonly KeystrokeBuffer _buffer = new();
     private readonly VariableExpander _expander;
     private readonly DispatcherTimer _restoreTimer;
 
     private TriggerMatcher _matcher = new(SnippetDocument.DefaultTriggerPrefix, []);
 
-    public SnippetEngine(KeyboardHook hook, ClipboardService clipboard, Dispatcher dispatcher)
+    public SnippetEngine(KeyboardHook hook, ClipboardService clipboard, Dispatcher dispatcher, EventLog? log)
     {
+        _log = log;
         _hook = hook;
         _clipboard = clipboard;
         _dispatcher = dispatcher;
@@ -91,11 +94,21 @@ internal sealed class SnippetEngine : IDisposable
         // new line (docs/PLAN.md P12.8).
         var expanded = _expander.Expand(match.Text).WithWindowsLineEndings();
 
-        // Delete the typed trigger, put the text on the clipboard and paste. The
+        // Put the text on the clipboard, delete the typed trigger and paste. The
         // user's clipboard goes back once the target app has had time to read it.
         _restoreTimer.Stop();
+        if (!_clipboard.PutTextForPaste(expanded.Text + match.Delimiter))
+        {
+            // Another program is holding the clipboard. Pasting now would insert
+            // whatever it holds, so the typed shortcut stays as it is
+            // (docs/PLAN.md P13.1); a restore still waiting from an earlier
+            // expansion goes ahead as planned.
+            _restoreTimer.Start();
+            _log?.Write("clipboard busy");
+            return;
+        }
+
         InputSender.SendBackspaces(match.TypedLength);
-        _clipboard.PutTextForPaste(expanded.Text + match.Delimiter);
         InputSender.Paste();
 
         if (expanded.CharactersAfterCursor > 0)

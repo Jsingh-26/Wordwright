@@ -90,16 +90,33 @@ public sealed class ClipboardService
     /// been restored yet, the clipboard still holds our text, so the user's
     /// original is kept rather than captured again.
     /// </summary>
-    public void PutTextForPaste(string text)
+    /// <returns>False when another program held the clipboard and our text did
+    /// not go on; a paste now would insert whatever is there instead
+    /// (docs/PLAN.md P13.1).</returns>
+    public bool PutTextForPaste(string text)
     {
+        var captured = false;
         if (!_restorePending)
         {
             _saved = CaptureCurrent();
             _restorePending = true;
+            captured = true;
         }
 
-        SetOwnText(text);
+        if (!SetOwnText(text))
+        {
+            if (captured)
+            {
+                // Nothing of ours went on, so there is nothing to put back.
+                _restorePending = false;
+                _saved = null;
+            }
+
+            return false;
+        }
+
         _ownSequence = GetClipboardSequenceNumber();
+        return true;
     }
 
     /// <summary>
@@ -129,7 +146,7 @@ public sealed class ClipboardService
     /// </summary>
     public IDisposable ReplaceWithText(string text)
     {
-        PutTextForPaste(text);
+        _ = PutTextForPaste(text);
         return new RestoredClipboard(this);
     }
 
@@ -226,18 +243,20 @@ public sealed class ClipboardService
     /// <summary>
     /// Writes the text and the history-exclusion markers straight through the
     /// Win32 clipboard, so the marker payload is exactly the DWORD Windows reads.
+    /// Returns false when the text did not go on.
     /// </summary>
-    private static void SetOwnText(string text)
+    private static bool SetOwnText(string text)
     {
         if (!OpenClipboardWithRetries())
         {
-            return;
+            return false;
         }
 
         try
         {
             _ = EmptyClipboard();
 
+            var textSet = false;
             var textHandle = AllocateGlobal(Encoding.Unicode.GetByteCount(text + '\0'));
             if (textHandle != IntPtr.Zero && WriteGlobal(textHandle, Encoding.Unicode.GetBytes(text + '\0')))
             {
@@ -245,6 +264,15 @@ public sealed class ClipboardService
                 {
                     _ = GlobalFree(textHandle);
                 }
+                else
+                {
+                    textSet = true;
+                }
+            }
+
+            if (!textSet)
+            {
+                return false;
             }
 
             foreach (var format in HistoryExclusionFormats)
@@ -266,6 +294,8 @@ public sealed class ClipboardService
                     _ = GlobalFree(markerHandle);
                 }
             }
+
+            return true;
         }
         finally
         {
