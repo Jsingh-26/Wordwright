@@ -83,7 +83,7 @@ Group headings sit above their rows (docs/DESIGN.md §8).
 |---|---|
 | About.Version | Version {Version} |
 | About.Body | Wordwright is free and open source (MIT). Your snippets stay on this PC. |
-| About.Privacy | Wordwright has no telemetry and sends nothing anywhere. It uses the internet only to check for updates, and only if you turned that on. |
+| About.Privacy | Wordwright has no telemetry and never connects to the internet. Nothing you type leaves this PC. |
 | About.Source | View source on GitHub |
 | About.Support | Support Wordwright |
 | About.ThirdParty | Third-party licences |

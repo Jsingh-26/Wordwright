@@ -30,7 +30,7 @@ WPF-UI allows one `ContentDialogHost` per window and throws when a second one re
 
 Two builds ship from the same source. Both keep the user's data in the same place; they differ in how they are installed and how they start with Windows.
 
-- **Installer (GitHub Releases):** `scripts/pack-release.ps1` publishes the app self-contained and packs it with Velopack. `App.xaml.cs` calls `VelopackApp.Build().Run()` in its constructor, the first thing the generated entry point does, so an install or uninstall can finish. Nothing ever checks for an update unless the user turns that on (P8).
+- **Installer (GitHub Releases):** `scripts/pack-release.ps1` publishes the app self-contained and packs it with Velopack. `App.xaml.cs` calls `VelopackApp.Build().Run()` in its constructor, the first thing the generated entry point does, so an install or uninstall can finish. The app never checks for updates itself (hard rule 1): new versions are installed by running the new `Setup.exe`, or by the Store for the MSIX package.
 - **Microsoft Store package:** `scripts/pack-msix.ps1` packs `packaging/AppxManifest.xml` with the tile assets `scripts/IconGen --msix` renders from the brand geometry. It is a full-trust (`runFullTrust`) desktop package; the manifest's Identity is a placeholder until Partner Center reserves the name.
 - Both builds target `net10.0-windows10.0.19041.0`, which is what gives the app the WinRT `StartupTask` API; the manifest declares Windows 10 19045 as the floor.
 - **Start with Windows** goes through `Wordwright.Platform.Startup.StartWithWindows`: the `HKCU\...\Run` key when unpackaged, the manifest's `desktop:startupTask` when packaged (Store policy forbids the Run key). `PackageIdentity.IsPackaged` decides which.
@@ -42,7 +42,7 @@ Two builds ship from the same source. Both keep the user's data in the same plac
 | `WPF-UI` (lepoco) | App | Windows 11 Fluent controls, Mica backdrop, light/dark theme |
 | `H.NotifyIcon.Wpf` | App | Tray icon and tray menu |
 | `CommunityToolkit.Mvvm` | App | MVVM boilerplate |
-| `Velopack` | App | Installer and (opt-in) app updates from GitHub Releases |
+| `Velopack` | App | Installer and uninstaller (the app never checks for updates) |
 | `xunit`, `FluentAssertions` | Tests | Unit tests |
 
 Not packages but bundled assets: Zodiak font files (Fontshare, embedded as WPF resources) and Phosphor icons (MIT) copied as XAML path geometries into `Wordwright.App/Resources/Icons.xaml`. Icons and logo come from `brand/`.
