@@ -330,6 +330,10 @@ public partial class App : Application
         Shutdown();
     }
 
+    /// <summary>Raised as the app exits, so an editor can write edits that are
+    /// still waiting for the typing pause (docs/PLAN.md P12.4).</summary>
+    internal event EventHandler? FlushingEdits;
+
     private IntPtr OnWindowMessage(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
         if (msg == WM_SETTINGCHANGE
@@ -343,6 +347,8 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        FlushingEdits?.Invoke(this, EventArgs.Empty);
+
         _snippetEngine?.Dispose();
         _keyboardHook?.Dispose();
         _trayIcon?.Dispose();

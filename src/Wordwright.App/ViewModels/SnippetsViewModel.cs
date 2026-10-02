@@ -9,8 +9,11 @@ namespace Wordwright.App.ViewModels;
 /// <summary>
 /// The Snippets page: a searchable list on the left and the editor on the right,
 /// saving as the user types with a quiet "Saved" beside the page title
-/// (docs/DESIGN.md §2). Validation follows docs/UX_COPY.md, and nothing is
-/// written until the shortcut is one the matcher could use.
+/// (docs/DESIGN.md §2). Validation follows docs/UX_COPY.md: a shortcut is only
+/// written once the matcher could use it, but the name and text are saved
+/// whatever the shortcut field holds. A pending save is never dropped: it is
+/// written before the editor moves to another snippet, before a new one is
+/// added, when the page goes away and when the app quits (docs/PLAN.md P12.4).
 /// </summary>
 internal sealed partial class SnippetsViewModel : ObservableObject
 {
@@ -115,9 +118,20 @@ internal sealed partial class SnippetsViewModel : ObservableObject
 
     public bool HasPreview => Preview.Length > 0;
 
+    /// <summary>Writes the edits still waiting for the typing pause, if any.</summary>
+    public void Flush()
+    {
+        if (_saveTimer.IsEnabled)
+        {
+            Save(refreshList: false);
+        }
+    }
+
     /// <summary>Starts a snippet and puts the editor on it.</summary>
     public SnippetListItem AddNew()
     {
+        Flush();
+
         var now = DateTimeOffset.UtcNow;
         var snippet = new Snippet { Id = Snippet.NewId(), CreatedUtc = now, UpdatedUtc = now };
 
@@ -179,6 +193,10 @@ internal sealed partial class SnippetsViewModel : ObservableObject
     }
 
     partial void OnSearchTextChanged(string value) => ApplyFilter();
+
+    /// <summary>Runs while the outgoing snippet and its edits are still in the
+    /// editor, so the last keystrokes are written to the right snippet.</summary>
+    partial void OnSelectedSnippetChanging(SnippetListItem? value) => Flush();
 
     partial void OnSelectedSnippetChanged(SnippetListItem? value)
     {
@@ -295,20 +313,25 @@ internal sealed partial class SnippetsViewModel : ObservableObject
         || (SnippetRules.IsValidTrigger(Shortcut)
             && !SnippetRules.IsTriggerTaken(_app.Snippets.Snippets, Shortcut, SelectedSnippet?.Id));
 
-    private void Save()
+    /// <param name="refreshList">False while the selection is changing: the
+    /// list is left alone then, so the ListBox is not edited mid-change.</param>
+    private void Save(bool refreshList = true)
     {
         _saveTimer.Stop();
 
-        if (SelectedSnippet is not { } item || !ShortcutIsUsable)
+        if (SelectedSnippet is not { } item)
         {
             return;
         }
 
         // The trigger is stored without the prefix, so a stray prefix typed into
-        // the shortcut field never reaches the file.
-        var trigger = Shortcut.StartsWith(Prefix, StringComparison.Ordinal)
-            ? Shortcut[Prefix.Length..]
-            : Shortcut;
+        // the shortcut field never reaches the file. A shortcut the matcher could
+        // not use keeps the stored one, while the name and text are still saved.
+        var trigger = !ShortcutIsUsable
+            ? item.Snippet.Trigger
+            : Shortcut.StartsWith(Prefix, StringComparison.Ordinal)
+                ? Shortcut[Prefix.Length..]
+                : Shortcut;
 
         var updated = item.Snippet with
         {
@@ -328,7 +351,10 @@ internal sealed partial class SnippetsViewModel : ObservableObject
         _app.UpdateSnippets(document);
         item.Snippet = updated;
 
-        ApplyFilter();
+        if (refreshList)
+        {
+            ApplyFilter();
+        }
 
         ShowSaved = true;
         _savedTimer.Stop();

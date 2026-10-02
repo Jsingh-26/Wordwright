@@ -49,10 +49,18 @@ public partial class SnippetsPage : Page
         {
             engine.Expanded += OnSnippetExpanded;
         }
+
+        // Quitting from the tray must not lose the last keystrokes (P12.4).
+        ((App)Application.Current).FlushingEdits += OnFlushingEdits;
     }
+
+    private void OnFlushingEdits(object? sender, EventArgs e) => ViewModel.Flush();
 
     private void OnUnloaded(object sender, RoutedEventArgs e)
     {
+        ViewModel.Flush();
+        ((App)Application.Current).FlushingEdits -= OnFlushingEdits;
+
         if (((App)Application.Current).SnippetEngine is { } engine)
         {
             engine.Expanded -= OnSnippetExpanded;
