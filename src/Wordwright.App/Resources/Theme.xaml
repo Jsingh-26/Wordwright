@@ -18,6 +18,10 @@
     <!-- The shortcut chip in the snippet list (docs/PLAN.md → P11.5); swapped
          with the theme like SelectionBrush. -->
     <SolidColorBrush x:Key="ChipBrush" Color="{StaticResource SteelColor}" />
+    <!-- Text on a selected row and inside the chip: the ordinary text colour,
+         except in a contrast theme (docs/PLAN.md P13.4); set in App.xaml.cs. -->
+    <SolidColorBrush x:Key="SelectionTextBrush" Color="{StaticResource AnvilColor}" />
+    <SolidColorBrush x:Key="ChipTextBrush" Color="{StaticResource AnvilColor}" />
     <!-- The page colour the hero illustration (Hero.xaml) cuts its hand and nib
          slit from: white in light theme, Anvil in dark; swapped with the theme. -->
     <SolidColorBrush x:Key="HeroPaperBrush" Color="White" />

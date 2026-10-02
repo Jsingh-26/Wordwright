@@ -235,6 +235,12 @@ public partial class App : Application
         Current.Dispatcher.BeginInvoke(
             () =>
             {
+                if (currentTheme == ApplicationTheme.HighContrast)
+                {
+                    ApplyHighContrastBrushes();
+                    return;
+                }
+
                 ApplicationAccentColorManager.Apply(accent, currentTheme);
 
                 // WPF-UI rewrites its accent *colours* from the user's Windows accent
@@ -269,8 +275,38 @@ public partial class App : Application
                     currentTheme == ApplicationTheme.Dark ? Anvil : Colors.White);
                 Current.Resources["CautionBrush"] = new SolidColorBrush(
                     currentTheme == ApplicationTheme.Dark ? OchreDarkTheme : Ochre);
+
+                // Outside a contrast theme the selected row and the chip keep the
+                // ordinary text colour.
+                var text = Current.TryFindResource("TextFillColorPrimaryBrush");
+                Current.Resources["SelectionTextBrush"] = text;
+                Current.Resources["ChipTextBrush"] = text;
             },
             DispatcherPriority.ContextIdle);
+    }
+
+    /// <summary>
+    /// A contrast theme owns every colour (docs/PLAN.md P13.4): the palette's
+    /// tints would vanish against its background, so each of our brushes takes
+    /// the Windows colour for its role. The selected row is the system
+    /// highlight with highlight text on it; the chip is a window-coloured
+    /// island with window text, so it reads on a plain row and a selected one.
+    /// The accent buttons are left to WPF-UI's own contrast theme.
+    /// </summary>
+    private static void ApplyHighContrastBrushes()
+    {
+        Current.Resources.Remove("AccentFillColorDefault");
+        Current.Resources.Remove("AccentButtonBackground");
+        Current.Resources.Remove("AccentButtonBackgroundPointerOver");
+        Current.Resources.Remove("AccentButtonBackgroundPressed");
+
+        Current.Resources["SelectionBrush"] = SystemColors.HighlightBrush;
+        Current.Resources["SelectionTextBrush"] = SystemColors.HighlightTextBrush;
+        Current.Resources["ChipBrush"] = SystemColors.WindowBrush;
+        Current.Resources["ChipTextBrush"] = SystemColors.WindowTextBrush;
+        Current.Resources["BrandAccentBrush"] = SystemColors.WindowTextBrush;
+        Current.Resources["HeroPaperBrush"] = SystemColors.WindowBrush;
+        Current.Resources["CautionBrush"] = SystemColors.ControlTextBrush;
     }
 
     /// <summary>Applies the theme chosen in Settings (docs/PLAN.md P11.2). System

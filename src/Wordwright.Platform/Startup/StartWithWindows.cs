@@ -37,12 +37,17 @@ public static class StartWithWindows
 
         using var runKey = Registry.CurrentUser.CreateSubKey(RunKeyPath, writable: true);
 
-        if (enabled)
+        // Quoted: install paths can contain spaces.
+        var wanted = $"\"{exePath}\"";
+        var current = runKey.GetValue(ValueName);
+
+        // This runs on every launch, so the key is only written when it has to
+        // change (docs/PLAN.md P13.4).
+        if (enabled && current as string != wanted)
         {
-            // Quoted: install paths can contain spaces.
-            runKey.SetValue(ValueName, $"\"{exePath}\"", RegistryValueKind.String);
+            runKey.SetValue(ValueName, wanted, RegistryValueKind.String);
         }
-        else
+        else if (!enabled && current is not null)
         {
             runKey.DeleteValue(ValueName, throwOnMissingValue: false);
         }

@@ -43,6 +43,8 @@
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="Row" Property="Background"
                                         Value="{DynamicResource SelectionBrush}" />
+                                <Setter Property="Foreground"
+                                        Value="{DynamicResource SelectionTextBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -134,10 +136,12 @@
                                 <Border Style="{StaticResource ShortcutChip}" Tag="ShortcutChip">
                                     <TextBlock FontFamily="{StaticResource AppText}"
                                                FontSize="12"
+                                               Foreground="{DynamicResource ChipTextBrush}"
                                                Text="{Binding Shortcut}" />
                                 </Border>
                                 <TextBlock Text="{Binding Name}"
                                            Style="{StaticResource BodyText}"
+                                           Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
                                            Margin="0,3,0,0"
                                            TextWrapping="NoWrap"
                                            TextTrimming="CharacterEllipsis" />
