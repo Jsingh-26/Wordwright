@@ -13,6 +13,8 @@ internal sealed class TestHttpServer : IDisposable
     private const int Attempts = 10;
 
     private readonly CancellationTokenSource _stopping = new();
+    private readonly TaskCompletionSource _stalled = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly TaskCompletionSource _stallGate = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly HttpListener _listener;
 
     public TestHttpServer()
@@ -96,6 +98,21 @@ internal sealed class TestHttpServer : IDisposable
     /// of the body, mid-response, the way a dropped connection does.</summary>
     public int StopAfterBytes { get; set; }
 
+    /// <summary>
+    /// When set, the server writes this many bytes of the body and then holds the
+    /// response open until <see cref="ReleaseStall"/>. A test that cancels on a
+    /// fixed delay races the transfer — on a fast machine 4 MB over localhost can
+    /// finish first — so it can wait for <see cref="Stalled"/> instead and know
+    /// the download is still in flight.
+    /// </summary>
+    public int StallAfterBytes { get; set; }
+
+    /// <summary>Completes once a stalled response has reached its stall point.</summary>
+    public Task Stalled => _stalled.Task;
+
+    /// <summary>Lets a stalled response finish.</summary>
+    public void ReleaseStall() => _stallGate.TrySetResult();
+
     /// <summary>When set, every request is answered with this status.</summary>
     public HttpStatusCode Status { get; set; } = HttpStatusCode.OK;
 
@@ -169,8 +186,34 @@ internal sealed class TestHttpServer : IDisposable
         context.Response.ContentLength64 = length;
 
         var written = StopAfterBytes > 0 ? Math.Min(length, StopAfterBytes) : length;
+
+        if (StallAfterBytes > 0)
+        {
+            written = Math.Min(written, StallAfterBytes);
+        }
+
         await context.Response.OutputStream.WriteAsync(content.AsMemory(offset, written), _stopping.Token);
         await context.Response.OutputStream.FlushAsync(_stopping.Token);
+
+        if (StallAfterBytes > 0)
+        {
+            // The body is provably half-sent, so the client is mid-download.
+            _stalled.TrySetResult();
+
+            try
+            {
+                await _stallGate.Task.WaitAsync(_stopping.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                // The server is being disposed; let this response go.
+                return;
+            }
+
+            await context.Response.OutputStream.WriteAsync(
+                content.AsMemory(offset + written, length - written), _stopping.Token);
+            await context.Response.OutputStream.FlushAsync(_stopping.Token);
+        }
 
         // An abort mid-body is how a dropped connection looks to the client.
         if (StopAfterBytes > 0)
@@ -197,6 +240,8 @@ internal sealed class TestHttpServer : IDisposable
 
     public void Dispose()
     {
+        // Release a stalled response first, so disposal cannot block on it.
+        _stallGate.TrySetResult();
         _stopping.Cancel();
         try
         {

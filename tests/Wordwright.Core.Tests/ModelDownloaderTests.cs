@@ -183,10 +183,15 @@ public class ModelDownloaderTests : IDisposable
     {
         var (bytes, hash) = TestHttpServer.DummyFile(4_000_000);
         _server.Content = bytes;
+
+        // Hold the body open and cancel at the stall point. Cancelling after a
+        // fixed delay raced the transfer: 4 MB over localhost can arrive inside
+        // it on a fast machine, and then nothing was cancelled to observe.
+        _server.StallAfterBytes = 64 * 1024;
         using var cancellation = new CancellationTokenSource();
 
         var download = Downloader().DownloadAsync(Model(bytes, hash), _directory, cancellationToken: cancellation.Token);
-        await Task.Delay(30);
+        await _server.Stalled.WaitAsync(TimeSpan.FromSeconds(15));
         cancellation.Cancel();
 
         await FluentActions.Awaiting(() => download).Should().ThrowAsync<OperationCanceledException>();
