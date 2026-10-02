@@ -22,3 +22,40 @@ jobs:
 
       - name: Test
         run: dotnet test -c Release --no-build
+
+      # The harnesses and the icon generator sit outside the solution and went
+      # stale once unnoticed (docs/PLAN.md P13.3), so they are built here too.
+      # They need a real desktop to run, so CI only compiles them.
+      - name: Build harnesses and tools
+        shell: pwsh
+        run: |
+          foreach ($project in 'HookProbe', 'HookHarness', 'PasteHarness', 'IconGen') {
+            dotnet build "scripts/$project" -c Release
+            if ($LASTEXITCODE -ne 0) { throw "$project failed to build" }
+          }
+
+  # Runs both packaging scripts end to end so they cannot rot between releases.
+  # The MSIX stays unsigned and nothing is uploaded or kept.
+  package:
+    runs-on: windows-latest
+    needs: build-and-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install vpk
+        # The same version as the Velopack package in Directory.Packages.props.
+        run: dotnet tool install -g vpk --version 1.2.161
+
+      - name: Store package (unsigned)
+        shell: pwsh
+        run: scripts/pack-msix.ps1 -Version 1.0.0
+
+      - name: Installer and portable zip
+        shell: pwsh
+        run: scripts/pack-release.ps1 -Version 1.0.0

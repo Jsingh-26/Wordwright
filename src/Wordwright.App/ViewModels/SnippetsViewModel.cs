@@ -14,15 +14,15 @@ namespace Wordwright.App.ViewModels;
 /// whatever the shortcut field holds. A pending save is never dropped: it is
 /// written before the editor moves to another snippet, before a new one is
 /// added, when the page goes away and when the app quits (docs/PLAN.md P12.4).
+/// The rules live in <see cref="SnippetEditSession"/>, where they are tested;
+/// this class only runs its timer and shows the result.
 /// </summary>
 internal sealed partial class SnippetsViewModel : ObservableObject
 {
-    /// <summary>How long typing pauses before the file is written.</summary>
-    private const int SaveDelayMilliseconds = 600;
-
     private const int SavedIndicatorMilliseconds = 2000;
 
     private readonly App _app;
+    private readonly SnippetEditSession _session;
     private readonly DispatcherTimer _saveTimer;
     private readonly DispatcherTimer _savedTimer;
     private readonly List<SnippetListItem> _all = [];
@@ -41,8 +41,10 @@ internal sealed partial class SnippetsViewModel : ObservableObject
     {
         _app = app;
 
-        _saveTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(SaveDelayMilliseconds) };
-        _saveTimer.Tick += (_, _) => Save();
+        _session = new SnippetEditSession(() => DateTimeOffset.UtcNow, () => _app.Snippets, _app.UpdateSnippets);
+
+        _saveTimer = new DispatcherTimer { Interval = SnippetEditSession.SaveDelay };
+        _saveTimer.Tick += (_, _) => OnSaveTimer();
 
         _savedTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(SavedIndicatorMilliseconds) };
         _savedTimer.Tick += (_, _) =>
@@ -121,9 +123,10 @@ internal sealed partial class SnippetsViewModel : ObservableObject
     /// <summary>Writes the edits still waiting for the typing pause, if any.</summary>
     public void Flush()
     {
-        if (_saveTimer.IsEnabled)
+        _saveTimer.Stop();
+        if (_session.Flush() is { } saved)
         {
-            Save(refreshList: false);
+            ShowWritten(saved, refreshList: false);
         }
     }
 
@@ -155,6 +158,7 @@ internal sealed partial class SnippetsViewModel : ObservableObject
         }
 
         _saveTimer.Stop();
+        _session.Discard();
         var document = _app.Snippets with
         {
             Snippets = _app.Snippets.Snippets.Where(snippet => snippet.Id != item.Id).ToList(),
@@ -200,6 +204,8 @@ internal sealed partial class SnippetsViewModel : ObservableObject
 
     partial void OnSelectedSnippetChanged(SnippetListItem? value)
     {
+        _session.Open(value?.Snippet);
+
         _loadingFields = true;
         try
         {
@@ -267,8 +273,27 @@ internal sealed partial class SnippetsViewModel : ObservableObject
 
         Validate();
 
+        _session.Edit(Name, Shortcut, Body);
         _saveTimer.Stop();
+        _saveTimer.Interval = SnippetEditSession.SaveDelay;
         _saveTimer.Start();
+    }
+
+    private void OnSaveTimer()
+    {
+        _saveTimer.Stop();
+
+        if (_session.SaveIfDue() is { } saved)
+        {
+            ShowWritten(saved, refreshList: true);
+        }
+        else if (_session.DueUtc is { } due)
+        {
+            // The timer fired a moment early; wait out the rest of the pause.
+            var remaining = due - DateTimeOffset.UtcNow;
+            _saveTimer.Interval = remaining > TimeSpan.Zero ? remaining : TimeSpan.FromMilliseconds(1);
+            _saveTimer.Start();
+        }
     }
 
     /// <summary>The rules from docs/ARCHITECTURE.md, worded by docs/UX_COPY.md.</summary>
@@ -307,49 +332,15 @@ internal sealed partial class SnippetsViewModel : ObservableObject
             : null;
     }
 
-    /// <summary>True when the shortcut is usable, so the snippet can be saved.</summary>
-    private bool ShortcutIsUsable =>
-        Shortcut.Length == 0
-        || (SnippetRules.IsValidTrigger(Shortcut)
-            && !SnippetRules.IsTriggerTaken(_app.Snippets.Snippets, Shortcut, SelectedSnippet?.Id));
-
+    /// <summary>Puts a written snippet back on its row and shows "Saved".</summary>
     /// <param name="refreshList">False while the selection is changing: the
     /// list is left alone then, so the ListBox is not edited mid-change.</param>
-    private void Save(bool refreshList = true)
+    private void ShowWritten(Snippet saved, bool refreshList)
     {
-        _saveTimer.Stop();
-
-        if (SelectedSnippet is not { } item)
+        if (_all.FirstOrDefault(item => item.Id == saved.Id) is { } item)
         {
-            return;
+            item.Snippet = saved;
         }
-
-        // The trigger is stored without the prefix, so a stray prefix typed into
-        // the shortcut field never reaches the file. A shortcut the matcher could
-        // not use keeps the stored one, while the name and text are still saved.
-        var trigger = !ShortcutIsUsable
-            ? item.Snippet.Trigger
-            : Shortcut.StartsWith(Prefix, StringComparison.Ordinal)
-                ? Shortcut[Prefix.Length..]
-                : Shortcut;
-
-        var updated = item.Snippet with
-        {
-            Trigger = trigger,
-            Name = Name,
-            Body = Body,
-            UpdatedUtc = DateTimeOffset.UtcNow,
-        };
-
-        var document = _app.Snippets with
-        {
-            Snippets = _app.Snippets.Snippets
-                .Select(snippet => snippet.Id == updated.Id ? updated : snippet)
-                .ToList(),
-        };
-
-        _app.UpdateSnippets(document);
-        item.Snippet = updated;
 
         if (refreshList)
         {

@@ -44,6 +44,7 @@ $makeappx = Find-MakeAppx
 # The tiles come from the brand geometry, so they are regenerated rather than
 # kept in the repository (docs/AGENTS.md rule 7).
 dotnet run --project (Join-Path $root "scripts/IconGen") -- --msix (Join-Path $root "packaging/Assets")
+if ($LASTEXITCODE -ne 0) { throw "rendering the tiles failed" }
 
 # Start from an empty folder: dotnet publish never deletes, so files from older
 # builds (the parked AI feature's 300 MB of native libraries) would ship too.

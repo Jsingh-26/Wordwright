@@ -48,7 +48,7 @@ Windows may show *"Windows protected your PC"* the first time, because the insta
 ### Verification
 
 - `dotnet build -c Release`: 0 warnings, 0 errors.
-- `dotnet test -c Release`: 181 passed, 0 failed.
+- `dotnet test -c Release`: 192 passed, 0 failed.
 - Every page captured at 800×600 and maximised, in light and dark: zero controls without an accessible name.
 - Manual pass on a real Windows machine: ___ (P10.2 and the release checklist in `docs/PLAN.md`).
 
