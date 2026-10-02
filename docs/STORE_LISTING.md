@@ -30,7 +30,7 @@ Everything Partner Center asks for, ready to paste. The package is `Releases/Wor
 | Privacy policy URL | https://github.com/Jsingh-26/Wordwright#privacy |
 | Website | https://github.com/Jsingh-26/Wordwright |
 | Support contact info | *(maintainer: a support email, e.g. one on unboundkite.com once the domain is set up)* |
-| Product declarations | Leave all unchecked except "This app has been tested to meet accessibility guidelines" (zero unnamed controls; P10.2) |
+| Product declarations | Leave all unchecked. Tick "This app has been tested to meet accessibility guidelines" only after the Accessibility Insights and screen-reader pass in P10.2 has actually been run (zero unnamed controls alone is not that test) |
 | System requirements | Keyboard: required. Mouse: recommended. Memory: 4 GB recommended |
 
 ## Age ratings (IARC questionnaire)
