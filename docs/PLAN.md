@@ -150,7 +150,7 @@ From the UI review in `docs/UI_REVIEW.md`; per-task implementation detail (files
 - [x] **P11.5** Signature move (D7): connected animation from snippet list to editor (a proxy of the shortcut chip glides from the selected row into the Shortcut field, 200 ms), a choreographed editor settle, page-entrance transitions on navigation, the "Saved" fade-in/out, and list add/remove transitions.
   *Human check:* with "Show animations in Windows" on and off — off must behave exactly as before.
 - [x] **P11.6** Playground completion moment: the first expansion in the welcome window and the Snippets empty state reveals `Welcome.TryHere.Done` with the entrance animation and a small accent check mark. Copy already exists.
-- [ ] **P11.7** Housekeeping: drop the parked "AI actions"/"Offline AI" pages from `check-screens.ps1`; gitignore `scripts/ui-check-*.png` and untrack the checked-in captures.
+- [x] **P11.7** Housekeeping: drop the parked "AI actions"/"Offline AI" pages from `check-screens.ps1`; gitignore `scripts/ui-check-*.png` and untrack the checked-in captures.
 
 ## Phase P10: Release (day 13–14)
 - [ ] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and the About page slot from DESIGN.md §9.

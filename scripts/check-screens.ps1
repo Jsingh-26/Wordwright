@@ -38,7 +38,7 @@ function Snap($name) {
   Write-Output "saved $path ($w x $h)"
 }
 
-foreach ($n in @("Snippets","AI actions","Offline AI","Settings","About")) {
+foreach ($n in @("Snippets","Settings","About")) {
   # Re-read the tree each time: WPF-UI rebuilds parts of it on navigation.
   $root = [System.Windows.Automation.AutomationElement]::FromHandle($hwnd)
   $cond = New-Object System.Windows.Automation.PropertyCondition([System.Windows.Automation.AutomationElement]::NameProperty, $n)
