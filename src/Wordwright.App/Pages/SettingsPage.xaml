@@ -97,6 +97,26 @@
                                  AutomationProperties.Name="{res:Str Settings.StartWithWindows}" />
             </ui:CardControl>
 
+            <!-- Theme (docs/DESIGN.md §8, decision D11). System follows Windows;
+                 Light and Dark pin one theme until the user picks System again. -->
+            <ui:CardControl Margin="0,8,0,0"
+                            CornerRadius="{StaticResource PanelRadius}"
+                            AutomationProperties.Name="{res:Str Settings.Theme}">
+                <ui:CardControl.Header>
+                    <TextBlock Style="{StaticResource BodyText}"
+                               VerticalAlignment="Center"
+                               Text="{res:Str Settings.Theme}" />
+                </ui:CardControl.Header>
+                <ComboBox Width="120"
+                          AutomationProperties.Name="{res:Str Settings.Theme}"
+                          SelectedValuePath="Tag"
+                          SelectedValue="{Binding Theme, Mode=TwoWay}">
+                    <ComboBoxItem Content="{res:Str Settings.Theme.System}" Tag="system" />
+                    <ComboBoxItem Content="{res:Str Settings.Theme.Light}" Tag="light" />
+                    <ComboBoxItem Content="{res:Str Settings.Theme.Dark}" Tag="dark" />
+                </ComboBox>
+            </ui:CardControl>
+
             <!-- Open data folder. The whole row is the button (docs/DESIGN.md §8
                  shows no separate control in it), so there is no second copy of
                  the label to read out. -->

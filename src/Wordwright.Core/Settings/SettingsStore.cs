@@ -29,11 +29,23 @@ public sealed class SettingsStore
 
     public AppSettings Load()
     {
-        return JsonFile.Read<AppSettings>(_filePath) ?? new AppSettings();
+        var settings = JsonFile.Read<AppSettings>(_filePath) ?? new AppSettings();
+
+        // A missing or unknown theme name falls back to System (docs/PLAN.md P11.2),
+        // so a hand-edited or older settings.json can never leave the app themeless.
+        return settings with { Theme = NormalizeTheme(settings.Theme) };
     }
 
     public void Save(AppSettings settings)
     {
         JsonFile.Write(_filePath, settings, keepBackup: false);
     }
+
+    /// <summary>Returns one of "system", "light" or "dark"; anything else is System.</summary>
+    internal static string NormalizeTheme(string? theme) => theme?.ToLowerInvariant() switch
+    {
+        "light" => "light",
+        "dark" => "dark",
+        _ => "system",
+    };
 }

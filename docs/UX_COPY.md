@@ -64,6 +64,9 @@ Group headings sit above their rows (docs/DESIGN.md §8).
 | Settings.Prefix | Snippet prefix |
 | Settings.StartWithWindows | Start Wordwright when I sign in |
 | Settings.Theme | Theme |
+| Settings.Theme.System | System |
+| Settings.Theme.Light | Light |
+| Settings.Theme.Dark | Dark |
 | Settings.ExcludedApps | Turn Wordwright off in these apps |
 | Settings.ExcludedAppsHelp | Wordwright can't always tell when you're typing a password. List apps where it should stay quiet, such as password managers. |
 | Settings.OpenDataFolder | Open data folder |

@@ -142,7 +142,7 @@ From the UI review in `docs/UI_REVIEW.md`; per-task implementation detail (files
 - [x] **P11.0** Record decisions D7–D11 (below) in DESIGN.md and this plan.
 - [x] **P11.1** Theme tokens (D8, D9): add `PanelRadius` (6 px) and apply it to the Settings cards and the snippet-list selection (fields, buttons, menu items stay 4 px); show validation errors in the Fluent critical fill (`SystemFillColorCriticalBrush`, theme-following) via a trigger on `ShortcutMessageIsError` — cautions stay Ochre.
   *Done when:* `check-screens.ps1` shows panels at 6 px; an "already used" error reads as an error and the very-long warning stays Ochre.
-- [ ] **P11.2** Settings "Theme" row (D11): System / Light / Dark in the Wordwright group (copy exists: `Settings.Theme`), persisted in `settings.json`, applied through the existing accent-swap path in `App.xaml.cs`; the OS watcher only applies in System. Core test for the persisted value.
+- [x] **P11.2** Settings "Theme" row (D11): System / Light / Dark in the Wordwright group (copy exists: `Settings.Theme`), persisted in `settings.json`, applied through the existing accent-swap path in `App.xaml.cs`; the OS watcher only applies in System. Core test for the persisted value.
   *Human check:* each choice re-skins the window immediately and survives a restart.
 - [ ] **P11.3** Tray menu theming (D10): Fluent-styled context menu (palette brushes, 4 px radius, light/dark following the taskbar via the tray icon's `SystemTheme` logic). No new dependency.
   *Human check:* the menu matches the taskbar theme in both modes.

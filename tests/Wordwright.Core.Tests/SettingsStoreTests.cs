@@ -131,6 +131,49 @@ public class SettingsStoreTests : IDisposable
         json.GetProperty("window").ValueKind.Should().Be(JsonValueKind.Null);
     }
 
+    [Theory]
+    [InlineData("system")]
+    [InlineData("light")]
+    [InlineData("dark")]
+    public void Save_thenLoad_roundTripsTheTheme(string theme)
+    {
+        var store = CreateStore();
+
+        store.Save(new AppSettings { Theme = theme });
+
+        store.Load().Theme.Should().Be(theme);
+    }
+
+    [Theory]
+    [InlineData("purple")]
+    [InlineData("System")]
+    [InlineData("")]
+    public void Load_withUnknownTheme_fallsBackToSystem(string theme)
+    {
+        Directory.CreateDirectory(_directory);
+        File.WriteAllText(SettingsPath, $"{{\"theme\":\"{theme}\"}}");
+
+        CreateStore().Load().Theme.Should().Be("system");
+    }
+
+    [Fact]
+    public void Load_withoutATheme_fallsBackToSystem()
+    {
+        Directory.CreateDirectory(_directory);
+        File.WriteAllText(SettingsPath, "{\"snippetsEnabled\":true}");
+
+        CreateStore().Load().Theme.Should().Be("system");
+    }
+
+    [Fact]
+    public void Load_withANullTheme_fallsBackToSystem()
+    {
+        Directory.CreateDirectory(_directory);
+        File.WriteAllText(SettingsPath, "{\"theme\":null}");
+
+        CreateStore().Load().Theme.Should().Be("system");
+    }
+
     [Fact]
     public void Load_withCorruptFile_renamesItAndReturnsDefaults()
     {

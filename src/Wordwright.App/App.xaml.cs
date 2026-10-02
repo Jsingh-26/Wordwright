@@ -54,6 +54,10 @@ public partial class App : Application
     private KeyboardHook? _keyboardHook;
     private SnippetEngine? _snippetEngine;
 
+    /// <summary>Whether SystemThemeWatcher is currently attached, so we only ever
+    /// unwatch a window it is watching (UnWatch throws on an unwatched window).</summary>
+    private bool _themeWatched;
+
     /// <summary>The user's settings; changes go through <see cref="UpdateSettings"/>.</summary>
     internal AppSettings Settings { get; private set; } = null!;
 
@@ -106,11 +110,12 @@ public partial class App : Application
             new WelcomeWindow().Show();
         }
 
-        // Theme follows the system. SystemThemeWatcher applies the theme, and
+        // The theme chosen in Settings decides the source: System follows Windows
+        // through SystemThemeWatcher; Light/Dark pin one theme (docs/PLAN.md P11.2).
         // Changed fires after every apply, which is where we re-assert the brand
         // accent (DESIGN.md: Forge ink in light theme, Ink light in dark).
         ApplicationThemeManager.Changed += OnApplicationThemeChanged;
-        SystemThemeWatcher.Watch(_mainWindow, WindowBackdropType.Mica, updateAccents: false);
+        ApplyTheme();
 
         // Refresh the tray glyph when Windows switches between light and dark.
         var handle = new WindowInteropHelper(_mainWindow).EnsureHandle();
@@ -153,6 +158,60 @@ public partial class App : Application
                     currentTheme == ApplicationTheme.Dark ? OchreDarkTheme : Ochre);
             },
             DispatcherPriority.ContextIdle);
+    }
+
+    /// <summary>Applies the theme chosen in Settings (docs/PLAN.md P11.2). System
+    /// re-attaches the OS watcher; Light and Dark detach it and pin one theme, so a
+    /// later Windows theme change leaves the app alone. The tray keeps following
+    /// the taskbar theme regardless (P11.3).</summary>
+    internal void ApplyTheme()
+    {
+        if (_mainWindow is null)
+        {
+            return;
+        }
+
+        var followsSystem = Settings.Theme is not ("light" or "dark");
+
+        // Only detach the watcher if it is attached; UnWatch throws otherwise, and
+        // at startup the window is still hidden and has never been watched.
+        if (_themeWatched)
+        {
+            SystemThemeWatcher.UnWatch(_mainWindow);
+            _themeWatched = false;
+        }
+
+        if (followsSystem)
+        {
+            SystemThemeWatcher.Watch(_mainWindow, WindowBackdropType.Mica, updateAccents: false);
+            _themeWatched = true;
+        }
+
+        // Apply explicitly rather than relying on Watch: the watcher keeps us
+        // following later OS changes, but it does not re-apply on its own when it
+        // is (re-)attached mid-session, so switching back to System would stick.
+        var theme = Settings.Theme switch
+        {
+            "light" => ApplicationTheme.Light,
+            "dark" => ApplicationTheme.Dark,
+            _ => ResolveSystemTheme(),
+        };
+        ApplicationThemeManager.Apply(theme, WindowBackdropType.Mica, updateAccent: false);
+    }
+
+    /// <summary>Maps the OS theme to one of ours, so System can be applied
+    /// without waiting for the next OS theme change.</summary>
+    private static ApplicationTheme ResolveSystemTheme()
+    {
+        if (ApplicationThemeManager.IsSystemHighContrast())
+        {
+            return ApplicationTheme.HighContrast;
+        }
+
+        // Qualified: the tray has its own SystemTheme enum (Tray/SystemTheme.cs).
+        return ApplicationThemeManager.GetSystemTheme() == Wpf.Ui.Appearance.SystemTheme.Light
+            ? ApplicationTheme.Light
+            : ApplicationTheme.Dark;
     }
 
     /// <summary>Persists new settings and applies anything with an external

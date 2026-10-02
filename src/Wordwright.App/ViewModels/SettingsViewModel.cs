@@ -23,6 +23,7 @@ internal sealed partial class SettingsViewModel : ObservableObject
 
         _loading = true;
         StartWithWindows = app.Settings.StartWithWindows;
+        Theme = app.Settings.Theme;
         SnippetPrefix = app.Snippets.TriggerPrefix;
         foreach (var executable in app.Settings.ExcludedApps)
         {
@@ -36,6 +37,10 @@ internal sealed partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _startWithWindows;
+
+    /// <summary>"system", "light" or "dark" (docs/PLAN.md P11.2).</summary>
+    [ObservableProperty]
+    private string _theme = "system";
 
     [ObservableProperty]
     private string _snippetPrefix = "";
@@ -54,6 +59,15 @@ internal sealed partial class SettingsViewModel : ObservableObject
         if (!_loading)
         {
             _app.UpdateSettings(_app.Settings with { StartWithWindows = value });
+        }
+    }
+
+    partial void OnThemeChanged(string value)
+    {
+        if (!_loading && value != _app.Settings.Theme)
+        {
+            _app.UpdateSettings(_app.Settings with { Theme = value });
+            _app.ApplyTheme();
         }
     }
 
