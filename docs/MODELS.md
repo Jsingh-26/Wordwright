@@ -5,7 +5,7 @@
 - Only permissive licences in the catalog (Apache-2.0, MIT). The licence is shown in the consent dialogue.
 - Downloads come straight from the model publisher's official Hugging Face repository (or a well-known GGUF publisher if the official one has no GGUF). Wordwright never hosts weights.
 - A model enters the catalog as `candidate`, and becomes `approved` only after the evaluation in `docs/EVAL.md`. Release builds show only `approved` entries; debug builds can show candidates.
-- Quantisation: `Q4_K_M` by default (best size/quality balance for CPU).
+- Quantisation: `Q4_K_M` by default (best size/quality balance for CPU). Where a publisher's official repository ships no `Q4_K_M`, the entry takes the official quant it does ship — Qwen publishes `Q8_0` for 0.6B and 1.7B — and the catalog's `notes` records the deviation rather than leaving it to be discovered.
 
 ## Hardware tiers (`Wordwright.Core.Hardware.TierClassifier`)
 
