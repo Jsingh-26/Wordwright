@@ -23,6 +23,9 @@
     <SolidColorBrush x:Key="EmberBrush" Color="{StaticResource EmberColor}" />
     <SolidColorBrush x:Key="OchreBrush" Color="{StaticResource OchreColor}" />
 
+    <!-- Shape (docs/DESIGN.md, D8): panels 6, controls 4. -->
+    <CornerRadius x:Key="PanelRadius">6</CornerRadius>
+
     <!-- Type (docs/DESIGN.md): Zodiak for display, Segoe UI Variable Text for
          everything the user reads or clicks. Windows 10 falls back to Segoe UI. -->
     <FontFamily x:Key="Zodiak">/Wordwright.App;component/Resources/Fonts/Zodiak-Bold.otf#Zodiak</FontFamily>

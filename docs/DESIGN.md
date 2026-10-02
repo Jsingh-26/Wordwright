@@ -191,7 +191,7 @@ Wordwright
   Check weekly for Wordwright updates                        (toggle, P8)
   Open data folder
 ```
-Group headings in Segoe UI Variable Semibold 14, not Zodiak (Zodiak is for page titles only). Rows keep 4 px radius; no card-in-card.
+Group headings in Segoe UI Variable Semibold 14, not Zodiak (Zodiak is for page titles only). Card rows take the 6 px panel radius (decision D8); no card-in-card.
 
 ### 9. About page
 ```

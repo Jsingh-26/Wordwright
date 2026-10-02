@@ -8,9 +8,10 @@
     </Page.Resources>
 
     <!-- Grouped rows (docs/DESIGN.md §8): a heading, then one CardControl per row
-         with its label left and its control right. Rows are 4 px cards and never
-         nest, so each is spaced by its own margin. Later phases add their rows
-         inside the existing groups rather than appending to the page. -->
+         with its label left and its control right. Cards take the 6 px panel
+         radius (D8) and never nest, so each is spaced by its own margin. Later
+         phases add their rows inside the existing groups rather than appending
+         to the page. -->
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="32,24" MaxWidth="620" HorizontalAlignment="Left">
             <TextBlock Style="{StaticResource PageTitle}" Text="{res:Str Settings.Title}" />
@@ -20,7 +21,7 @@
                        Text="{res:Str Settings.Group.Snippets}" />
 
             <!-- Snippet prefix -->
-            <ui:CardControl CornerRadius="4"
+            <ui:CardControl CornerRadius="{StaticResource PanelRadius}"
                             AutomationProperties.Name="{res:Str Settings.Prefix}">
                 <ui:CardControl.Header>
                     <TextBlock Style="{StaticResource BodyText}"
@@ -45,7 +46,7 @@
                     <DataTemplate>
                         <!-- The Remove button sits inside the app's own row. -->
                         <ui:CardControl Margin="0,0,0,4"
-                                        CornerRadius="4"
+                                        CornerRadius="{StaticResource PanelRadius}"
                                         AutomationProperties.Name="{Binding}">
                             <ui:CardControl.Header>
                                 <TextBlock Style="{StaticResource BodyText}"
@@ -85,7 +86,7 @@
                        Text="{res:Str Settings.Group.Wordwright}" />
 
             <!-- Start with Windows -->
-            <ui:CardControl CornerRadius="4"
+            <ui:CardControl CornerRadius="{StaticResource PanelRadius}"
                             AutomationProperties.Name="{res:Str Settings.StartWithWindows}">
                 <ui:CardControl.Header>
                     <TextBlock Style="{StaticResource BodyText}"
@@ -100,7 +101,7 @@
                  shows no separate control in it), so there is no second copy of
                  the label to read out. -->
             <ui:CardControl Margin="0,8,0,0"
-                            CornerRadius="4"
+                            CornerRadius="{StaticResource PanelRadius}"
                             AutomationProperties.Name="{res:Str Settings.OpenDataFolder}"
                             Click="OnOpenDataFolderClicked">
                 <ui:CardControl.Header>

@@ -17,7 +17,7 @@
                     <ControlTemplate TargetType="ListBoxItem">
                         <Border x:Name="Row"
                                 Background="Transparent"
-                                CornerRadius="4"
+                                CornerRadius="{StaticResource PanelRadius}"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter />
                         </Border>
@@ -146,9 +146,23 @@
                                Text="{Binding ShortcutHelp}" />
                     <TextBlock Margin="2,4,0,0"
                                TextWrapping="Wrap"
-                               Foreground="{DynamicResource CautionBrush}"
                                Text="{Binding ShortcutMessage}"
-                               Visibility="{Binding HasShortcutMessage, Converter={StaticResource BoolToVisibility}}" />
+                               Visibility="{Binding HasShortcutMessage, Converter={StaticResource BoolToVisibility}}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{DynamicResource CautionBrush}" />
+                                <Style.Triggers>
+                                    <!-- D9: true errors read as errors; cautions ("very long…")
+                                         stay Ochre. SystemFillColorCriticalBrush is WPF-UI's
+                                         theme-following critical fill. -->
+                                    <DataTrigger Binding="{Binding ShortcutMessageIsError}" Value="True">
+                                        <Setter Property="Foreground"
+                                                Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </StackPanel>
 
                 <StackPanel Grid.Row="2" Margin="0,16,0,0">

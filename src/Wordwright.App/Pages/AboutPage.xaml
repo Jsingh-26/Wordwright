@@ -25,7 +25,7 @@
             </TextBlock>
 
             <ui:CardExpander Margin="0,20,0,0"
-                             CornerRadius="4"
+                             CornerRadius="{StaticResource PanelRadius}"
                              Header="{res:Str About.ThirdParty}"
                              AutomationProperties.Name="{res:Str About.ThirdParty}">
                 <StackPanel>
