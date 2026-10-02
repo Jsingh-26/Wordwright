@@ -61,7 +61,7 @@ An earlier Wordwright also had an **on-device AI writing assistant**: select tex
 
 It is not part of this application. It needs a machine with enough free memory to load a model, and a range of devices to judge speed and quality on — neither of which was available to test it properly. Rather than ship an untested feature that downloads a multi-gigabyte model, it was parked.
 
-**All of it is preserved**, and the whole story — what was planned, how it was built, what was proven and what never was, and how to pick it up again — is in [`docs/AI_REWRITING.md`](docs/AI_REWRITING.md). The code is on the [`ai-rewriting`](https://github.com/Jsingh-26/Wordwright/tree/ai-rewriting) branch, and releases **v0.1.3–v0.1.5** contain it.
+**All of it is preserved**, and the whole story — what was planned, how it was built, what was proven and what never was, and how to pick it up again — is in [`docs/AI_REWRITING.md`](docs/AI_REWRITING.md). The code is on the [`ai-rewriting`](https://github.com/Jsingh-26/Wordwright/tree/ai-rewriting) tag, and releases **v0.1.3–v0.1.5** contain it.
 
 ## Tests and running locally
 

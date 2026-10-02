@@ -6,7 +6,7 @@ made to work. It is **not part of the application that ships**. This document is
 record of what it was, how it was built, why it stopped, and how to pick it back up.
 
 If you are reading this because you want the AI feature back: everything is on the
-`ai-rewriting` branch, and this page tells you what you are looking at.
+`ai-rewriting` tag, and this page tells you what you are looking at.
 
 ---
 
@@ -41,7 +41,7 @@ validate it on.
 
 | What | Where |
 |---|---|
-| The complete AI implementation | branch **`ai-rewriting`**, at commit **`f01633c`** |
+| The complete AI implementation | tag **`ai-rewriting`**, at commit **`f01633c`** |
 | Everything up to and including it | `main`'s history up to `f01633c` |
 | Builds that contained it | releases **v0.1.3**, **v0.1.4**, **v0.1.5** |
 | The plan as it stood | `docs/PLAN.md` **on that branch** — phases P4–P9 |
@@ -52,7 +52,7 @@ validate it on.
 To see it:
 
 ```bash
-git checkout ai-rewriting
+git checkout ai-rewriting   # a tag: detached HEAD; `git switch -c ai-work ai-rewriting` to build on it, then merge back into main
 dotnet build -c Release && dotnet test -c Release
 ```
 
@@ -146,7 +146,7 @@ Two things are worth calling out because they were the hard parts:
 
 ## If you pick this up again
 
-1. `git checkout ai-rewriting` and read `docs/PLAN.md` there — it carries the phase
+1. `git checkout ai-rewriting   # a tag: detached HEAD; `git switch -c ai-work ai-rewriting` to build on it, then merge back into main` and read `docs/PLAN.md` there — it carries the phase
    list, the acceptance criteria, the human checks and the open questions as they
    stood.
 2. `dotnet build -c Release && dotnet test -c Release` to confirm the baseline.

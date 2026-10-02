@@ -4,7 +4,7 @@
 
 Wordwright lives in the Windows system tray. It watches for snippet triggers (e.g. `;sig`) as you type and replaces them with the stored text, expanding `{date}`, `{time}`, `{clipboard}` and `{cursor}` on the way. It is a text expander and nothing else: it makes no network connections of any kind.
 
-An earlier version also rewrote selected text with an on-device AI model. That is parked, not deleted — see [AI_REWRITING.md](AI_REWRITING.md) and the `ai-rewriting` branch.
+An earlier version also rewrote selected text with an on-device AI model. That is parked, not deleted — see [AI_REWRITING.md](AI_REWRITING.md) and the `ai-rewriting` tag.
 
 ## Solution layout
 

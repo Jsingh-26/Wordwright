@@ -2,7 +2,7 @@
 
 > **Parked.** This document describes the on-device AI writing assistant, which is
 > **not part of the application that ships**. It is kept because that work is
-> preserved on the `ai-rewriting` branch and may return in a future version. The full
+> preserved on the `ai-rewriting` tag and may return in a future version. The full
 > account is in [`AI_REWRITING.md`](AI_REWRITING.md).
 
 

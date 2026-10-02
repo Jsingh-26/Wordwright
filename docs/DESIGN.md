@@ -3,7 +3,7 @@
 > **Partly parked.** The AI screens — the consent dialogue (§5), the action palette
 > (§6) and the progress pill (§7) — belong to the on-device AI writing assistant,
 > which is **not part of the application that ships**. They are kept for the record;
-> the palette in particular is preserved on the `ai-rewriting` branch. See
+> the palette in particular is preserved on the `ai-rewriting` tag. See
 > [`AI_REWRITING.md`](AI_REWRITING.md). Everything else here describes the app.
 
 
