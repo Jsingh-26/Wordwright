@@ -81,7 +81,7 @@ public class WindowPlacementTests
     }
 
     [Fact]
-    public void AWorkAreaSmallerThanTheMinimum_keepsTheMinimumSize()
+    public void AWorkAreaSmallerThanTheMinimum_keepsTheMinimumWidthButFitsTheHeight()
     {
         var tiny = new WindowArea(0, 0, 640, 480);
         var saved = new WindowPlacement { Left = 100, Top = 100, Width = 1040, Height = 720 };
@@ -89,9 +89,71 @@ public class WindowPlacementTests
         var clamped = saved.ClampTo(tiny);
 
         clamped.Width.Should().Be(WindowPlacement.MinimumWidth);
-        clamped.Height.Should().Be(WindowPlacement.MinimumHeight);
+        clamped.Height.Should().Be(480);
         clamped.Left.Should().Be(0);
         clamped.Top.Should().Be(0);
+    }
+
+    [Fact]
+    public void ALaptopAt125Percent_getsAWindowThatFitsAboveTheTaskbar()
+    {
+        // 1366×768 at 125 %: 1092.8 × 614.4 DIPs, about 582 tall above the taskbar.
+        var laptop = new WindowArea(0, 0, 1092.8, 582.4);
+
+        var clamped = new WindowPlacement().ClampTo(laptop);
+
+        clamped.Height.Should().Be(582.4);
+        (clamped.Top + clamped.Height).Should().BeLessThanOrEqualTo(laptop.Bottom);
+        WindowPlacement.MinimumHeightFor(laptop).Should().Be(582.4);
+    }
+
+    [Fact]
+    public void MinimumHeightFor_aTallWorkArea_isTheDesignedMinimum()
+    {
+        WindowPlacement.MinimumHeightFor(WorkArea).Should().Be(WindowPlacement.MinimumHeight);
+    }
+
+    /// <summary>The primary 1920×1040 work area, and a second monitor to its right.</summary>
+    private static readonly WindowArea[] TwoMonitors =
+    [
+        WorkArea,
+        new WindowArea(1920, 0, 2560, 1400),
+    ];
+
+    [Fact]
+    public void PickWorkArea_aWindowClosedOnTheSecondMonitor_staysThere()
+    {
+        var saved = new WindowPlacement { Left = 2300, Top = 200, Width = 1040, Height = 720 };
+
+        saved.PickWorkArea(TwoMonitors).Should().Be(TwoMonitors[1]);
+        saved.ClampTo(saved.PickWorkArea(TwoMonitors)).Should().Be(saved);
+    }
+
+    [Fact]
+    public void PickWorkArea_aWindowAcrossBothMonitors_goesWhereMostOfItIs()
+    {
+        var mostlyRight = new WindowPlacement { Left = 1700, Top = 100, Width = 1040, Height = 720 };
+        var mostlyLeft = new WindowPlacement { Left = 1200, Top = 100, Width = 1040, Height = 720 };
+
+        mostlyRight.PickWorkArea(TwoMonitors).Should().Be(TwoMonitors[1]);
+        mostlyLeft.PickWorkArea(TwoMonitors).Should().Be(TwoMonitors[0]);
+    }
+
+    [Fact]
+    public void PickWorkArea_whenThatMonitorIsGone_takesTheNearestOne()
+    {
+        // Saved on a monitor that sat to the right of the second one.
+        var saved = new WindowPlacement { Left = 5000, Top = 100, Width = 1040, Height = 720 };
+
+        saved.PickWorkArea(TwoMonitors).Should().Be(TwoMonitors[1]);
+    }
+
+    [Fact]
+    public void PickWorkArea_withOneMonitor_isThatMonitor()
+    {
+        var saved = new WindowPlacement { Left = -3000, Top = -3000 };
+
+        saved.PickWorkArea([WorkArea]).Should().Be(WorkArea);
     }
 
     [Fact]

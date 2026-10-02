@@ -6,6 +6,7 @@ using Wpf.Ui.Controls;
 using Wordwright.App.Pages;
 using Wordwright.App.Resources;
 using Wordwright.Core.Settings;
+using Wordwright.Platform.Display;
 
 namespace Wordwright.App;
 
@@ -116,10 +117,10 @@ public partial class MainWindow : FluentWindow
     }
 
     /// <summary>Puts the window back where it was when it last closed, pulled
-    /// inside the current work area (docs/PLAN.md → P3.4a).</summary>
+    /// inside the work area of the monitor it was on (docs/PLAN.md → P3.4a,
+    /// P12.9).</summary>
     private void RestorePlacement()
     {
-        var workArea = ToArea(SystemParameters.WorkArea);
         var saved = ((App)Application.Current).Settings.Window;
 
         if (saved is null)
@@ -127,13 +128,17 @@ public partial class MainWindow : FluentWindow
             // First run: the designed size, centred by WindowStartupLocation, but
             // never taller than the work area — a centred 720 px window in a
             // shorter work area would push its title bar off the top.
-            var initial = new WindowPlacement().ClampTo(workArea);
+            var primary = ToArea(SystemParameters.WorkArea);
+            var initial = new WindowPlacement().ClampTo(primary);
+            MinHeight = WindowPlacement.MinimumHeightFor(primary);
             Width = initial.Width;
             Height = initial.Height;
             return;
         }
 
+        var workArea = saved.PickWorkArea(WorkAreas());
         var placement = saved.ClampTo(workArea);
+        MinHeight = WindowPlacement.MinimumHeightFor(workArea);
 
         // Left and Top are only honoured with a manual start-up location, and both
         // are applied when the window is shown, so nothing jumps into place later.
@@ -179,6 +184,25 @@ public partial class MainWindow : FluentWindow
     }
 
     private static WindowArea ToArea(Rect rect) => new(rect.Left, rect.Top, rect.Width, rect.Height);
+
+    /// <summary>Every monitor's work area in the units Left and Top use before
+    /// the window is shown: physical pixels over the primary monitor's scale,
+    /// which SystemParameters.WorkArea (already in those units) gives away.</summary>
+    private static IReadOnlyList<WindowArea> WorkAreas()
+    {
+        var pixels = Monitors.WorkAreasInPixels();
+        var primary = SystemParameters.WorkArea;
+        if (pixels.Count == 0 || pixels[0].Width == 0)
+        {
+            return [ToArea(primary)];
+        }
+
+        var scale = primary.Width / pixels[0].Width;
+        return pixels
+            .Select(area => new WindowArea(
+                area.Left * scale, area.Top * scale, area.Width * scale, area.Height * scale))
+            .ToList();
+    }
 
     // Closing hides to the tray; the app keeps running. The tray menu's Quit exits.
     protected override void OnClosing(CancelEventArgs e)
