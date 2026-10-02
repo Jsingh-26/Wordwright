@@ -4,6 +4,7 @@
                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
                  xmlns:res="clr-namespace:Wordwright.App.Resources"
                  Title="Wordwright"
+                 Icon="pack://application:,,,/Resources/icon.ico"
                  Width="460"
                  SizeToContent="Height"
                  ResizeMode="NoResize"

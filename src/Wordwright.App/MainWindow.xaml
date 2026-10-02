@@ -5,6 +5,7 @@
                  xmlns:res="clr-namespace:Wordwright.App.Resources"
                  xmlns:pages="clr-namespace:Wordwright.App.Pages"
                  Title="Wordwright"
+                 Icon="pack://application:,,,/Resources/icon.ico"
                  Height="720" Width="1040"
                  MinWidth="800" MinHeight="600"
                  WindowStartupLocation="CenterScreen"

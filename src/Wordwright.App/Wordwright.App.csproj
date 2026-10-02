@@ -23,6 +23,11 @@
     <!-- Zodiak (ITF Free Font License), embedded as app resources. -->
     <Resource Include="Resources\Fonts\*.otf" />
     <Resource Include="Resources\Fonts\LICENSE-Zodiak.txt" />
+
+    <!-- The brand app icon (docs/DESIGN.md §4), embedded so each window can set
+         its Icon and the taskbar button wears the mark instead of the generic
+         placeholder Windows shows for a window with no icon. -->
+    <Resource Include="..\..\brand\icon.ico" Link="Resources\icon.ico" />
   </ItemGroup>
 
 </Project>
