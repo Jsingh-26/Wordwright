@@ -80,7 +80,7 @@ Everything lives under `%AppData%\Wordwright\`.
 
 ## Paste and selection capture (shared)
 
-- **Paste:** save clipboard (text plus best-effort other formats) → set clipboard to our text, also adding the `ExcludeClipboardContentFromMonitorProcessing` format so it stays out of Windows clipboard history (Win+V) → `SendInput` Ctrl+V → wait 150 ms → restore the saved clipboard.
+- **Paste:** save clipboard (Unicode text, text, RTF, HTML, CSV and file lists, plus a bitmap only when there is no text, within a 200 ms budget) → set clipboard to our text, also adding the `ExcludeClipboardContentFromMonitorProcessing` format so it stays out of Windows clipboard history (Win+V) → `SendInput` Ctrl+V → 400 ms later, without blocking, restore the saved clipboard unless something else has written to it since (clipboard sequence number). A second expansion inside those 400 ms keeps the first one's saved clipboard.
 - **Capture selection:** save clipboard → clear → `SendInput` Ctrl+C → poll for new text up to 400 ms → read → restore clipboard. Empty result means "nothing selected".
 - **Known limitation:** Windows blocks input from a normal app into apps running as administrator (UIPI). Detect an elevated foreground window and show the message from `UX_COPY.md` instead of failing silently.
 ## Privacy summary

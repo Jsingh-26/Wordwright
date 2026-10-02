@@ -37,7 +37,8 @@ internal static class Program
                 InputSender.Paste();
                 Wait(300);
 
-                Check("our text is on the clipboard", clipboard.GetText() == "hello");
+                Check("our text is on the clipboard", Clipboard.GetText() == "hello");
+                Check("{clipboard} still reads the user's text", clipboard.GetText() == originalClipboard);
                 Check("marked to stay out of Win+V history", HasHistoryExclusionMarkers());
             }
 
@@ -67,12 +68,43 @@ internal static class Program
             // 4. The clipboard is back to what the maintainer had.
             Wait(200);
             Check("clipboard restored", clipboard.GetText() == originalClipboard);
+
+            // 5. Rich content comes back with its formats (P12.7).
+            var rich = new DataObject();
+            rich.SetData(DataFormats.UnicodeText, "rich");
+            rich.SetData(DataFormats.Html, "<b>rich</b>");
+            rich.SetData(DataFormats.Rtf, @"{\rtf1 rich}");
+            Clipboard.SetDataObject(rich, copy: true);
+            using (clipboard.ReplaceWithText("plain"))
+            {
+            }
+
+            var back = Clipboard.GetDataObject();
+            Check("text, HTML and RTF restored",
+                back is not null
+                && back.GetDataPresent(DataFormats.UnicodeText)
+                && back.GetDataPresent(DataFormats.Html)
+                && back.GetDataPresent(DataFormats.Rtf));
+
+            // 6. A copy made while our text is on the clipboard is newer than
+            // what was saved, so the restore leaves it alone (P12.7).
+            clipboard.PutTextForPaste("ours");
+            Clipboard.SetText("newer");
+            clipboard.RestoreSaved();
+            Check("a newer copy is not overwritten", Clipboard.GetText() == "newer");
         }
         finally
         {
+            // Set directly: ReplaceWithText would restore whatever the last check
+            // left on the clipboard, not the maintainer's text.
+            clipboard.RestoreSaved();
             if (originalClipboard is not null)
             {
-                using var restore = clipboard.ReplaceWithText(originalClipboard);
+                Clipboard.SetText(originalClipboard);
+            }
+            else
+            {
+                Clipboard.Clear();
             }
         }
 

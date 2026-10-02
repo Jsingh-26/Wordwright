@@ -17,14 +17,17 @@ internal sealed class SnippetEngine : IDisposable
 {
     /// <summary>How long our text stays on the clipboard after Ctrl+V, so the
     /// target app has read it before the old contents go back
-    /// (docs/ARCHITECTURE.md → Paste).</summary>
-    private const int PasteSettleMilliseconds = 150;
+    /// (docs/ARCHITECTURE.md → Paste). Slow targets (Electron apps under load,
+    /// Remote Desktop) read late, so this is generous; nothing waits on it, and
+    /// another expansion inside the window reuses the saved clipboard.</summary>
+    private static readonly TimeSpan RestoreDelay = TimeSpan.FromMilliseconds(400);
 
     private readonly KeyboardHook _hook;
     private readonly ClipboardService _clipboard;
     private readonly Dispatcher _dispatcher;
     private readonly KeystrokeBuffer _buffer = new();
     private readonly VariableExpander _expander;
+    private readonly DispatcherTimer _restoreTimer;
 
     private TriggerMatcher _matcher = new(SnippetDocument.DefaultTriggerPrefix, []);
 
@@ -34,6 +37,13 @@ internal sealed class SnippetEngine : IDisposable
         _clipboard = clipboard;
         _dispatcher = dispatcher;
         _expander = new VariableExpander(() => DateTimeOffset.Now, clipboard.GetText);
+
+        _restoreTimer = new DispatcherTimer(DispatcherPriority.Normal, dispatcher) { Interval = RestoreDelay };
+        _restoreTimer.Tick += (_, _) =>
+        {
+            _restoreTimer.Stop();
+            _clipboard.RestoreSaved();
+        };
 
         _hook.CharacterTyped += OnCharacterTyped;
         _hook.BackspacePressed += OnBackspacePressed;
@@ -79,21 +89,21 @@ internal sealed class SnippetEngine : IDisposable
     {
         var expanded = _expander.Expand(match.Text);
 
-        // Delete the typed trigger, put the text on the clipboard, paste, let the
-        // target app read it, then put the user's clipboard back.
+        // Delete the typed trigger, put the text on the clipboard and paste. The
+        // user's clipboard goes back once the target app has had time to read it.
+        _restoreTimer.Stop();
         InputSender.SendBackspaces(match.TypedLength);
-
-        using (_clipboard.ReplaceWithText(expanded.Text + match.Delimiter))
-        {
-            InputSender.Paste();
-            Thread.Sleep(PasteSettleMilliseconds);
-        }
+        _clipboard.PutTextForPaste(expanded.Text + match.Delimiter);
+        InputSender.Paste();
 
         if (expanded.CharactersAfterCursor > 0)
         {
-            // Put the caret back where the body's {cursor} marker was.
+            // Put the caret back where the body's {cursor} marker was. The arrows
+            // queue behind Ctrl+V, so the target handles them after the paste.
             InputSender.SendLeftArrows(expanded.CharactersAfterCursor);
         }
+
+        _restoreTimer.Start();
 
         Debug.WriteLine($"snippet {match.Snippet.Trigger} expanded ({expanded.Text.Length} characters)");
 
@@ -106,6 +116,10 @@ internal sealed class SnippetEngine : IDisposable
 
     public void Dispose()
     {
+        // Quitting (or rebuilding the engine) must not leave our text behind.
+        _restoreTimer.Stop();
+        _clipboard.RestoreSaved();
+
         _hook.CharacterTyped -= OnCharacterTyped;
         _hook.BackspacePressed -= OnBackspacePressed;
         _hook.BufferCleared -= OnBufferCleared;
