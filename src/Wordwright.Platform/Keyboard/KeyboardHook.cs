@@ -81,6 +81,12 @@ public sealed class KeyboardHook : IDisposable
     private bool _foregroundIsExcluded;
     private readonly char[] _translation = new char[8];
 
+    // Windows keeps only a raw pointer to the hook procedures, so these fields
+    // are what stops the garbage collector from freeing them while the hooks
+    // are installed (a collected callback is a fail-fast crash).
+    private readonly HookProcedure _keyboardProcedure;
+    private readonly HookProcedure _mouseProcedure;
+
     /// <param name="excludedApps">Executable file names (e.g. <c>KeePass.exe</c>)
     /// where Wordwright stays quiet, from the user's settings.</param>
     /// <param name="ignoreInjectedInput">Low-level input that other programs
@@ -91,6 +97,8 @@ public sealed class KeyboardHook : IDisposable
     {
         _excludedApps = excludedApps.ToList();
         IgnoreInjectedInput = ignoreInjectedInput;
+        _keyboardProcedure = OnKeyboardMessage;
+        _mouseProcedure = OnMouseMessage;
     }
 
     /// <summary>Whether synthesised input is filtered out (the production default).</summary>
@@ -143,6 +151,15 @@ public sealed class KeyboardHook : IDisposable
         _hookReady.Wait(TimeSpan.FromSeconds(5));
     }
 
+    /// <summary>Installs the hooks afresh. Windows can drop a low-level hook
+    /// without telling its owner (around sleep and resume, or a session lock),
+    /// so the app calls this when the machine wakes or the session unlocks.</summary>
+    public void Restart()
+    {
+        Stop();
+        Start();
+    }
+
     public void Stop()
     {
         if (_hookThread is null)
@@ -176,8 +193,8 @@ public sealed class KeyboardHook : IDisposable
         _hookThreadId = GetCurrentThreadId();
 
         var module = GetModuleHandle(null);
-        _keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, OnKeyboardMessage, module, 0);
-        _mouseHook = SetWindowsHookEx(WH_MOUSE_LL, OnMouseMessage, module, 0);
+        _keyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, _keyboardProcedure, module, 0);
+        _mouseHook = SetWindowsHookEx(WH_MOUSE_LL, _mouseProcedure, module, 0);
         _installed = _keyboardHook != IntPtr.Zero;
         _hookReady.Set();
 

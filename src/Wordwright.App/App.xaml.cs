@@ -11,6 +11,7 @@ using Wordwright.App.Snippets;
 using Wordwright.App.Tray;
 using Wordwright.Core.Settings;
 using Wordwright.Core.Snippets;
+using Microsoft.Win32;
 using Velopack;
 using Wordwright.Platform.Input;
 using Wordwright.Platform.Keyboard;
@@ -121,7 +122,42 @@ public partial class App : Application
         // Refresh the tray glyph when Windows switches between light and dark.
         var handle = new WindowInteropHelper(_mainWindow).EnsureHandle();
         HwndSource.FromHwnd(handle)!.AddHook(OnWindowMessage);
+
+        // Windows can drop a low-level hook around sleep and a session lock
+        // without telling us, so put it back each time (docs/PLAN.md P12.6).
+        SystemEvents.PowerModeChanged += OnPowerModeChanged;
+        SystemEvents.SessionSwitch += OnSessionSwitch;
     }
+
+    private void OnPowerModeChanged(object sender, PowerModeChangedEventArgs e)
+    {
+        if (e.Mode == PowerModes.Resume)
+        {
+            Dispatcher.BeginInvoke(ReinstallHook);
+        }
+    }
+
+    private void OnSessionSwitch(object sender, SessionSwitchEventArgs e)
+    {
+        if (e.Reason is SessionSwitchReason.SessionUnlock or SessionSwitchReason.ConsoleConnect
+            or SessionSwitchReason.RemoteConnect)
+        {
+            Dispatcher.BeginInvoke(ReinstallHook);
+        }
+    }
+
+    private void ReinstallHook()
+    {
+        if (Settings.SnippetsEnabled && _keyboardHook is not null)
+        {
+            _keyboardHook.Restart();
+            _trayIcon?.RefreshTooltip();
+        }
+    }
+
+    /// <summary>True when snippets are on but Windows would not install the
+    /// keyboard hook, so nothing can expand; the tray says so.</summary>
+    internal bool HookRefused => Settings.SnippetsEnabled && _keyboardHook is { IsInstalled: false };
 
     private static void OnApplicationThemeChanged(ApplicationTheme currentTheme, Color systemAccent)
     {
@@ -272,6 +308,8 @@ public partial class App : Application
         {
             _keyboardHook.Stop();
         }
+
+        _trayIcon?.RefreshTooltip();
     }
 
     /// <summary>Replaces the snippets the engine matches against.</summary>
@@ -354,6 +392,10 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         FlushingEdits?.Invoke(this, EventArgs.Empty);
+
+        // SystemEvents holds static references; let go of this instance.
+        SystemEvents.PowerModeChanged -= OnPowerModeChanged;
+        SystemEvents.SessionSwitch -= OnSessionSwitch;
 
         _snippetEngine?.Dispose();
         _keyboardHook?.Dispose();

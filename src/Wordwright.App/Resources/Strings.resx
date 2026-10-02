@@ -14,6 +14,7 @@
   <data name="Tray.SnippetsOn" xml:space="preserve"><value>Snippets on</value></data>
   <data name="Tray.Quit" xml:space="preserve"><value>Quit Wordwright</value></data>
   <data name="Tray.Tooltip" xml:space="preserve"><value>Wordwright: type {Prefix} + a shortcut to insert a snippet</value></data>
+  <data name="Tray.Tooltip.HookRefused" xml:space="preserve"><value>Wordwright: snippets aren't working. Right-click here and turn Snippets on again.</value></data>
 
   <!-- First run (welcome, shown once) -->
   <data name="Welcome.Title" xml:space="preserve"><value>Wordwright is running</value></data>

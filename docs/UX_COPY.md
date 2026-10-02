@@ -11,6 +11,7 @@ Placeholders use `{Name}`.
 | Tray.SnippetsOn | Snippets on |
 | Tray.Quit | Quit Wordwright |
 | Tray.Tooltip | Wordwright: type {Prefix} + a shortcut to insert a snippet |
+| Tray.Tooltip.HookRefused | Wordwright: snippets aren't working. Right-click here and turn Snippets on again. |
 
 ## First run (welcome, shown once)
 | ID | Text |

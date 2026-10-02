@@ -106,6 +106,14 @@ static void Main(string[] args)
     Key(0x11, down: true); Key(0x11, down: false);
     Pump(800);
     Console.WriteLine($"survived GC; hook still installed={hook.IsInstalled}; clears delta={clears - before}");
+
+    // Restart probe (P12.6): what the app does after resume and unlock.
+    hook.Restart();
+    Pump(200);
+    before = clears;
+    Key(0x11, down: true); Key(0x11, down: false);
+    Pump(800);
+    Console.WriteLine($"after Restart(): installed={hook.IsInstalled}; clears delta={clears - before}");
     hook.Stop();
 }
 

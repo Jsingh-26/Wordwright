@@ -78,10 +78,13 @@ internal sealed class TrayIconController : IDisposable
         _trayIcon.ForceCreate(false);
     }
 
-    /// <summary>Shows the current prefix in the tooltip, after it changes.</summary>
+    /// <summary>Shows the current prefix in the tooltip, or says that snippets
+    /// are not working when Windows refused the keyboard hook (P12.6).</summary>
     internal void RefreshTooltip()
     {
-        _trayIcon.ToolTipText = Strings.Get("Tray.Tooltip", ("Prefix", _app.Snippets.TriggerPrefix));
+        _trayIcon.ToolTipText = _app.HookRefused
+            ? Strings.Get("Tray.Tooltip.HookRefused")
+            : Strings.Get("Tray.Tooltip", ("Prefix", _app.Snippets.TriggerPrefix));
     }
 
     /// <summary>Re-skins the glyph and the menu after the taskbar theme changes.</summary>
