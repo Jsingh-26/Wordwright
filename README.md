@@ -23,7 +23,7 @@ By **Unbound Kite**. A free, open-source text expander for Windows: type a short
 2. Wordwright starts in the tray (the "W" by the clock; on Windows 11 it may sit in the overflow, behind the ^). A short welcome lets you try it: type `;date` and today's date appears.
 3. Open the tray icon to add your own snippets.
 
-Prefer not to install? **`Wordwright-win-Portable.zip`** from the same release runs from any folder. A Microsoft Store version is on the way.
+Prefer not to install? **`Wordwright-win-Portable.zip`** from the same release runs from any folder. It does not start with Windows unless you turn that on in Settings. A Microsoft Store version is on the way.
 
 To uninstall, use **Settings → Apps → Installed apps → Wordwright**. Your snippets stay in `%AppData%\Wordwright` until you delete that folder.
 
@@ -38,7 +38,7 @@ To continue, click **More info**, then **Run anyway**. If you would rather check
 - **No network access.** Wordwright opens no connections at all: no telemetry, no analytics, no crash reports, no update check. You can confirm it in Resource Monitor's Network tab.
 - **Nothing you type is stored.** To spot a shortcut, Wordwright keeps the last 64 characters you typed in memory only, and clears them whenever you click, switch windows or press Enter, Escape or an arrow key. Typed text, your clipboard and your snippet text are never written to a log.
 - **Your clipboard comes back.** A snippet is pasted through the clipboard, and whatever you had copied is put back straight afterwards. Wordwright asks Windows to keep its paste out of clipboard history (Win+V).
-- **Your data, in one place.** Snippets and settings are plain JSON in `%AppData%\Wordwright`. Nothing is kept anywhere else.
+- **Your data, in one place.** Snippets and settings are plain JSON in `%AppData%\Wordwright`, beside a small log that records events such as "started" and never any text. Nothing is kept anywhere else.
 - **Quiet where it matters.** Wordwright cannot always tell when you are typing a password, so Settings lets you turn it off in chosen apps, such as your password manager.
 
 ## How it works

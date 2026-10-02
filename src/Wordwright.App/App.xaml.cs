@@ -14,8 +14,10 @@ using Wordwright.Core.Settings;
 using Wordwright.Core.Snippets;
 using Microsoft.Win32;
 using Velopack;
+using Velopack.Locators;
 using Wordwright.Platform.Input;
 using Wordwright.Platform.Keyboard;
+using Wordwright.Platform.Packaging;
 using Wordwright.Platform.Startup;
 
 namespace Wordwright.App;
@@ -104,7 +106,17 @@ public partial class App : Application
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
 
         _settingsStore = new SettingsStore(userData);
+        var firstLaunch = !File.Exists(Path.Combine(userData, "settings.json"));
         Settings = _settingsStore.Load();
+        if (firstLaunch && !IsInstalledBuild())
+        {
+            // A portable copy, or a build run from its output folder, would write
+            // a Run entry pointing at wherever it happens to be (docs/PLAN.md
+            // P12.12). It starts with Windows only once the user asks.
+            Settings = Settings with { StartWithWindows = false };
+            _settingsStore.Save(Settings);
+        }
+
         StartWithWindows.Apply(Settings.StartWithWindows, Environment.ProcessPath!);
 
         _snippetStore = new SnippetStore(userData);
@@ -194,6 +206,24 @@ public partial class App : Application
     /// <summary>True when snippets are on but Windows would not install the
     /// keyboard hook, so nothing can expand; the tray says so.</summary>
     internal bool HookRefused => Settings.SnippetsEnabled && _keyboardHook is { IsInstalled: false };
+
+    /// <summary>True for the Store package and for a copy Setup installed;
+    /// false for the portable zip and for a build run where it was built.</summary>
+    private static bool IsInstalledBuild()
+    {
+        if (PackageIdentity.IsPackaged)
+        {
+            return true;
+        }
+
+        if (!VelopackLocator.IsCurrentSet)
+        {
+            return false;
+        }
+
+        var locator = VelopackLocator.Current;
+        return locator.CurrentlyInstalledVersion is not null && !locator.IsPortable;
+    }
 
     private static void OnApplicationThemeChanged(ApplicationTheme currentTheme, Color systemAccent)
     {
