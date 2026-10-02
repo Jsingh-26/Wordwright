@@ -2,7 +2,6 @@
   <Folder Name="/src/">
     <Project Path="src/Wordwright.App/Wordwright.App.csproj" />
     <Project Path="src/Wordwright.Core/Wordwright.Core.csproj" />
-    <Project Path="src/Wordwright.Inference/Wordwright.Inference.csproj" />
     <Project Path="src/Wordwright.Platform/Wordwright.Platform.csproj" />
   </Folder>
   <Folder Name="/tests/">

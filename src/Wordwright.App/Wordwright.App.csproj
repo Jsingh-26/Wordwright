@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Wordwright.Core\Wordwright.Core.csproj" />
-    <ProjectReference Include="..\Wordwright.Inference\Wordwright.Inference.csproj" />
     <ProjectReference Include="..\Wordwright.Platform\Wordwright.Platform.csproj" />
   </ItemGroup>
 

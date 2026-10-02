@@ -1,9 +1,0 @@
-<Page x:Class="Wordwright.App.Pages.OfflineAiPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:res="clr-namespace:Wordwright.App.Resources">
-    <!-- Placeholder until P5. -->
-    <StackPanel Margin="32,24">
-        <TextBlock Style="{StaticResource PageTitle}" Text="{res:Str Ai.Off.Title}" />
-    </StackPanel>
-</Page>

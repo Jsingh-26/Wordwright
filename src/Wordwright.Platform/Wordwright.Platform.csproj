@@ -8,10 +8,6 @@
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Management" />
-    <PackageReference Include="Vortice.DXGI" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Wordwright.Core\Wordwright.Core.csproj" />

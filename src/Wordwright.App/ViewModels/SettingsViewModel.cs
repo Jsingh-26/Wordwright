@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Wordwright.App.Resources;
-using Wordwright.Core.Actions;
 using Wordwright.Core.Snippets;
 
 namespace Wordwright.App.ViewModels;
@@ -24,9 +23,7 @@ internal sealed partial class SettingsViewModel : ObservableObject
 
         _loading = true;
         StartWithWindows = app.Settings.StartWithWindows;
-        AiEnabled = app.Settings.AiEnabled;
         SnippetPrefix = app.Snippets.TriggerPrefix;
-        PaletteHotkey = app.Settings.PaletteHotkey;
         foreach (var executable in app.Settings.ExcludedApps)
         {
             ExcludedApps.Add(executable);
@@ -44,9 +41,6 @@ internal sealed partial class SettingsViewModel : ObservableObject
     private string _snippetPrefix = "";
 
     [ObservableProperty]
-    private string? _paletteHotkey;
-
-    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasMessage))]
     private string? _message;
 
@@ -54,32 +48,6 @@ internal sealed partial class SettingsViewModel : ObservableObject
     public bool HasMessage => !string.IsNullOrEmpty(Message);
 
     public bool HasExcludedApps => ExcludedApps.Count > 0;
-
-    /// <summary>
-    /// Whether offline AI is on. Drives the Settings row that can turn it off.
-    /// </summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanTurnOffAi))]
-    private bool _aiEnabled;
-
-    public bool CanTurnOffAi => AiEnabled;
-
-    /// <summary>
-    /// Turns offline AI off.
-    ///
-    /// This is the only model-management action that exists before P7.2 builds
-    /// the Offline AI page, and it lives on Settings because that page is hidden
-    /// whenever this PC cannot carry a model: someone who already had AI on must
-    /// not be stranded with no way to switch it off. It cannot gain a model, so
-    /// it does not bypass the eligibility rule (docs/PLAN.md → "Maintainer
-    /// requirement: startup resource eligibility").
-    /// </summary>
-    public void TurnOffAi()
-    {
-        _app.UpdateSettings(_app.Settings with { AiEnabled = false });
-        _app.Rewrite.Unload();
-        AiEnabled = false;
-    }
 
     partial void OnStartWithWindowsChanged(bool value)
     {
@@ -97,40 +65,6 @@ internal sealed partial class SettingsViewModel : ObservableObject
         }
 
         _app.UpdateSnippets(_app.Snippets with { TriggerPrefix = value.Trim() });
-    }
-
-    partial void OnPaletteHotkeyChanged(string? value)
-    {
-        if (_loading)
-        {
-            return;
-        }
-
-        _app.UpdateSettings(_app.Settings with { PaletteHotkey = value ?? "" });
-    }
-
-    /// <summary>Checks a palette-hotkey candidate for a clash with an action's own
-    /// hotkey, for the recorder to show.</summary>
-    public (bool Accepted, string? Message) ValidatePaletteHotkey(HotkeySpec candidate)
-    {
-        var text = candidate.ToString();
-
-        if (HotkeyRules.Validate(text) != HotkeyValidation.Ok)
-        {
-            return (false, Strings.Get("Actions.Hotkey.Invalid"));
-        }
-
-        foreach (var action in _app.Actions.Actions.Where(action => action.Hotkey is not null))
-        {
-            if (HotkeySpec.Parse(action.Hotkey) is { } spec
-                && spec.Modifiers == candidate.Modifiers
-                && string.Equals(spec.Key, candidate.Key, StringComparison.Ordinal))
-            {
-                return (false, Strings.Get("Actions.Hotkey.Duplicate", ("Hotkey", text), ("Action", action.Name)));
-            }
-        }
-
-        return (true, null);
     }
 
     public void AddExcludedApp(string executable)

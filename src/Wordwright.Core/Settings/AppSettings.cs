@@ -9,23 +9,11 @@ public sealed record AppSettings
 {
     public int SchemaVersion { get; init; } = SettingsStore.SchemaVersion;
 
-    public string PaletteHotkey { get; init; } = "Ctrl+Alt+Space";
-
     public bool SnippetsEnabled { get; init; } = true;
 
     public bool StartWithWindows { get; init; } = true;
 
-    public bool AiEnabled { get; init; }
-
-    public string? ActiveModelId { get; init; }
-
-    public int UnloadAfterIdleMinutes { get; init; } = 10;
-
-    public bool CheckForBetterModelsWeekly { get; init; }
-
     public bool CheckForAppUpdatesWeekly { get; init; }
-
-    public DateTimeOffset? LastCatalogCheckUtc { get; init; }
 
     /// <summary>Processes (by exe file name) where Wordwright stays quiet.</summary>
     public IReadOnlyList<string> ExcludedApps { get; init; } =

@@ -5,9 +5,7 @@ using System.Windows.Threading;
 using Wpf.Ui.Controls;
 using Wordwright.App.Pages;
 using Wordwright.App.Resources;
-using Wordwright.Core.Models;
 using Wordwright.Core.Settings;
-using Wordwright.Platform.Hardware;
 
 namespace Wordwright.App;
 
@@ -37,18 +35,6 @@ public partial class MainWindow : FluentWindow
     {
         RootNavigation.Navigate(_startPage);
 
-        _ = UpdateOfflineAiItemAsync();
-
-#if DEBUG
-        // The hardware page exists to work on the app, so only a debug build
-        // offers a way to reach it (docs/PLAN.md P4.1).
-        RootNavigation.MenuItems.Add(new NavigationViewItem
-        {
-            Content = Strings.Get("Debug.Title"),
-            TargetPageType = typeof(HardwarePage),
-        });
-#endif
-
         // Loaded runs before the first layout pass and the templates named below
         // only exist after that, so wait for the dispatcher to catch up.
         _ = Dispatcher.BeginInvoke(
@@ -58,32 +44,6 @@ public partial class MainWindow : FluentWindow
                 Accessibility.NameScrollButtons(RootNavigation);
             },
             DispatcherPriority.Loaded);
-    }
-
-    /// <summary>
-    /// Decides whether the Offline AI item belongs in the sidebar
-    /// (docs/PLAN.md → "Maintainer requirement: startup resource eligibility",
-    /// 2026-10-02). It is shown when this PC has the memory and disk for
-    /// something in the catalog, and hidden otherwise.
-    ///
-    /// Deliberately blind to whether AI is already on: a PC that can no longer
-    /// carry a model must not keep offering the page because a model happened to
-    /// be activated while it still could. Managing what is installed stays
-    /// reachable from Settings, which can turn AI off but cannot gain a model,
-    /// so it does not bypass eligibility.
-    ///
-    /// The probe reads WMI and DXGI, so it runs off the UI thread and the item
-    /// starts hidden in XAML rather than blinking into view and out again.
-    /// </summary>
-    private async Task UpdateOfflineAiItemAsync()
-    {
-        var availability = await Task.Run(
-            () => AiEligibility.Check(CatalogParser.Embedded(), HardwareProbe.Read()));
-
-        if (!Dispatcher.HasShutdownStarted)
-        {
-            OfflineAiItem.Visibility = availability.IsAvailable ? Visibility.Visible : Visibility.Collapsed;
-        }
     }
 
     /// <summary>

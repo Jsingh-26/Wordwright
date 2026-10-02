@@ -1,112 +1,38 @@
 # Build plan
 
-Target: a public v1.0 on GitHub Releases in about 14 working days, with a snippets-only v0.1 release early so there is always something usable.
+Target: **v1.0 of a snippets-only Wordwright on the Microsoft Store** — a text expander, nothing else. Phases P0–P3 are done, P3.6 (the Store package) is done, and P10 (release) is what remains.
 
-## Current status and next handoff (reviewed 2026-10-02)
+> **The AI writing assistant is parked, not deleted.** Wordwright was also built with an on-device AI rewriting feature. It was implemented, released three times (v0.1.3–v0.1.5) and made to work, but it could not be tested on real hardware, so it is not part of the shipping application. Everything about it — the plan, how it was built, what was proven, what never was, and how to resume — is in [`AI_REWRITING.md`](AI_REWRITING.md), and the code is on the `ai-rewriting` branch.
+>
+> The phase sections below are kept as the historical record. **P4–P9 are parked**: they describe work that is not in this application. `main` carries no AI code.
 
-### Latest no-build recheck: source b3f99ed (2026-10-02)
+## Current status (2026-10-02)
 
-The maintainer requested validation and plan updates only; **no local build, publish, packaging or product-code changes were performed**. Installed and latest published app remain **v0.1.3**, which predates the startup/import/load resource guards. Source implementation is therefore not yet delivered to this laptop.
+The application is a text expander: snippets with `{date}`, `{time}`, `{clipboard}` and `{cursor}`, a searchable list and editor, excluded apps, export and import, a tray icon, a first-run welcome with a "try it here" playground, and Start with Windows. Core is unit-tested and the solution builds with zero warnings.
 
-Local Python tests **21/21 pass**; prompt-hint smoke check, catalog metadata checks (5 candidates, none approved) and the existing Qwen model's SHA-256 check pass. [GitHub CI for b3f99ed](https://github.com/Jsingh-26/Wordwright/actions/runs/36969433803) passed its Build and Test steps. Current-source Core tests were not run locally: compiling them would violate the no-build request, and old local binaries would not test this source.
+**Left to do:**
 
-Installed-app smoke check: launch, About version 0.1.3, persisted snippet list and search for sig pass. This does not establish physical expansion, clipboard recovery or latest resource-refusal behavior. Available RAM **1.9186 GiB (~2.06 GB)**; free disk **218.6656 GiB (~234.79 GB)**. The smallest candidate needs **2.5 GB available RAM** and **~0.767 GB free disk**, so this normal-use session must refuse AI. Do not ask the customer to close apps or relax thresholds.
+- [ ] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and the About page slot from DESIGN.md §9.
+- [ ] **P10.1** README: a GIF of a snippet expanding, install steps, the SmartScreen "unknown publisher" explanation, and a privacy section.
+- [ ] **P10.2** Manual test pass using the checklist below and the DESIGN.md polish checklist (light, dark and a high-contrast theme; 100 %, 150 % and 200 % scaling; 800×600 and maximised; keyboard-only; Accessibility Insights for Windows with zero unnamed controls); fix blockers.
+- [ ] **P10.3** Release **v1.0.0** on GitHub with notes.
+- [ ] **P10.4** Publish the MSIX package (P3.6) to the Microsoft Store.
 
-Source review identified unfinished safeguards:
-- [x] Remove the saved-AiEnabled shortcut in MainWindow.xaml.cs:78 that shows Offline AI without a current resource check. Low-resource startup must hide it even with an installed/previously activated model. Provide any necessary model-management access without bypassing eligibility.
-- [x] Validate the specific downloaded/imported/active model. The current any-catalog-model fit gate can admit a larger or unknown imported model merely because a smaller entry fits; e.g. 2.6 GB available admits tiny Qwen but cannot carry the 1.7B entry requiring 3.5 GB with headroom. Do not infer RAM from GGUF file size.
-- [x] Recheck the selected model's RAM and disk immediately before starting/resuming a download and before activation on completion. Current download start uses the dialog's earlier result; downloader itself only refreshes disk.
-- [x] Add regression checks for AI-on low-resource startup, smaller-fit/larger-selected setup/load, unknown imported requirements, and RAM/disk loss while consent stays open. These are required checks for the above fixes, not completed tests.
-- [ ] **Build/release handoff to the other laptop:** after fixes, run the required solution build/Core tests, publish a new version with its exact source SHA, and provide the installer. No local build or new release was produced in this validation session.
-- [ ] Install that release here; under normal laptop usage verify sidebar hidden and download/import/load refused while snippets remain usable. Cover new and existing AI-on profiles; controlled low-disk checks must not fill the user's disk.
-- [ ] On naturally qualifying hardware, finish physical hotkeys and real-app rewriting, clipboard restore, Ctrl+Z, Esc cancellation, elevated fallback and inference privacy checks.
+**Human checks still open** — the maintainer runs these on a real Windows machine, and they are the only thing gating the release:
 
-**Fixed on the build laptop** (awaiting a release and the hand check): the sidebar is now hidden purely on the resource check, with the turn-off action moved to Settings so an AI-on profile is not stranded; eligibility judges the *specific* model, with a file the catalog does not know held to the strictest entry for a PC of that size rather than its file size; the download start/resume path, the import path and the model-load path each measure again at the moment of use; and six regression checks cover those rules. See the commit that follows.
-
-Full [review evidence in issue #3](https://github.com/Jsingh-26/Wordwright/issues/3#issuecomment-5946325984) and the validation report. **App shell runs; current resource requirements are not yet satisfied by the delivered app. P4/P5/P6 maintainer confirmations stay open and P7 is not cleared.** P7 calibration/management, P8 replacement/updater, P9.4 evaluation/approval and P10 release validation remain unfinished. Historical evidence below retains its original baseline.
-
-
-### Maintainer requirement: startup resource eligibility (2026-10-02)
-
-Evaluate available RAM and free disk space at startup under normal laptop usage. Show the Offline AI sidebar option only when a suitable model fits both documented resource requirements, including headroom. Otherwise hide that option and refuse model download, import and activation. Customers should not have to close their normal apps to qualify. Recheck before model setup/use to prevent a stale startup result from bypassing refusal. Keep existing RAM/disk thresholds unchanged.
-
-The 16 GB laptop's latest ~2.01 GB available RAM is below the Qwen candidate's 2.5 GB requirement. The expected outcome is Offline AI unavailable/hidden. v0.1.3's observed import/activation despite insufficient RAM is a gap against this clarified requirement; file integrity and persistence passes do not establish resource eligibility. Startup/sidebar and setup safeguards need implementation and validation before the relevant gates are cleared. P7 remains gated. See [the maintainer requirement in issue #3](https://github.com/Jsingh-26/Wordwright/issues/3#issuecomment-5945510280).
-
-
-Reviewed baseline: installed release **v0.1.3**; source rechecked at `bb5b29e`. P0–P6 implementation tasks are ticked; **P7–P10 remain incomplete**. A tick records implementation, not confirmation of a phase's human checks.
-
-The [Windows installation and AI setup report](WINDOWS_TEST_2026-10-01.md) records a successful install and launch on the 16 GB laptop, the no-approved-model dialogue, both placeholder AI pages, and **196 passing Core tests** at the pre-P6 baseline `62d588e`. Since that test, **P6.1–P6.8 (on-device rewriting: engine, prompt/cleaner, actions, hotkeys, palette, pill and snippet picker) have been implemented and pushed**; the Core suite now reports **258 passing tests** and the solution builds with zero warnings. The report is a record of the v0.1.2 release and does **not** confirm live inference, model import/download in the installed app, calibration, the full build at that time, or the P4/P5/P6 human checks. v0.1.3 is now installed on the 16 GB laptop and contains P6; the remaining desktop checks are listed in issue #3.
-
-### Latest 16 GB laptop validation (2026-10-02)
-
-See [the v0.1.3 desktop validation report](WINDOWS_VALIDATION_2026-10-02.md) and [GitHub issue #2](https://github.com/Jsingh-26/Wordwright/issues/2). The release is installed and its version verified. Hardware readings were compared with Windows; consent, invalid-GGUF rejection and the occupied-action-hotkey warning were observed. Release and Debug builds pass. A full 258-test run passes, but other runs expose an intermittent disposed-HttpListener test-fixture failure. Real-model import/persistence, physical hotkeys and live rewriting remain unverified; only about 0.8–0.9 GB RAM was free. **P4/P5/P6 gate confirmations remain outstanding; P7 is not cleared.** The earlier no-P6-release statements below describe the old baseline and are superseded by the v0.1.3 release record and this report.
-
-The intermittent fixture failure has since been fixed: `HttpListener` disposes itself when `Start()` throws, so `TestHttpServer`'s retry was calling `Prefixes.Clear()` on a disposed listener. It now builds a fresh listener per attempt, `TestHttpServerTests` pins the collision path down (the test reproduces the original `ObjectDisposedException` against the old code), and five consecutive full runs pass **259/259**. No production downloader behaviour changed.
-
-### Follow-up checks on the 16 GB laptop (2026-10-02)
-
-At source `bb5b29e`, the Release build passes with zero warnings/errors, the Core suite passes **259/259**, and the Python cleaner suite passes **21/21**. Independent Windows/.NET checks confirm **6 physical cores, AVX2 supported, AVX512F unsupported**, matching the debug Hardware page. See the follow-up in [the validation report](WINDOWS_VALIDATION_2026-10-02.md) and [issue #3](https://github.com/Jsingh-26/Wordwright/issues/3).
-
-**Corrected RAM prerequisite:** the current Qwen candidate has `ramRequiredGB: 1.5`; MODELS.md requires that plus 1 GB, so **2.5 GB available** is needed, rather than the file-size-based 1.7 GB in the initial handoff. The latest Windows sample was about **2.09 GB available**. The maintainer subsequently consented to the official Qwen download. Exact size/SHA-256/GGUF checks and v0.1.3 manual import/restart persistence passed; the release classifies it as custom/unverified because its embedded catalog predates the candidate. The latest RAM sample is about **2.01 GB**, still below 2.5 GB, so live inference remains deferred. Physical hotkeys and the remaining rewrite/clipboard/undo/cancellation/elevated/privacy checks are outstanding. See the consented-import addendum in the report. **P7 stays gated.**
-
-### Gates before starting P7
-
-**These can only be confirmed on the maintainer's 16 GB laptop.** The 4 GB build laptop does not have the memory for any catalog model and is documented below as never running one, so P4/P5/P6 cannot be completed there; anything attempted on it will show the intended refusal, not a defect. The exact remaining steps, with the model to import and its verified hash, are the hand-off checklist in [issue #3](https://github.com/Jsingh-26/Wordwright/issues/3).
-
-- [ ] **P4 human check confirmed by maintainer:** compare the debug Hardware page with this laptop's memory, processor, graphics and disk readings. The release dialogue currently hides those details when there is no approved model, so its no-offer message is not a hardware validation.
-- [ ] **P5 human check confirmed by maintainer:** import a real GGUF; confirm its installed-model record and file survive restart. Exercise download interruption/resume and tamper rejection using controlled test data through the existing downloader tests, and record separately which installed-app checks remain blocked by the unapproved catalog. Do not mark the full human check passed from unit tests alone.
-- [ ] **P6 human checks confirmed by maintainer:** publish a release containing P6.1–P6.8, install it on the 16 GB laptop, and walk the P6 human checks in this file (palette in Notepad, snippet picker, `Ctrl+Alt+G`, elevated-window copy fallback, in-use hotkey, built-in actions in Word/Outlook/Chrome/Teams, `Ctrl+Z`, Esc, and no user text in the log).
-- [ ] Record the maintainer's gate confirmations here or in a linked GitHub issue/PR before moving to P7, as required by AGENTS.md. No confirmation is recorded by the test session. If the catalog still blocks the installed-app download checks, obtain an explicit maintainer decision on staged validation and record the deferred checks for re-testing after P9.4; the test report does not grant that exception.
-
-**2026-10-01 — v0.1.3 published, so the P6 check can run.** [v0.1.3](https://github.com/Jsingh-26/Wordwright/releases/tag/v0.1.3) was packed from main at `7c2975e` and published with the full package, portable zip, installer, a 0.1.2→0.1.3 delta and `RELEASES`. It is the first release containing P6.1–P6.8. Before packing: `dotnet build -c Release` reported 0 warnings and 0 errors, and `dotnet test -c Release` reported 258 passed, 0 failed, 0 skipped. `vpk pack` warns that `VelopackApp.Run()` is called from `App..ctor()` rather than the start of `Main()`; that is pre-existing and should be looked at before update-checking is switched on. **The gate checkboxes above stay unticked until the maintainer records the confirmations** — publishing a build is not itself a confirmation of any human check.
-
-### Next implementation task after the gates: P7.1
-
-Calibration run after download/import: measure a real generation on the 16 GB laptop (or the maintainer's test machine) with a known GGUF, store the result, and have the download/import "Done" screen redraw the time ruler with the measured times. Validate against a stopwatch and record event timings without recording prompts or outputs. Run `dotnet build` and `dotnet test`; then tick and commit P7.1. P7.1 and P7.2 remain unverified until the P6 human checks are confirmed, and calibration measures a model the engine can actually load.
-
-### Verification and release readiness
-
-| Check | Current evidence | Remaining work / owning task |
-|---|---|---|
-| Install and launch | v0.1.2 installer exit 0; welcome and main window opened | Fresh-user install/uninstall and persistence checks: P3 human check, P10.2 |
-| Automated Core checks | 196 passed at baseline `62d588e`; **258 passed, 0 failed, 0 skipped** after the P6 push (`edf7323`) | Full build/test and GitHub CI must pass for every implementation change |
-| Hardware fit | Laptop has about 15.87 GB usable RAM; about 0.82 GB available at inspection | Validate normal-use eligibility and refuse AI when the unchanged model + 1 GB rule fails: P4 / MODELS.md |
-| Model acquisition | No approved models; automatic download disabled; import entry point visible | P5 human check; real source, license, size and SHA-256: P9.3; approval only after P9.4 evaluation |
-| Inference and rewrite | P6.1–P6.8 implemented and pushed; **v0.1.3 is the first release containing P6**; builds clean with 258 Core tests | The P6 human checks in the listed Windows apps against v0.1.3; P7.1–P7.2 remains |
-| Calibration and activation | Calibration not implemented; P6 import enables AI but successful generation remains unverified | P7.1–P7.2; measured times against a stopwatch |
-| Privacy and recovery | Core tests are passing; no live rewrite evidence | Offline/network-monitor check, no user text in logs, clipboard restore, Ctrl+Z, Esc cancellation and failure recovery: P6 human checks / P10.2 |
-| Safe model replacement | Not implemented | Keep the working model until replacement verification and calibration succeed; switch-back check: P8.3 |
-
-The current catalog is a blocker for the automatic-download path on every laptop, independent of RAM. Manual import is the development route for the P6/P7 checks now that the engine and relevant UI are implemented in source; it does not make the v0.1.2 release capable of rewriting. Do not approve candidates or relax hardware requirements just to unblock a test. P9 retains its existing evaluation requirements and its stated option to run alongside P6; the normal phase gate still applies.
+- [ ] Install the release on a fresh user account: create, edit and delete snippets; everything persists after a restart; nothing is left outside `%AppData%\Wordwright`.
+- [ ] Expand snippets in Notepad, Word, Outlook, Chrome, Slack or Teams, VS Code and the Windows search box; the clipboard is restored afterwards, and nothing appears in Win+V history.
+- [ ] Install the MSIX package on the same account and repeat, including Start with Windows through the packaged startup task.
 
 ## How to run this plan with a coding agent
 
-Repository: https://github.com/Jsingh-26/Wordwright. Work from a current clone; laptop-specific checkout paths are not prerequisites.
+1. Install the .NET 10 SDK, Git and the GitHub CLI on Windows. Open a terminal in this repo folder.
+2. Give the agent one task at a time, using this prompt template:
 
-1. Install the .NET 10 SDK, Git, and the GitHub CLI on Windows. Open a terminal in this repo folder.
-2. Start OpenCode on Ollama Cloud: `ollama launch opencode --model glm-5.3:cloud` (if the tag differs, pick GLM-5.3 from the menu).
-3. Give the agent one task at a time, using this prompt template:
+   > Read AGENTS.md, then do task **P10.1** from docs/PLAN.md. Restate its acceptance criteria first. Build only that task. Run `dotnet build` and `dotnet test`. Tick the checkbox, then commit as `P10.1: <summary>`. Stop and tell me what to check manually, if anything.
 
-   > Read AGENTS.md, then do task **P2.3** from docs/PLAN.md. Restate its acceptance criteria first. Build only that task. Run `dotnet build` and `dotnet test`. Tick the checkbox, then commit as `P2.3: <summary>`. Stop and tell me what to check manually, if anything.
+3. At each **Human check**, test on your machine and record the confirmation before moving on.
 
-4. At each **Human check**, test on your machine and record the maintainer confirmation before moving on. `scripts/check-screens.ps1` captures every page and counts unnamed controls where PowerShell is allowed. On a Windows machine that blocks PowerShell, do not invoke `powershell.exe` or `pwsh.exe`: run Git and .NET commands directly, and use an available UI Automation tool for screen checks. Record any check that cannot be performed; an environment limitation is not a pass.
-5. Review each finished phase with a second model (`kimi-k3`): "Review the diff for phase P2 against AGENTS.md hard rules and ARCHITECTURE.md. List violations and bugs only."
-
-## Testing machines and the AI floor (decided 2026-10-01)
-
-The build machine is a 4 GB laptop with an Intel i3-1005G1 and no AI-capable GPU. **The RAM and disk fit rules in `MODELS.md` stay as written**: with Windows running there is around 0.3 GB free, so no catalog model passes "available RAM ≥ model + 1 GB" and Wordwright offers none — the consent dialogue says which kind of "no" it is. This is the documented behaviour, not a bug, and the `minimal` tier's copy ("can run only a very small model") is for machines that do have the memory free for the tiny model. **Do not relax the fit rule to make the 4 GB machine work.**
-
-Everything AI-facing is therefore intended to be tested on the maintainer's **16 GB laptop**, after the required implementation exists and enough memory is free for the chosen model:
-
-- **P4 (human check):** the tier and the hardware summary are checked there. The Hardware page is compiled into debug builds only, so an installed release cannot show the raw values — run a debug build on that machine (`dotnet run --project src/Wordwright.App`) to see them.
-- **P5.3 (human check):** downloading, verifying and importing a model.
-- **P6 and P7 (human checks):** rewriting in real apps, the palette, the pill, and the calibrated times against a stopwatch.
-
-The laptop stays useful as the **minimum-spec machine**: it proves the app installs, expands snippets and refuses AI in the way the docs describe, which the release checklist wants ("works on an 8 GB machine with the `cpu8` recommendation" is the same check one tier down).
-
-**No catalogue model is approved yet** — that happens in P9.4 — so until then the dialogue on that laptop says "no model ready to offer yet" and the catalogue download path cannot be exercised there. **Import model file** is implemented now, but importing only stores and records the file. It does not enable rewriting in v0.1.2. After P6 is implemented, a manually imported GGUF can be used to test rewriting. Calibration and activation remain P7.1.
-
-**Getting a build onto that machine:** publish a GitHub release (`scripts/pack-release.ps1` with an explicit new version, then `vpk upload github`), install it there, and record which commit and checks the build covers. The packaging script defaults to 0.1.0, so do not use its default for a new release. On machines that block PowerShell, use the equivalent direct `dotnet publish` and `vpk pack` commands from that script; do not bypass the policy. A release is worth publishing after any change the check depends on — the assistant should offer.
 
 ## Phase P0: Repository and solution (day 1)
 - [x] **P0.1** Create `Wordwright.sln` with `src/Wordwright.Core`, `src/Wordwright.Platform`, `src/Wordwright.Inference`, `src/Wordwright.App` (WPF), `tests/Wordwright.Core.Tests` (xUnit), project references as in ARCHITECTURE.md. Add `Directory.Build.props` (nullable enabled, warnings as errors in Core, x64) and `Directory.Packages.props` with pinned versions of the allowed dependencies.
@@ -155,21 +81,21 @@ Two product changes the study recommended. Both approved by the maintainer on 20
 - [x] **P3.6** Packaging: MSIX package for the Microsoft Store (added at the maintainer's request on 2026-10-01). Full-trust package manifest, visual assets from `brand/`, a Store-ready bundle, and the Start-with-Windows setting using the manifest's `windows.startupTask` extension when the app runs from the package (the `HKCU\...\Run` key stays for the installer build, which Store policy does not allow).
   *Human check:* install from the release on a clean user account; create, edit, delete snippets; everything persists after restart; then the same from the MSIX package, plus Start with Windows working through the packaged startup task.
 
-## Phase P4: Hardware check and recommendation (day 6)
+## Phase P4: Hardware check and recommendation (day 6) — PARKED (see AI_REWRITING.md)
 - [x] **P4.1** Platform: `HardwareProbe` returning `HardwareProfile` (ARCHITECTURE.md). A debug page shows the raw values.
 - [x] **P4.2** Core: `TierClassifier` per MODELS.md. Tests for every tier boundary.
 - [x] **P4.3** Core: `CatalogParser` (schema checks, ignore unknown fields, reject newer major schema) with the embedded `models.json`. Tests with valid, invalid and future-schema files.
 - [x] **P4.4** Core: `Recommender` and `SpeedEstimator` per MODELS.md, including the step-down rules. Tests: the worked example must produce "2–4" and "4–9" seconds.
   *Human check:* on your laptop the tier and hardware summary are correct.
 
-## Phase P5: Consent, download, import (day 7)
+## Phase P5: Consent, download, import (day 7) — PARKED (see AI_REWRITING.md)
 - [x] **P5.1** "Turn on offline AI" dialogue: recommendation screen with the time ruler (DESIGN.md §5), good at / not so good at, load note, other options, disk and RAM notes.
 - [x] **P5.2** Core: `ModelDownloader` (Range resume to `.part`, progress, cancel, free-space check, SHA-256 verify, atomic rename, refuses empty hashes). Tests against a local test HTTP server with a small dummy file.
 - [x] **P5.3** Download, verify and failure screens in the dialogue.
 - [x] **P5.4** Import model file (GGUF magic check, hash match against catalog, custom-unverified path).
   *Human check:* download pauses/resumes across a network drop; a tampered file is rejected and deleted; import works.
 
-## Phase P6: On-device rewriting (day 8–9)
+## Phase P6: On-device rewriting (day 8–9) — PARKED (see AI_REWRITING.md)
 - [x] **P6.1** Inference: `LocalModel` (load with CPU or Vulkan backend per ARCHITECTURE.md, generate with cancellation, apply chat template, thinking-off hint, unload). Idle-unload timer.
 - [x] **P6.2** Core: `PromptBuilder` and `OutputCleaner`. Tests for every cleaner rule, including preambles, quotes, code fences, `<think>` blocks, trailing notes, runaway output.
 - [x] **P6.3** Core: `ActionStore` with the built-in actions from UX_COPY.md; AI actions page (list, editor, reset, Try it).
@@ -181,18 +107,18 @@ Two product changes the study recommended. Both approved by the maintainer on 20
   *Human check:* palette hotkey in Notepad with nothing selected → snippets listed; typing "sig" filters; Enter inserts the signature; Esc leaves the text untouched.
   *Human check:* Ctrl+Alt+G fixes grammar directly and Ctrl+Alt+Space opens the palette; a rewrite aimed at an elevated Notepad ends with the "Copied" pill and the text on the clipboard; a hotkey already used by another app shows the in-use message; every built-in action works in Notepad, Word, Outlook, Chrome and Teams; Ctrl+Z restores the original; Esc cancels cleanly; no text is written to the log file.
 
-## Phase P7: Calibration and the Offline AI page (day 9–10)
+## Phase P7: Calibration and the Offline AI page (day 9–10) — PARKED (see AI_REWRITING.md)
 - [ ] **P7.1** Calibration run after download/import; store results; "Done" screen redraws the ruler with measured times.
 - [ ] **P7.2** Offline AI page (on and off states), change model, remove model, turn off AI, idle-unload setting.
   *Human check:* measured times look right against a stopwatch on your laptop.
 
-## Phase P8: Better-model check (day 10)
+## Phase P8: Better-model check (day 10) — PARKED (see AI_REWRITING.md)
 - [ ] **P8.1** Core: `CatalogUpdater` (fetch raw `models.json`, validate, cache, only on click or weekly opt-in, sets `lastCatalogCheckUtc`). Tests with a local test server.
 - [ ] **P8.2** Core: better-model rule from MODELS.md. Tests.
 - [ ] **P8.3** App: "Check for a better model" button, weekly toggle, banner, tray dot, safe switch (keep old until new is verified and calibrated, "switch back", offer to delete old).
   *Human check:* publish a test catalog on a branch, point a debug build at it, and walk through the whole switch.
 
-## Phase P9: Evaluation and catalog (day 11–12, can run in parallel from P6)
+## Phase P9: Evaluation and catalog (day 11–12, can run in parallel from P6) — PARKED (see AI_REWRITING.md)
 - [x] **P9.1** Complete `eval/cases` to 48 cases per EVAL.md.
 - [x] **P9.2** `eval/cleaner.py` (port of OutputCleaner with the same tests), `run_candidates.py`, `checks.py`, `judge.py`, `spotcheck.py`, `report.py`, `requirements.txt`, `eval/README.md`.
 - [x] **P9.3** Fill real `source`, `sizeBytes`, `sha256`, `license` for each candidate from Hugging Face; drop any that are gated or not permissively licensed.
@@ -201,18 +127,17 @@ Two product changes the study recommended. Both approved by the maintainer on 20
 
 ## Phase P10: Release (day 13–14)
 - [ ] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and the About page slot from DESIGN.md §9.
-- [ ] **P10.1** README: GIF of a snippet expansion and a rewrite, install steps, the SmartScreen "unknown publisher" explanation, privacy section, link to REPORT.md.
+- [ ] **P10.1** README: a GIF of a snippet expanding, install steps, the SmartScreen "unknown publisher" explanation, and a privacy section.
 - [ ] **P10.2** Manual test pass using the checklist below and the DESIGN.md polish checklist (light, dark and a high-contrast theme; 100 %, 150 % and 200 % scaling; 800×600 and maximised; keyboard-only; Accessibility Insights for Windows with zero unnamed controls); fix blockers.
 - [ ] **P10.3** Release **v1.0.0** on GitHub with notes.
-- [ ] **P10.4** 60–90 s demo video: snippet → turn on offline AI (time ruler) → rewrite in Outlook → Ctrl+Z.
+- [ ] **P10.4** Publish the MSIX package (P3.6) to the Microsoft Store.
 
 ## Release checklist
-- Fresh Windows user account install and uninstall leave no files outside `%AppData%\Wordwright` and `%LocalAppData%\Wordwright`.
-- With Wi-Fi off: snippets and AI rewriting work; the only errors are on "Check for a better model".
+- Fresh Windows user account install and uninstall leave no files outside `%AppData%\Wordwright`.
+- Snippets expand in the listed applications, and the clipboard is restored afterwards.
 - Network monitor (e.g. Resource Monitor) shows no connections during normal use.
 - Log files contain no user text.
-- Works on an 8 GB machine with the `cpu8` recommendation.
-- Keyboard-only use of every screen; screen reader reads the palette items.
+- Keyboard-only use of every screen; a screen reader reads the snippet list and the editor.
 
 ## Out of scope for v1
-Mac/Linux, ARM64, cloud providers, sync across devices, fill-in form snippets, rich-text snippets, per-app snippets, streaming the rewrite into the app, translation as a built-in action.
+Mac/Linux, ARM64, sync across devices, fill-in form snippets, rich-text snippets, per-app snippets — and **the AI writing assistant**, which is parked rather than in scope: [`AI_REWRITING.md`](AI_REWRITING.md).

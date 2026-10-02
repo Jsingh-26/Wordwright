@@ -38,8 +38,6 @@
                     <TextBlock Style="{StaticResource SecondaryText}"
                                Text="{res:Str About.Licence.NotifyIcon}" />
                     <TextBlock Style="{StaticResource SecondaryText}"
-                               Text="{res:Str About.Licence.LlamaSharp}" />
-                    <TextBlock Style="{StaticResource SecondaryText}"
                                Text="{res:Str About.Licence.Velopack}" />
                 </StackPanel>
             </ui:CardExpander>

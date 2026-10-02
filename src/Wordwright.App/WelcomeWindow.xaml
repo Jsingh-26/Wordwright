@@ -42,13 +42,7 @@
                         Margin="0,4,0,0"
                         FontSize="14" />
 
-            <TextBlock Style="{StaticResource SecondaryText}"
-                       Margin="0,12,0,0"
-                       Text="{res:Str Welcome.AiHint}" />
             <StackPanel Orientation="Horizontal" Margin="0,20,0,0" HorizontalAlignment="Right">
-                <ui:Button Margin="0,0,8,0"
-                           Content="{res:Str Welcome.Secondary}"
-                           Click="OnTurnOnAiClicked" />
                 <ui:Button Appearance="Primary"
                            Content="{res:Str Welcome.Primary}"
                            Click="OnShowSnippetsClicked" />

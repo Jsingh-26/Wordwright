@@ -1,5 +1,0 @@
-# The evaluation harness (docs/EVAL.md). Python 3.11+.
-#   python -m pip install -r eval/requirements.txt
-
-requests>=2.32
-pytest>=8.0

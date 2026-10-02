@@ -62,10 +62,4 @@ public partial class WelcomeWindow : FluentWindow
         Close();
         _app.ShowMainWindow();
     }
-
-    private void OnTurnOnAiClicked(object sender, RoutedEventArgs e)
-    {
-        Close();
-        new ConsentWindow().Show();
-    }
 }

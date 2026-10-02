@@ -1,5 +1,11 @@
 # Models: catalog, tiers, recommendation and estimates
 
+> **Parked.** This document describes the on-device AI writing assistant, which is
+> **not part of the application that ships**. It is kept because that work is
+> preserved on the `ai-rewriting` branch and may return in a future version. The full
+> account is in [`AI_REWRITING.md`](AI_REWRITING.md).
+
+
 ## Principles
 - Only models whose weights download **without an account or licence gate** qualify. Gated repos (e.g. Gemma, Llama on Hugging Face) would force users to sign in, which breaks the "no account" promise. They can still be used through **Import model file**.
 - Only permissive licences in the catalog (Apache-2.0, MIT). The licence is shown in the consent dialogue.

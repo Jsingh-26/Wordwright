@@ -1,11 +1,11 @@
 # AGENTS.md — rules for AI coding agents
 
-You are building **Wordwright**, a Windows tray app: a text expander plus an offline, on-device AI rewrite tool. Read these files before writing any code, in this order:
+You are building **Wordwright**, a Windows tray app: a text expander, and nothing else. Read these files before writing any code, in this order:
 
 1. `docs/PLAN.md` — what to build, in which order, and how each task is judged done
 2. `docs/ARCHITECTURE.md` — projects, components, data formats, technical decisions
 3. `docs/DESIGN.md` and `docs/UX_COPY.md` — how it looks and exactly what it says
-4. `docs/MODELS.md` — model catalog and hardware tiers
+4. `docs/AI_REWRITING.md` — the on-device AI rewriting feature that was built and then **parked**. It is not part of this application and must not be reintroduced without the maintainer asking for it.
 
 ## How to work
 
@@ -19,15 +19,13 @@ You are building **Wordwright**, a Windows tray app: a text expander plus an off
 
 ## Hard rules (never break these)
 
-1. **No network access** anywhere except `ModelDownloader` and `CatalogUpdater` in `Wordwright.Core`/`Wordwright.App`. Both run only after an explicit user action or the opt-in weekly check. No telemetry, analytics, crash reporting or "phone home" of any kind.
-2. **Never write user text to disk or logs.** Typed characters, selected text, clipboard contents and model outputs live only in memory. Logs may record events (e.g. "rewrite finished in 3.2 s") but never content.
+1. **No network access at all.** The application opens no connections: no telemetry, analytics, crash reporting, update check or "phone home" of any kind. (The one thing that ever did was the parked AI feature's model download, which lives on the `ai-rewriting` branch.)
+2. **Never write user text to disk or logs.** Typed characters, clipboard contents and snippet bodies live only in memory. Logs may record events ("snippet expanded") but never content.
 3. The keystroke buffer holds at most the last 64 characters, in memory, and is cleared on focus change, mouse click, Enter, Escape and navigation keys.
 4. Always restore the user's clipboard after a paste operation.
-5. Never download a model without the consent dialogue, and never use a downloaded file before its SHA-256 matches the catalog.
-6. Never delete a working model until its replacement is downloaded, verified and calibrated.
-7. Use only the colours, fonts, icons and logo files defined in `docs/DESIGN.md` and `brand/`. No new colours, fonts or icon sets.
-8. All user-facing strings come from `docs/UX_COPY.md` (implemented as a resource file). Do not write new copy inline.
-9. `Wordwright.Core` must not reference WPF, WinForms or Win32 APIs, so it stays unit-testable.
+5. Use only the colours, fonts, icons and logo files defined in `docs/DESIGN.md` and `brand/`. No new colours, fonts or icon sets.
+6. All user-facing strings come from `docs/UX_COPY.md` (implemented as a resource file). Do not write new copy inline.
+7. `Wordwright.Core` must not reference WPF, WinForms or Win32 APIs, so it stays unit-testable.
 
 ## Environment
 

@@ -15,12 +15,9 @@ internal sealed class TrayIconController : IDisposable
 {
     private readonly App _app;
     private readonly TaskbarIcon _trayIcon;
-    private readonly MenuItem _aiItem;
     private Icon? _currentIcon;
 
     /// <summary>Offline AI is not built yet (phase P5), so this stays false.</summary>
-    internal bool AiOn { get; private set; }
-
     public TrayIconController(App app)
     {
         _app = app;
@@ -37,21 +34,12 @@ internal sealed class TrayIconController : IDisposable
         snippetsItem.Click += (_, _) => _app.UpdateSettings(
             _app.Settings with { SnippetsEnabled = snippetsItem.IsChecked });
 
-        _aiItem = new MenuItem
-        {
-            Header = Strings.Get("Tray.TurnOnAi"),
-            IsCheckable = true,
-            IsChecked = AiOn,
-        };
-        _aiItem.Click += OnAiItemClicked;
-
         var quitItem = new MenuItem { Header = Strings.Get("Tray.Quit") };
         quitItem.Click += (_, _) => _app.Quit();
 
         var menu = new ContextMenu();
         menu.Items.Add(openItem);
         menu.Items.Add(snippetsItem);
-        menu.Items.Add(_aiItem);
         menu.Items.Add(new Separator());
         menu.Items.Add(quitItem);
 
@@ -59,8 +47,7 @@ internal sealed class TrayIconController : IDisposable
         {
             ToolTipText = Strings.Get(
                 "Tray.Tooltip",
-                ("Prefix", _app.Snippets.TriggerPrefix),
-                ("PaletteHotkey", _app.Settings.PaletteHotkey)),
+                ("Prefix", _app.Snippets.TriggerPrefix)),
             ContextMenu = menu,
             LeftClickCommand = new RelayCommand(() => _app.ShowMainWindow()),
         };
@@ -84,20 +71,6 @@ internal sealed class TrayIconController : IDisposable
         _trayIcon.Icon = newIcon;
         _currentIcon?.Dispose();
         _currentIcon = newIcon;
-    }
-
-    private void OnAiItemClicked(object sender, System.Windows.RoutedEventArgs e)
-    {
-        if (AiOn)
-        {
-            AiOn = _aiItem.IsChecked;
-            return;
-        }
-
-        // AI is off, so ask first: the dialogue says what would be downloaded and
-        // what it costs in time before anything is fetched (docs/PLAN.md P5.1).
-        _aiItem.IsChecked = false;
-        new ConsentWindow().Show();
     }
 
     public void Dispose()

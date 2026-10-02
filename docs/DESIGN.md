@@ -1,5 +1,12 @@
 # Design
 
+> **Partly parked.** The AI screens — the consent dialogue (§5), the action palette
+> (§6) and the progress pill (§7) — belong to the on-device AI writing assistant,
+> which is **not part of the application that ships**. They are kept for the record;
+> the palette in particular is preserved on the `ai-rewriting` branch. See
+> [`AI_REWRITING.md`](AI_REWRITING.md). Everything else here describes the app.
+
+
 Follows the maintainer's `craft-studio` playbook (`playbooks/desktop-app.md`): study the product and its niche first, two-pass direction, one signature move, the 13 anti-slop rules read for an app, free resources only.
 
 ## Study note (craft-studio §0, 2026-10-01, build after P3.4)

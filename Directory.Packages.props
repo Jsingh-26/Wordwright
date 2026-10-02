@@ -8,15 +8,6 @@
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageVersion Include="Velopack" Version="1.2.161" />
 
-    <!-- Wordwright.Inference -->
-    <PackageVersion Include="LLamaSharp" Version="0.27.0" />
-    <PackageVersion Include="LLamaSharp.Backend.Cpu" Version="0.27.0" />
-    <PackageVersion Include="LLamaSharp.Backend.Vulkan" Version="0.27.0" />
-
-    <!-- Wordwright.Platform -->
-    <PackageVersion Include="Vortice.DXGI" Version="3.8.3" />
-    <PackageVersion Include="System.Management" Version="10.0.12" />
-
     <!-- tests/Wordwright.Core.Tests -->
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <!-- FluentAssertions pinned to 7.x: the last version under the MIT licence. -->

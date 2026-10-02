@@ -1,5 +1,11 @@
 # Evaluation: how Wordwright chooses its models
 
+> **Parked.** This document describes the on-device AI writing assistant, which is
+> **not part of the application that ships**. It is kept because that work is
+> preserved on the `ai-rewriting` branch and may return in a future version. The full
+> account is in [`AI_REWRITING.md`](AI_REWRITING.md).
+
+
 Every catalog model is chosen with measurements, not guesses. The harness lives in `eval/` (Python 3.11+) and is **not shipped** with the app.
 
 ## Part A: rewrite quality

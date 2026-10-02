@@ -34,15 +34,9 @@ public class SettingsStoreTests : IDisposable
         var settings = CreateStore().Load();
 
         settings.SchemaVersion.Should().Be(1);
-        settings.PaletteHotkey.Should().Be("Ctrl+Alt+Space");
         settings.SnippetsEnabled.Should().BeTrue();
         settings.StartWithWindows.Should().BeTrue();
-        settings.AiEnabled.Should().BeFalse();
-        settings.ActiveModelId.Should().BeNull();
-        settings.UnloadAfterIdleMinutes.Should().Be(10);
-        settings.CheckForBetterModelsWeekly.Should().BeFalse();
         settings.CheckForAppUpdatesWeekly.Should().BeFalse();
-        settings.LastCatalogCheckUtc.Should().BeNull();
         settings.ExcludedApps.Should().Equal("KeePass.exe", "KeePassXC.exe", "1Password.exe", "Bitwarden.exe");
         settings.Theme.Should().Be("system");
         settings.Window.Should().BeNull("the window has not been closed yet on a first run");
@@ -62,15 +56,9 @@ public class SettingsStoreTests : IDisposable
         var store = CreateStore();
         var saved = new AppSettings
         {
-            PaletteHotkey = "Ctrl+Alt+W",
             SnippetsEnabled = false,
             StartWithWindows = false,
-            AiEnabled = true,
-            ActiveModelId = "qwen2.5-3b-instruct-q4",
-            UnloadAfterIdleMinutes = 25,
-            CheckForBetterModelsWeekly = true,
             CheckForAppUpdatesWeekly = true,
-            LastCatalogCheckUtc = new DateTimeOffset(2026, 10, 1, 9, 30, 0, TimeSpan.Zero),
             ExcludedApps = ["KeePass.exe", "vault.exe"],
             Theme = "system",
             Window = new WindowPlacement
@@ -112,17 +100,17 @@ public class SettingsStoreTests : IDisposable
     public void Save_replacesAnExistingFileAndLeavesNoTempFile()
     {
         var store = CreateStore();
-        store.Save(new AppSettings { PaletteHotkey = "First" });
-        store.Save(new AppSettings { PaletteHotkey = "Second" });
+        store.Save(new AppSettings { SnippetsEnabled = false });
+        store.Save(new AppSettings { SnippetsEnabled = true });
 
-        store.Load().PaletteHotkey.Should().Be("Second");
+        store.Load().SnippetsEnabled.Should().BeTrue();
         Directory.GetFiles(_directory, "*.tmp").Should().BeEmpty();
     }
 
     [Fact]
     public void Save_createsTheDirectoryWhenMissing()
     {
-        CreateStore().Save(new AppSettings { PaletteHotkey = "Ctrl+Alt+J" });
+        CreateStore().Save(new AppSettings { SnippetsEnabled = false });
 
         File.Exists(SettingsPath).Should().BeTrue();
     }
@@ -134,15 +122,9 @@ public class SettingsStoreTests : IDisposable
 
         var json = JsonDocument.Parse(File.ReadAllText(SettingsPath)).RootElement;
         json.GetProperty("schemaVersion").GetInt32().Should().Be(1);
-        json.GetProperty("paletteHotkey").GetString().Should().Be("Ctrl+Alt+Space");
         json.GetProperty("snippetsEnabled").GetBoolean().Should().BeTrue();
         json.GetProperty("startWithWindows").GetBoolean().Should().BeTrue();
-        json.GetProperty("aiEnabled").GetBoolean().Should().BeFalse();
-        json.GetProperty("activeModelId").ValueKind.Should().Be(JsonValueKind.Null);
-        json.GetProperty("unloadAfterIdleMinutes").GetInt32().Should().Be(10);
-        json.GetProperty("checkForBetterModelsWeekly").GetBoolean().Should().BeFalse();
         json.GetProperty("checkForAppUpdatesWeekly").GetBoolean().Should().BeFalse();
-        json.GetProperty("lastCatalogCheckUtc").ValueKind.Should().Be(JsonValueKind.Null);
         json.GetProperty("excludedApps").EnumerateArray().Select(e => e.GetString())
             .Should().Equal("KeePass.exe", "KeePassXC.exe", "1Password.exe", "Bitwarden.exe");
         json.GetProperty("theme").GetString().Should().Be("system");
@@ -183,8 +165,8 @@ public class SettingsStoreTests : IDisposable
         File.WriteAllText(SettingsPath, "not json");
 
         _ = store.Load();
-        store.Save(new AppSettings { AiEnabled = true });
+        store.Save(new AppSettings { StartWithWindows = false });
 
-        store.Load().AiEnabled.Should().BeTrue();
+        store.Load().StartWithWindows.Should().BeFalse();
     }
 }
