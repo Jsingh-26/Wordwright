@@ -96,6 +96,7 @@ Group headings sit above their rows (docs/DESIGN.md §8).
 | About.Licence.WpfUi | WPF-UI — MIT |
 | About.Licence.NotifyIcon | H.NotifyIcon — MIT |
 | About.Licence.Velopack | Velopack — MIT |
+| About.Licence.Mvvm | CommunityToolkit.Mvvm — MIT |
 
 ## Shared
 | ID | Text |

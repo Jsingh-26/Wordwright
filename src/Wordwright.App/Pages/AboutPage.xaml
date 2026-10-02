@@ -57,6 +57,8 @@
                                Text="{res:Str About.Licence.NotifyIcon}" />
                     <TextBlock Style="{StaticResource SecondaryText}"
                                Text="{res:Str About.Licence.Velopack}" />
+                    <TextBlock Style="{StaticResource SecondaryText}"
+                               Text="{res:Str About.Licence.Mvvm}" />
                 </StackPanel>
             </ui:CardExpander>
         </StackPanel>

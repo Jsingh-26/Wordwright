@@ -46,6 +46,7 @@
   <data name="About.Licence.WpfUi" xml:space="preserve"><value>WPF-UI — MIT</value></data>
   <data name="About.Licence.NotifyIcon" xml:space="preserve"><value>H.NotifyIcon — MIT</value></data>
   <data name="About.Licence.Velopack" xml:space="preserve"><value>Velopack — MIT</value></data>
+  <data name="About.Licence.Mvvm" xml:space="preserve"><value>CommunityToolkit.Mvvm — MIT</value></data>
   <!-- Snippets page -->
   <data name="Snippets.New" xml:space="preserve"><value>New snippet</value></data>
   <data name="Snippets.Search" xml:space="preserve"><value>Search snippets</value></data>
