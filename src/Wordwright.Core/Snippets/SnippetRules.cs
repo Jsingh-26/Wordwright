@@ -9,6 +9,8 @@ public static class SnippetRules
 {
     public const int MaxTriggerLength = 32;
 
+    public const int MaxPrefixLength = 3;
+
     /// <summary>Above this, the editor warns but still saves (performance only).</summary>
     public const int LongBodyLength = 100_000;
 
@@ -23,6 +25,32 @@ public static class SnippetRules
         foreach (var character in trigger)
         {
             if (!char.IsAsciiLetterOrDigit(character) && character is not ('-' or '_'))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>1–3 symbols (docs/UX_COPY.md <c>Settings.Error.PrefixInvalid</c>).
+    /// A letter, digit, <c>-</c> or <c>_</c> could be part of a shortcut, so the
+    /// matcher could not tell where the prefix ends; whitespace and control
+    /// characters cannot be typed as a prefix at all. An empty prefix would make
+    /// every bare word that equals a shortcut expand.</summary>
+    public static bool IsValidPrefix(string? prefix)
+    {
+        if (string.IsNullOrEmpty(prefix) || prefix.Length > MaxPrefixLength)
+        {
+            return false;
+        }
+
+        foreach (var character in prefix)
+        {
+            if (char.IsLetterOrDigit(character)
+                || char.IsWhiteSpace(character)
+                || char.IsControl(character)
+                || character is '-' or '_')
             {
                 return false;
             }

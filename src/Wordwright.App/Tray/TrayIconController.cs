@@ -78,6 +78,12 @@ internal sealed class TrayIconController : IDisposable
         _trayIcon.ForceCreate(false);
     }
 
+    /// <summary>Shows the current prefix in the tooltip, after it changes.</summary>
+    internal void RefreshTooltip()
+    {
+        _trayIcon.ToolTipText = Strings.Get("Tray.Tooltip", ("Prefix", _app.Snippets.TriggerPrefix));
+    }
+
     /// <summary>Re-skins the glyph and the menu after the taskbar theme changes.</summary>
     internal void RefreshTheme()
     {

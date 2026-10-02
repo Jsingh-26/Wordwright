@@ -31,6 +31,36 @@ public class SnippetRulesTests
         SnippetRules.IsValidTrigger(trigger).Should().BeFalse();
     }
 
+    [Theory]
+    [InlineData(";")]
+    [InlineData("//")]
+    [InlineData("::")]
+    [InlineData(":")]
+    [InlineData("#!$")]
+    [InlineData("\\")]
+    public void IsValidPrefix_acceptsOneToThreeSymbols(string prefix)
+    {
+        SnippetRules.IsValidPrefix(prefix).Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    [InlineData(";;;;")]
+    [InlineData("a")]
+    [InlineData("1")]
+    [InlineData(";a")]
+    [InlineData(" ")]
+    [InlineData("; ")]
+    [InlineData("-")]
+    [InlineData("_")]
+    [InlineData("\t")]
+    [InlineData("é")]
+    public void IsValidPrefix_rejectsEmptyLongLettersDigitsAndSpace(string? prefix)
+    {
+        SnippetRules.IsValidPrefix(prefix).Should().BeFalse();
+    }
+
     [Fact]
     public void IsTriggerTaken_findsAnExactMatch()
     {

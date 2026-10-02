@@ -62,6 +62,7 @@ Group headings sit above their rows (docs/DESIGN.md §8).
 | Settings.Group.Snippets | Snippets |
 | Settings.Group.Wordwright | Wordwright |
 | Settings.Prefix | Snippet prefix |
+| Settings.Error.PrefixInvalid | Use 1 to 3 symbols, such as ; or //. |
 | Settings.StartWithWindows | Start Wordwright when I sign in |
 | Settings.Theme | Theme |
 | Settings.Theme.System | System |

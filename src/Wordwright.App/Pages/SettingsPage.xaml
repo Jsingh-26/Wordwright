@@ -33,11 +33,20 @@
                                VerticalAlignment="Center"
                                Text="{res:Str Settings.Prefix}" />
                 </ui:CardControl.Header>
+                <!-- Committed on LostFocus or Enter, not per keystroke: clearing
+                     the field to retype it must not leave an empty prefix live
+                     (docs/PLAN.md P12.5). -->
                 <ui:TextBox x:Name="PrefixBox"
                             Width="120"
                             AutomationProperties.Name="{res:Str Settings.Prefix}"
-                            Text="{Binding SnippetPrefix, UpdateSourceTrigger=PropertyChanged}" />
+                            KeyDown="OnPrefixKeyDown"
+                            Text="{Binding SnippetPrefix, UpdateSourceTrigger=LostFocus}" />
             </ui:CardControl>
+            <TextBlock Margin="2,4,0,0"
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                       Text="{Binding PrefixError}"
+                       Visibility="{Binding HasPrefixError, Converter={StaticResource BoolToVisibility}}" />
 
             <!-- Apps Wordwright stays quiet in -->
             <TextBlock Style="{StaticResource BodyText}"

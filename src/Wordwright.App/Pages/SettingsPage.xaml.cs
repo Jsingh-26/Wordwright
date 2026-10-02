@@ -24,6 +24,16 @@ public partial class SettingsPage : Page
 
     internal SettingsViewModel ViewModel { get; }
 
+    /// <summary>Enter commits the prefix, as leaving the field does.</summary>
+    private void OnPrefixKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.Enter)
+        {
+            PrefixBox.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+            e.Handled = true;
+        }
+    }
+
     private void OnAddExcludedAppClicked(object sender, RoutedEventArgs e)
     {
         var dialog = new OpenFileDialog

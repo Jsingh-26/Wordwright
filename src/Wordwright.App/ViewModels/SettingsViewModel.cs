@@ -42,8 +42,17 @@ internal sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string _theme = "system";
 
+    /// <summary>The prefix field. It is committed when the field loses focus or
+    /// Enter is pressed, never per keystroke, and only a valid prefix replaces
+    /// the stored one (docs/PLAN.md P12.5).</summary>
     [ObservableProperty]
     private string _snippetPrefix = "";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasPrefixError))]
+    private string? _prefixError;
+
+    public bool HasPrefixError => !string.IsNullOrEmpty(PrefixError);
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasMessage))]
@@ -73,12 +82,24 @@ internal sealed partial class SettingsViewModel : ObservableObject
 
     partial void OnSnippetPrefixChanged(string value)
     {
-        if (_loading || value.Trim() == _app.Snippets.TriggerPrefix)
+        if (_loading)
         {
             return;
         }
 
-        _app.UpdateSnippets(_app.Snippets with { TriggerPrefix = value.Trim() });
+        var prefix = value.Trim();
+        if (!SnippetRules.IsValidPrefix(prefix))
+        {
+            // The old prefix stays in force until the field holds a usable one.
+            PrefixError = Strings.Get("Settings.Error.PrefixInvalid");
+            return;
+        }
+
+        PrefixError = null;
+        if (prefix != _app.Snippets.TriggerPrefix)
+        {
+            _app.UpdateSnippets(_app.Snippets with { TriggerPrefix = prefix });
+        }
     }
 
     public void AddExcludedApp(string executable)

@@ -277,9 +277,15 @@ public partial class App : Application
     /// <summary>Replaces the snippets the engine matches against.</summary>
     internal void UpdateSnippets(SnippetDocument document)
     {
+        var prefixChanged = document.TriggerPrefix != Snippets.TriggerPrefix;
         Snippets = document;
         _snippetStore.Save(document);
         _snippetEngine?.Apply(document);
+
+        if (prefixChanged)
+        {
+            _trayIcon?.RefreshTooltip();
+        }
     }
 
     /// <summary>The user's data folder, for "Open data folder" and the stores.</summary>

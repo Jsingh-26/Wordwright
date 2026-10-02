@@ -72,6 +72,7 @@
   <data name="Settings.Group.Snippets" xml:space="preserve"><value>Snippets</value></data>
   <data name="Settings.Group.Wordwright" xml:space="preserve"><value>Wordwright</value></data>
   <data name="Settings.Prefix" xml:space="preserve"><value>Snippet prefix</value></data>
+  <data name="Settings.Error.PrefixInvalid" xml:space="preserve"><value>Use 1 to 3 symbols, such as ; or //.</value></data>
   <data name="Settings.ExcludedApps" xml:space="preserve"><value>Turn Wordwright off in these apps</value></data>
   <data name="Settings.ExcludedAppsHelp" xml:space="preserve"><value>Wordwright can't always tell when you're typing a password. List apps where it should stay quiet, such as password managers.</value></data>
   <data name="Settings.ExcludedApps.Add" xml:space="preserve"><value>Add app</value></data>
