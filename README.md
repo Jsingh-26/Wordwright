@@ -46,7 +46,7 @@ To continue, click **More info**, then **Run anyway**. If you would rather check
 - A low-level keyboard hook runs on its own thread and only queues each key, so typing is never slowed down.
 - Typed characters go into an in-memory buffer of at most 64 characters. Enter, Esc, arrows, mouse clicks, switching windows or a 5-second pause clear it. It is never saved.
 - After each character, a matcher checks whether the buffer ends with a shortcut on a word boundary. If `;s` and `;sig` both exist, it waits for the next space or punctuation before choosing.
-- On a match it deletes the typed shortcut, fills in the variables, and pastes the text through the clipboard, then puts your clipboard back. The pasted text is marked so it stays out of Windows clipboard history (Win+V).
+- On a match it fills in the variables, puts the text on the clipboard, deletes the typed shortcut and pastes, then puts your clipboard back. If another program is holding the clipboard, the shortcut is left as you typed it rather than pasting the wrong thing. The pasted text is marked so it stays out of Windows clipboard history (Win+V).
 - The code is split into `Wordwright.Core` (pure .NET, no UI, unit-tested), `Wordwright.Platform` (Windows hook, clipboard, input) and `Wordwright.App` (WPF tray app). Details: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## Decisions

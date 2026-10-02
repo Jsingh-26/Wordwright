@@ -12,9 +12,9 @@ The application is a text expander: snippets with `{date}`, `{time}`, `{clipboar
 
 **Left to do, in order:**
 
-- [ ] **P13.1, P13.2, P13.3, P13.4, P13.14, P13.15** — small code and doc fixes from the second review (Phase P13 below): paste only when the clipboard was taken, release notes carry the P12 changes, CI builds the harnesses and packaging, high-contrast brushes, 32 px control heights, Snap Layouts hit test.
-- [ ] **P13.12** — Zodiak font files out of the public repository (licence §02). **Blocks the release tag.**
-- [ ] **P13.13** — DESIGN.md Study note and Pass 1 rewritten for the snippets-only app.
+- [x] **P13.1, P13.2, P13.3, P13.4, P13.14, P13.15** — small code and doc fixes from the second review (Phase P13 below): paste only when the clipboard was taken, release notes carry the P12 changes, CI builds the harnesses and packaging (autosave now tested in Core, 192 tests), high-contrast brushes, 32 px control heights and an Acrylic tray menu; Snap Layouts turned out to work already (P13.15).
+- [ ] **P13.12** — Zodiak font files out of the public repository (licence §02). **Blocks the release tag.** The files are out of the tree and the build fetches and verifies them; what is left is purging them from history, which needs the maintainer's go-ahead (a force-push of `main` and all tags).
+- [x] **P13.13** — DESIGN.md Study note and Pass 1 rewritten for the snippets-only app.
 - [x] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and the About page slot from DESIGN.md §9.
 - [ ] **P10.1** README: a GIF of a snippet expanding, install steps, the SmartScreen "unknown publisher" explanation, and a privacy section.
 - [ ] **P10.2** Manual test pass using the checklist below and the DESIGN.md polish checklist (light, dark and a high-contrast theme; 100 %, 150 % and 200 % scaling; 800×600 and maximised; keyboard-only; Accessibility Insights for Windows with zero unnamed controls); fix blockers.
