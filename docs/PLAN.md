@@ -20,7 +20,7 @@ The application is a text expander: snippets with `{date}`, `{time}`, `{clipboar
 - [ ] **P10.2** Manual test pass using [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md), which includes the DESIGN.md polish checklist (light, dark and a high-contrast theme; 100 %, 150 % and 200 % scaling; 800×600 and maximised; keyboard-only; Accessibility Insights for Windows with zero unnamed controls); fix blockers.
 - [ ] **P10.3** Release **v1.0.0** on GitHub with notes.
 - [ ] **P10.4** Publish the MSIX package (P3.6) to the Microsoft Store.
-- [ ] **P10.5** Support link (D12): `.github/FUNDING.yml` (custom Razorpay URL), `About.Support` copy and an About-page link, README support section (with P10.1).
+- **P10.5** Support link (D12): **deferred to a later update** (maintainer, 2026-10-03). v1.0 ships with no support option; the hidden About link and its `About.Support` string were removed.
 
 **Added on 2026-10-02:** the **Phase P11 craft pass** (from the UI review in `docs/UI_REVIEW.md`), inserted below before the release phase — it finishes before P10.2 so the release verification covers the final UI.
 
@@ -326,7 +326,7 @@ The app already follows most of the playbook: Mica base, Fluent type ramp with Z
   *2026-10-03, ready:* version 1.0.0 everywhere; `scripts/pack-release.ps1` builds a 78 MB installer (was 160 MB: stale AI-era native libraries were shipping); notes drafted in `docs/RELEASE_NOTES_v1.0.0.md`. **Open:** the manual P10.2 pass, then the maintainer's go-ahead to publish.
 - [ ] **P10.4** Publish the MSIX package (P3.6) to the Microsoft Store.
   *2026-10-03, ready:* `Wordwright-1.0.0.msixbundle` builds (publisher display name Unbound Kite, stale AI description fixed); every listing field is in `docs/STORE_LISTING.md`. **Open (maintainer):** Partner Center account and name reservation, the three identity values into the manifest, a support email, Store screenshots. Store listing keywords: "text expander", "snippets", "typing". A privacy-policy URL is not required when nothing is collected; point it at the README privacy section anyway.
-- [ ] **P10.5** Support link (D12): *2026-10-03:* the About link is built and hidden until `SupportUrl` in `AboutPage.xaml.cs` is set; FUNDING.yml and the README section wait for the Razorpay URL. Create `.github/FUNDING.yml` with the custom Razorpay URL (shows a Sponsor heart on the repo pointing at the payment page), add `About.Support` ("Support Wordwright") to UX_COPY.md and `Strings.resx` with a link on the About page under the GitHub link (opens the browser; the app itself stays offline), and a Support section in the README as part of P10.1.
+- **P10.5** Support link (D12): **deferred to a later app update** (maintainer, 2026-10-03: "the Razorpay link, we will do in a later update"). The hidden About-page link, `SupportUrl` and the `About.Support` string were removed so v1.0 carries no trace of it. When it returns: `.github/FUNDING.yml` with the Razorpay URL, `About.Support` back in UX_COPY.md and `Strings.resx`, a link under the GitHub one on About, and a README section.
   *Done when:* the Sponsor button shows on the repo and the About link opens the payment page. *Human step:* the maintainer creates the Razorpay Payment Page ("Customer Decides Amount", UPI + cards enabled) — the link goes live only once that page exists. Discovery/launch sequence: `docs/LAUNCH.md`.
 
 ## Release checklist

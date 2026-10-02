@@ -32,15 +32,6 @@
                     <Run Text="{res:Str About.Source}" />
                 </Hyperlink>
             </TextBlock>
-            <!-- D12 (P10.5): the Razorpay Payment Page. Shown once SupportUrl in
-                 the code-behind is set. -->
-            <TextBlock x:Name="SupportLink" Margin="0,8,0,0" Visibility="Collapsed">
-                <Hyperlink x:Name="SupportHyperlink"
-                           Foreground="{DynamicResource BrandAccentBrush}"
-                           RequestNavigate="OnSourceLinkClicked">
-                    <Run Text="{res:Str About.Support}" />
-                </Hyperlink>
-            </TextBlock>
 
             <ui:CardExpander Margin="0,20,0,0"
                              CornerRadius="{StaticResource PanelRadius}"

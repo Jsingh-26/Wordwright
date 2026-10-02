@@ -11,20 +11,9 @@ namespace Wordwright.App.Pages;
 
 public partial class AboutPage : Page
 {
-    /// <summary>The "Support Wordwright" page (decision D12, P10.5): the Razorpay
-    /// Payment Page, opened in the browser. Empty until that page exists, and the
-    /// link stays hidden while it is.</summary>
-    private const string SupportUrl = "";
-
     public AboutPage()
     {
         InitializeComponent();
-
-        if (SupportUrl.Length > 0)
-        {
-            SupportHyperlink.NavigateUri = new Uri(SupportUrl);
-            SupportLink.Visibility = Visibility.Visible;
-        }
 
         if (Version() is { } version)
         {
@@ -61,7 +50,7 @@ public partial class AboutPage : Page
         return version is null ? null : $"{version.Major}.{version.Minor}.{version.Build}";
     }
 
-    // The only allowed navigation: open the repository or the support page in
+    // The only allowed navigation: open the repository in
     // the user's browser.
     // (Rule 1: the app itself never makes network requests.)
     private void OnSourceLinkClicked(object sender, RequestNavigateEventArgs e)
