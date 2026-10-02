@@ -45,6 +45,9 @@ $makeappx = Find-MakeAppx
 # kept in the repository (docs/AGENTS.md rule 7).
 dotnet run --project (Join-Path $root "scripts/IconGen") -- --msix (Join-Path $root "packaging/Assets")
 
+# Start from an empty folder: dotnet publish never deletes, so files from older
+# builds (the parked AI feature's 300 MB of native libraries) would ship too.
+if (Test-Path $publish) { Remove-Item $publish -Recurse -Force }
 dotnet publish (Join-Path $root "src/Wordwright.App") `
     -c Release `
     -r win-x64 `

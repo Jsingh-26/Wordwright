@@ -4,6 +4,9 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
+    <!-- Every string is English (docs/UX_COPY.md), so the framework's translated
+         error messages for 13 other languages would only add size. -->
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <ApplicationIcon Condition="Exists('..\..\brand\icon.ico')">..\..\brand\icon.ico</ApplicationIcon>
   </PropertyGroup>
 

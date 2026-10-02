@@ -18,6 +18,9 @@ $releases = Join-Path $root "Releases"
 
 # The version the app reports on its About page comes from the assembly, so the
 # build and the package are given the same one.
+# Start from an empty folder: dotnet publish never deletes, so files from older
+# builds (the parked AI feature's 300 MB of native libraries) would ship too.
+if (Test-Path $publish) { Remove-Item $publish -Recurse -Force }
 dotnet publish (Join-Path $root "src/Wordwright.App") `
     -c Release `
     -r win-x64 `
