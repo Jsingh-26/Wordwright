@@ -87,7 +87,9 @@ internal sealed class SnippetEngine : IDisposable
 
     private void Expand(TriggerMatch match)
     {
-        var expanded = _expander.Expand(match.Text);
+        // Every line break goes out as \r\n, which every Windows app shows as a
+        // new line (docs/PLAN.md P12.8).
+        var expanded = _expander.Expand(match.Text).WithWindowsLineEndings();
 
         // Delete the typed trigger, put the text on the clipboard and paste. The
         // user's clipboard goes back once the target app has had time to read it.

@@ -92,6 +92,23 @@ internal static class Program
             Clipboard.SetText("newer");
             clipboard.RestoreSaved();
             Check("a newer copy is not overwritten", Clipboard.GetText() == "newer");
+
+            // 7. One Left arrow steps over a \r\n line break (P12.8 counts it once).
+            box.Clear();
+            using (clipboard.ReplaceWithText("x\r\ny"))
+            {
+                InputSender.Paste();
+                Wait(300);
+            }
+
+            InputSender.SendLeftArrows(2);
+            using (clipboard.ReplaceWithText("Z"))
+            {
+                InputSender.Paste();
+                Wait(300);
+            }
+
+            Check("two arrows cross y and the line break", box.Text == "xZ\r\ny");
         }
         finally
         {
