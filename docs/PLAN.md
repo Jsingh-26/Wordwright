@@ -17,7 +17,7 @@ The application is a text expander: snippets with `{date}`, `{time}`, `{clipboar
 - [x] **P13.13** — DESIGN.md Study note and Pass 1 rewritten for the snippets-only app.
 - [x] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and the About page slot from DESIGN.md §9.
 - [ ] **P10.1** README: a GIF of a snippet expanding, install steps, the SmartScreen "unknown publisher" explanation, and a privacy section.
-- [ ] **P10.2** Manual test pass using the checklist below and the DESIGN.md polish checklist (light, dark and a high-contrast theme; 100 %, 150 % and 200 % scaling; 800×600 and maximised; keyboard-only; Accessibility Insights for Windows with zero unnamed controls); fix blockers.
+- [ ] **P10.2** Manual test pass using [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md), which includes the DESIGN.md polish checklist (light, dark and a high-contrast theme; 100 %, 150 % and 200 % scaling; 800×600 and maximised; keyboard-only; Accessibility Insights for Windows with zero unnamed controls); fix blockers.
 - [ ] **P10.3** Release **v1.0.0** on GitHub with notes.
 - [ ] **P10.4** Publish the MSIX package (P3.6) to the Microsoft Store.
 - [ ] **P10.5** Support link (D12): `.github/FUNDING.yml` (custom Razorpay URL), `About.Support` copy and an About-page link, README support section (with P10.1).
@@ -28,18 +28,7 @@ The application is a text expander: snippets with `{date}`, `{time}`, `{clipboar
 
 **Added on 2026-10-03 (second review):** **Phase P13** below reviews the P12 work (sound: 0 warnings, 181/181 tests) and lists what would make Wordwright stand out. P13.1–P13.4 are small and go before v1.0.0, and **P13.12 (Zodiak font files in the public repo) blocks the release tag**; D14–D22 and the performance tasks are v1.1 candidates waiting on the maintainer's decision.
 
-**Human checks still open** — the maintainer runs these on a real Windows machine, and they are the only thing gating the release:
-
-- [ ] Install the release on a fresh user account: create, edit and delete snippets; everything persists after a restart; nothing is left outside `%AppData%\Wordwright`.
-- [ ] Expand snippets in Notepad, Word, Outlook, Chrome, Slack or Teams, VS Code and the Windows search box; the clipboard is restored afterwards, and nothing appears in Win+V history.
-- [ ] Install the MSIX package on the same account and repeat, including Start with Windows through the packaged startup task.
-- [ ] **Windows 10 22H2 (19045) in a VM:** install, Mica falls back to a plain background (not black or transparent), Segoe UI fallback reads fine, tray icon and menu, `;date` expands.
-- [ ] **Keyboard layouts (after P12.1):** German QWERTZ, Spanish, French AZERTY and UK; `;date` with the default prefix, a Shift-prefix such as `:`, Caps Lock on, and AltGr characters.
-- [ ] **Screens (after P12.3, P12.9):** two monitors with different scaling, drag the window across; a 1366×768 display at 125 %; a window closed on monitor 2 reopens there.
-- [ ] **Store build data (after P12.2):** Open data folder shows the real `%AppData%\Wordwright`; the Start with Windows toggle matches Task Manager → Startup apps after turning it off there.
-- [ ] **Long session:** 8 hours running, one sleep/resume and one lock/unlock, then `;date` still expands; Resource Monitor shows no connections throughout.
-- [ ] **Heavy clipboard:** copy a large Excel range, type `;sig`, time it, then paste the range again.
-- [ ] **Snap Layouts and 300 %:** hovering the Maximise button shows the Snap Layouts flyout (WPF-UI answers `HTMAXBUTTON`, see P13.15; confirm on the real windows); the window reads correctly at 300 % scaling.
+**Human checks still open** — the maintainer runs these on a real Windows machine, and they are the only thing gating the release. They live in one table with a result, date and build for each: [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) (P13.9).
 
 ## How to run this plan with a coding agent
 
@@ -301,7 +290,8 @@ Ordered by how much they would set Wordwright apart, against what they cost. The
 
 ### Plan and process
 
-- [ ] **P13.9 One release checklist, in one place.** The gating checks are spread over three lists (Current status → Human checks, Release checklist, and the P12 human checks). Replace them with `docs/RELEASE_CHECKLIST.md`: a table of check × result × date × build, so each release records what was actually run. P10.2 then points at it.
+- [x] **P13.9 One release checklist, in one place.** The gating checks are spread over three lists (Current status → Human checks, Release checklist, and the P12 human checks). Replace them with `docs/RELEASE_CHECKLIST.md`: a table of check × result × date × build, so each release records what was actually run. P10.2 then points at it.
+  *2026-10-03, done:* `docs/RELEASE_CHECKLIST.md`: 43 checks in eight groups (build and package, install and data, expansion, layouts, screens and look, accessibility, Windows 10, robustness and privacy), each with how, Gate or Polish, script or machine, and result/date/build columns, plus a Runs section to archive each release. It also takes the per-phase human checks that were still open (P1, P2, P3, P11, P12) and this session's additions (clipboard busy, Acrylic tray menu, high-contrast brushes, the font fetch). Results recorded only for what ran today (B1, B2, B4, B6, B7) and B8 marked Fail until the history purge. The Current status list and the old Release checklist section now point at it, and so does P10.2.
 - [ ] **P13.10 Tag the v1.1 scope.** When v1.0.0 ships, move the D14–D22 decisions the maintainer approves into a `## Phase P14: v1.1` section with task IDs, and leave the rest listed as declined with one line of reasoning, the way D1–D13 are recorded.
 - [ ] **P13.11 Store listing differentiators.** Once the keyboard-layout human check passes, the Store description and LAUNCH kit can say "Works with your keyboard layout" alongside the three existing differentiators; add a screenshot of the welcome playground mid-expansion (the one thing nobody else shows), and finish the P10.1 GIF from the same moment.
 
@@ -330,7 +320,7 @@ The app already follows most of the playbook: Mica base, Fluent type ramp with Z
 - [x] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and the About page slot from DESIGN.md §9.
 - [ ] **P10.1** README: a GIF of a snippet expanding, install steps, the SmartScreen "unknown publisher" explanation, and a privacy section.
   *2026-10-02:* install steps, SmartScreen and privacy sections are in. **Open:** the GIF — it needs real typing (the hook ignores injected keys), so the maintainer records it.
-- [ ] **P10.2** Manual test pass using the checklist below and the DESIGN.md polish checklist (light, dark and a high-contrast theme; 100 %, 150 % and 200 % scaling; 800×600 and maximised; keyboard-only; Accessibility Insights for Windows with zero unnamed controls); fix blockers.
+- [ ] **P10.2** Manual test pass using [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md), which includes the DESIGN.md polish checklist (light, dark and a high-contrast theme; 100 %, 150 % and 200 % scaling; 800×600 and maximised; keyboard-only; Accessibility Insights for Windows with zero unnamed controls); fix blockers.
   *2026-10-02, automated part:* light and dark, 800×600 and maximised checked with `scripts/check-screens.ps1 -Size 800x600|max`, zero unnamed controls on every page. Blocker fixed: at 800×600 no page scrolled, so half of Settings and the editor's Delete button were unreachable. **Open for the maintainer:** a high-contrast theme, 100 % and 200 % scaling, keyboard-only use, Accessibility Insights and a screen reader, and the release checklist below.
 - [ ] **P10.3** Release **v1.0.0** on GitHub with notes.
   *2026-10-03, ready:* version 1.0.0 everywhere; `scripts/pack-release.ps1` builds a 78 MB installer (was 160 MB: stale AI-era native libraries were shipping); notes drafted in `docs/RELEASE_NOTES_v1.0.0.md`. **Open:** the manual P10.2 pass, then the maintainer's go-ahead to publish.
@@ -340,11 +330,7 @@ The app already follows most of the playbook: Mica base, Fluent type ramp with Z
   *Done when:* the Sponsor button shows on the repo and the About link opens the payment page. *Human step:* the maintainer creates the Razorpay Payment Page ("Customer Decides Amount", UPI + cards enabled) — the link goes live only once that page exists. Discovery/launch sequence: `docs/LAUNCH.md`.
 
 ## Release checklist
-- Fresh Windows user account install and uninstall leave no files outside `%AppData%\Wordwright`.
-- Snippets expand in the listed applications, and the clipboard is restored afterwards.
-- Network monitor (e.g. Resource Monitor) shows no connections during normal use.
-- Log files contain no user text.
-- Keyboard-only use of every screen; a screen reader reads the snippet list and the editor.
+Moved to [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) (P13.9), which records each run.
 
 ## Out of scope for v1
 Mac/Linux, ARM64, sync across devices, fill-in form snippets, rich-text snippets, per-app snippets — and **the AI writing assistant**, which is parked rather than in scope: [`AI_REWRITING.md`](AI_REWRITING.md).

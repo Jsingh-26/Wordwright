@@ -92,6 +92,7 @@ Snippets only, and heading for the Microsoft Store. The plan and what is left ar
 | [`docs/AI_REWRITING.md`](docs/AI_REWRITING.md) | The parked AI writing assistant: what it was, how it was built, why it stopped, how to resume |
 | [`AGENTS.md`](AGENTS.md) | Rules for AI coding agents working in this repo |
 | [`docs/PLAN.md`](docs/PLAN.md) | Build plan, current handoff and acceptance criteria |
+| [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md) | Every check that gates a release, with its result |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Projects, components, data files, key technical decisions |
 | [`docs/DESIGN.md`](docs/DESIGN.md) | Visual design system, logo system and screen layouts |
 | [`docs/UX_COPY.md`](docs/UX_COPY.md) | Every piece of user-facing text |
