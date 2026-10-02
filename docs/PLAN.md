@@ -4,6 +4,26 @@ Target: a public v1.0 on GitHub Releases in about 14 working days, with a snippe
 
 ## Current status and next handoff (reviewed 2026-10-02)
 
+### Latest no-build recheck: source b3f99ed (2026-10-02)
+
+The maintainer requested validation and plan updates only; **no local build, publish, packaging or product-code changes were performed**. Installed and latest published app remain **v0.1.3**, which predates the startup/import/load resource guards. Source implementation is therefore not yet delivered to this laptop.
+
+Local Python tests **21/21 pass**; prompt-hint smoke check, catalog metadata checks (5 candidates, none approved) and the existing Qwen model's SHA-256 check pass. [GitHub CI for b3f99ed](https://github.com/Jsingh-26/Wordwright/actions/runs/36969433803) passed its Build and Test steps. Current-source Core tests were not run locally: compiling them would violate the no-build request, and old local binaries would not test this source.
+
+Installed-app smoke check: launch, About version 0.1.3, persisted snippet list and search for sig pass. This does not establish physical expansion, clipboard recovery or latest resource-refusal behavior. Available RAM **1.9186 GiB (~2.06 GB)**; free disk **218.6656 GiB (~234.79 GB)**. The smallest candidate needs **2.5 GB available RAM** and **~0.767 GB free disk**, so this normal-use session must refuse AI. Do not ask the customer to close apps or relax thresholds.
+
+Source review identified unfinished safeguards:
+- [ ] Remove the saved-AiEnabled shortcut in MainWindow.xaml.cs:78 that shows Offline AI without a current resource check. Low-resource startup must hide it even with an installed/previously activated model. Provide any necessary model-management access without bypassing eligibility.
+- [ ] Validate the specific downloaded/imported/active model. The current any-catalog-model fit gate can admit a larger or unknown imported model merely because a smaller entry fits; e.g. 2.6 GB available admits tiny Qwen but cannot carry the 1.7B entry requiring 3.5 GB with headroom. Do not infer RAM from GGUF file size.
+- [ ] Recheck the selected model's RAM and disk immediately before starting/resuming a download and before activation on completion. Current download start uses the dialog's earlier result; downloader itself only refreshes disk.
+- [ ] Add regression checks for AI-on low-resource startup, smaller-fit/larger-selected setup/load, unknown imported requirements, and RAM/disk loss while consent stays open. These are required checks for the above fixes, not completed tests.
+- [ ] **Build/release handoff to the other laptop:** after fixes, run the required solution build/Core tests, publish a new version with its exact source SHA, and provide the installer. No local build or new release was produced in this validation session.
+- [ ] Install that release here; under normal laptop usage verify sidebar hidden and download/import/load refused while snippets remain usable. Cover new and existing AI-on profiles; controlled low-disk checks must not fill the user's disk.
+- [ ] On naturally qualifying hardware, finish physical hotkeys and real-app rewriting, clipboard restore, Ctrl+Z, Esc cancellation, elevated fallback and inference privacy checks.
+
+Full [review evidence in issue #3](https://github.com/Jsingh-26/Wordwright/issues/3#issuecomment-5946325984) and the validation report. **App shell runs; current resource requirements are not yet satisfied by the delivered app. P4/P5/P6 maintainer confirmations stay open and P7 is not cleared.** P7 calibration/management, P8 replacement/updater, P9.4 evaluation/approval and P10 release validation remain unfinished. Historical evidence below retains its original baseline.
+
+
 ### Maintainer requirement: startup resource eligibility (2026-10-02)
 
 Evaluate available RAM and free disk space at startup under normal laptop usage. Show the Offline AI sidebar option only when a suitable model fits both documented resource requirements, including headroom. Otherwise hide that option and refuse model download, import and activation. Customers should not have to close their normal apps to qualify. Recheck before model setup/use to prevent a stale startup result from bypassing refusal. Keep existing RAM/disk thresholds unchanged.
@@ -48,7 +68,7 @@ Calibration run after download/import: measure a real generation on the 16 GB la
 |---|---|---|
 | Install and launch | v0.1.2 installer exit 0; welcome and main window opened | Fresh-user install/uninstall and persistence checks: P3 human check, P10.2 |
 | Automated Core checks | 196 passed at baseline `62d588e`; **258 passed, 0 failed, 0 skipped** after the P6 push (`edf7323`) | Full build/test and GitHub CI must pass for every implementation change |
-| Hardware fit | Laptop has about 15.87 GB usable RAM; about 0.82 GB available at inspection | Validate with HardwareProbe; free enough RAM for the unchanged model + 1 GB rule: P4 / MODELS.md |
+| Hardware fit | Laptop has about 15.87 GB usable RAM; about 0.82 GB available at inspection | Validate normal-use eligibility and refuse AI when the unchanged model + 1 GB rule fails: P4 / MODELS.md |
 | Model acquisition | No approved models; automatic download disabled; import entry point visible | P5 human check; real source, license, size and SHA-256: P9.3; approval only after P9.4 evaluation |
 | Inference and rewrite | P6.1–P6.8 implemented and pushed; **v0.1.3 is the first release containing P6**; builds clean with 258 Core tests | The P6 human checks in the listed Windows apps against v0.1.3; P7.1–P7.2 remains |
 | Calibration and activation | Calibration not implemented; P6 import enables AI but successful generation remains unverified | P7.1–P7.2; measured times against a stopwatch |

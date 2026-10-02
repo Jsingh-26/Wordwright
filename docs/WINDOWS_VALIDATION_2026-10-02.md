@@ -75,3 +75,25 @@ The maintainer explicitly approved the 639 MB Qwen test-model download in this c
 - Available RAM was about 2.25 GB before download, about 2.00 GB after import and **2.01 GB** after restart (1.8719 GiB). This remains below the unchanged **2.5 GB** prerequisite. The maintainer was asked to close unused apps; no readiness response was received during these checks. **Live inference deferred for insufficient available RAM.**
 
 This completes the file acquisition/hash and installed-release import/persistence observations. Physical hotkeys, actual rewrites across the required apps, cancellation/undo/clipboard/elevated fallback and inference-log privacy remain unperformed. Installed-app download interruption/resume/tamper remains blocked by the unapproved catalog; the external transfer is not a substitute. **P4/P5/P6 confirmations stay unticked; P7 is not cleared.**
+
+
+## Latest no-build recheck — b3f99ed, 2026-10-02
+
+### Latest no-build recheck: source b3f99ed (2026-10-02)
+
+The maintainer requested validation and plan updates only; **no local build, publish, packaging or product-code changes were performed**. Installed and latest published app remain **v0.1.3**, which predates the startup/import/load resource guards. Source implementation is therefore not yet delivered to this laptop.
+
+Local Python tests **21/21 pass**; prompt-hint smoke check, catalog metadata checks (5 candidates, none approved) and the existing Qwen model's SHA-256 check pass. [GitHub CI for b3f99ed](https://github.com/Jsingh-26/Wordwright/actions/runs/36969433803) passed its Build and Test steps. Current-source Core tests were not run locally: compiling them would violate the no-build request, and old local binaries would not test this source.
+
+Installed-app smoke check: launch, About version 0.1.3, persisted snippet list and search for sig pass. This does not establish physical expansion, clipboard recovery or latest resource-refusal behavior. Available RAM **1.9186 GiB (~2.06 GB)**; free disk **218.6656 GiB (~234.79 GB)**. The smallest candidate needs **2.5 GB available RAM** and **~0.767 GB free disk**, so this normal-use session must refuse AI. Do not ask the customer to close apps or relax thresholds.
+
+Source review identified unfinished safeguards:
+- [ ] Remove the saved-AiEnabled shortcut in MainWindow.xaml.cs:78 that shows Offline AI without a current resource check. Low-resource startup must hide it even with an installed/previously activated model. Provide any necessary model-management access without bypassing eligibility.
+- [ ] Validate the specific downloaded/imported/active model. The current any-catalog-model fit gate can admit a larger or unknown imported model merely because a smaller entry fits; e.g. 2.6 GB available admits tiny Qwen but cannot carry the 1.7B entry requiring 3.5 GB with headroom. Do not infer RAM from GGUF file size.
+- [ ] Recheck the selected model's RAM and disk immediately before starting/resuming a download and before activation on completion. Current download start uses the dialog's earlier result; downloader itself only refreshes disk.
+- [ ] Add regression checks for AI-on low-resource startup, smaller-fit/larger-selected setup/load, unknown imported requirements, and RAM/disk loss while consent stays open. These are required checks for the above fixes, not completed tests.
+- [ ] **Build/release handoff to the other laptop:** after fixes, run the required solution build/Core tests, publish a new version with its exact source SHA, and provide the installer. No local build or new release was produced in this validation session.
+- [ ] Install that release here; under normal laptop usage verify sidebar hidden and download/import/load refused while snippets remain usable. Cover new and existing AI-on profiles; controlled low-disk checks must not fill the user's disk.
+- [ ] On naturally qualifying hardware, finish physical hotkeys and real-app rewriting, clipboard restore, Ctrl+Z, Esc cancellation, elevated fallback and inference privacy checks.
+
+Full [review evidence in issue #3](https://github.com/Jsingh-26/Wordwright/issues/3#issuecomment-5946325984) and the validation report. **App shell runs; current resource requirements are not yet satisfied by the delivered app. P4/P5/P6 maintainer confirmations stay open and P7 is not cleared.** P7 calibration/management, P8 replacement/updater, P9.4 evaluation/approval and P10 release validation remain unfinished. Historical evidence below retains its original baseline.
