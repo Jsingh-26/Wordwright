@@ -17,6 +17,30 @@ A free, open-source text expander for Windows: type a shortcut like `;sig` and y
 
 > A *wright* is a maker: a shipwright builds ships, a wheelwright builds wheels. Wordwright builds your words.
 
+## Install
+
+1. Download **`Wordwright-win-Setup.exe`** from the [latest release](https://github.com/Jsingh-26/Wordwright/releases/latest) and run it. It installs for your user account only, so no administrator rights are needed.
+2. Wordwright starts in the tray (the "W" by the clock; on Windows 11 it may sit in the overflow, behind the ^). A short welcome lets you try it: type `;date` and today's date appears.
+3. Open the tray icon to add your own snippets.
+
+Prefer not to install? **`Wordwright-win-Portable.zip`** from the same release runs from any folder. A Microsoft Store version is on the way.
+
+To uninstall, use **Settings → Apps → Installed apps → Wordwright**. Your snippets stay in `%AppData%\Wordwright` until you delete that folder.
+
+### "Windows protected your PC"
+
+The first time you run the installer, Microsoft Defender SmartScreen may say *"Windows protected your PC"* and name an **unknown publisher**. That is because the installer is not signed with a paid code-signing certificate, which a free, one-person project does not have. It does not mean anything was found in the file.
+
+To continue, click **More info**, then **Run anyway**. If you would rather check first, the source for every release is in this repository, and you can build it yourself with `dotnet build`. The Microsoft Store version, once published, is signed by the Store and shows no warning.
+
+## Privacy
+
+- **No network access.** Wordwright opens no connections at all: no telemetry, no analytics, no crash reports, no update check. You can confirm it in Resource Monitor's Network tab.
+- **Nothing you type is stored.** To spot a shortcut, Wordwright keeps the last 64 characters you typed in memory only, and clears them whenever you click, switch windows or press Enter, Escape or an arrow key. Typed text, your clipboard and your snippet text are never written to a log.
+- **Your clipboard comes back.** A snippet is pasted through the clipboard, and whatever you had copied is put back straight afterwards. Wordwright asks Windows to keep its paste out of clipboard history (Win+V).
+- **Your data, in one place.** Snippets and settings are plain JSON in `%AppData%\Wordwright`. Nothing is kept anywhere else.
+- **Quiet where it matters.** Wordwright cannot always tell when you are typing a password, so Settings lets you turn it off in chosen apps, such as your password manager.
+
 ## How it works
 
 - A low-level keyboard hook runs on its own thread and only queues each key, so typing is never slowed down.
