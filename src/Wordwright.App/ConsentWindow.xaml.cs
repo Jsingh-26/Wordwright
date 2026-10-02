@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using Microsoft.Win32;
 using Wpf.Ui.Controls;
+using Wordwright.App.Ai;
 using Wordwright.App.Controls;
 using Wordwright.App.Resources;
 using Wordwright.Core.Hardware;
@@ -56,6 +57,16 @@ public partial class ConsentWindow : FluentWindow
 
         Checking.Visibility = Visibility.Collapsed;
 
+        // Judged as the machine is now, not as it was when the app started
+        // (docs/PLAN.md → "Maintainer requirement: startup resource eligibility").
+        var availability = AiGate.Check(profile);
+
+        if (!availability.IsAvailable)
+        {
+            ShowUnavailable(availability);
+            return;
+        }
+
         if (Recommender.Recommend(catalog, profile) is not { } recommendation)
         {
             ShowNothingToOffer(catalog, profile);
@@ -63,6 +74,21 @@ public partial class ConsentWindow : FluentWindow
         }
 
         Show(recommendation, profile);
+    }
+
+    /// <summary>
+    /// This PC cannot carry anything in the catalog, so nothing is offered. The
+    /// wording names the resource that is short, and never asks the user to close
+    /// anything to qualify.
+    /// </summary>
+    private void ShowUnavailable(AiAvailability availability)
+    {
+        NoOffer.Text = AiGate.Refusal(availability);
+        NoOffer.Visibility = Visibility.Visible;
+
+        // Nothing to download, and nothing may be added by hand either.
+        PrimaryButton.IsEnabled = false;
+        ImportButton.IsEnabled = false;
     }
 
     private void Show(ModelRecommendation recommendation, HardwareProfile profile)
@@ -411,6 +437,17 @@ public partial class ConsentWindow : FluentWindow
     /// <summary>The import itself, once a file has been chosen.</summary>
     private void Import(string path)
     {
+        // Measured again here rather than trusting the window's own probe: the
+        // dialogue can sit open for a while, and the requirement is that a change
+        // since then cannot be bypassed (docs/PLAN.md → resource eligibility).
+        if (!AiGate.Check(HardwareProbe.Read()).IsAvailable)
+        {
+            Busy.Visibility = Visibility.Collapsed;
+            Problem.Text = Strings.Get("Ai.Unavailable.Import");
+            Problem.Visibility = Visibility.Visible;
+            return;
+        }
+
         Busy.Text = Strings.Get("Ai.Verify");
         Busy.Visibility = Visibility.Visible;
         Problem.Visibility = Visibility.Collapsed;

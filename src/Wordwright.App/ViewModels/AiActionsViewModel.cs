@@ -293,6 +293,7 @@ internal sealed partial class AiActionsViewModel : ObservableObject
                 RewriteStatus.TooLong => Strings.Get("Pill.TooLong"),
                 RewriteStatus.BadOutput => Strings.Get("Pill.BadOutput"),
                 RewriteStatus.NoModel => Strings.Get("Actions.NeedsAi"),
+                RewriteStatus.NotEnoughResources => Strings.Get("Pill.NotEnoughResources"),
                 _ => null,
             };
         }

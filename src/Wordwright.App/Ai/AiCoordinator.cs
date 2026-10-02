@@ -256,6 +256,10 @@ internal sealed class AiCoordinator : IDisposable
                     Post(() => pill.ShowResult(PillState.Error, Strings.Get("Pill.BadOutput")));
                     break;
 
+                case RewriteStatus.NotEnoughResources:
+                    Post(() => pill.ShowResult(PillState.Error, Strings.Get("Pill.NotEnoughResources")));
+                    break;
+
                 default:
                     Post(() => pill.ShowResult(PillState.Error, Strings.Get("Pill.AiOff")));
                     break;

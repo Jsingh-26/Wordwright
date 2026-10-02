@@ -117,6 +117,7 @@ Placeholders use `{Name}`.
 | Pill.AdminApp.Copied | Copied the rewrite. Wordwright can't type into apps running as administrator, so paste it yourself. |
 | Pill.HotkeyTaken | {Hotkey} is used by another app. Choose a different one in Wordwright. |
 | Pill.AiOff | Offline AI is off. Open Wordwright to turn it on. |
+| Pill.NotEnoughResources | Offline AI needs more memory or disk space than this PC has free right now. Your text is unchanged. |
 
 ## Turn on offline AI
 | ID | Text |

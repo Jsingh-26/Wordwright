@@ -15,6 +15,10 @@ internal enum RewriteStatus
     /// <summary>AI is off, or no model file is installed.</summary>
     NoModel,
 
+    /// <summary>This PC is too short of memory or disk to load the model now
+    /// (docs/PLAN.md → "Maintainer requirement: startup resource eligibility").</summary>
+    NotEnoughResources,
+
     /// <summary>The selection was past the v1 input limit.</summary>
     TooLong,
 
@@ -86,6 +90,17 @@ internal sealed class RewriteService : IDisposable
         if (ActiveModel() is null)
         {
             return new RewriteOutcome(RewriteStatus.NoModel);
+        }
+
+        // Loading is the moment the memory is actually claimed, so the machine is
+        // measured again here rather than trusting the startup result: a PC that
+        // has run out of room since then must not be made to load a model it
+        // cannot carry (docs/PLAN.md → resource eligibility). A model that is
+        // already loaded keeps working — its memory is already committed.
+        if (!IsLoaded
+            && !(await AiGate.CheckAsync(cancellationToken).ConfigureAwait(false)).IsAvailable)
+        {
+            return new RewriteOutcome(RewriteStatus.NotEnoughResources);
         }
 
         try
