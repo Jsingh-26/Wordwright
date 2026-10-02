@@ -20,7 +20,7 @@ Follows the maintainer's `craft-studio` playbook (`playbooks/desktop-app.md`): s
 - **What is unique (the design hook):** *the promise becomes real on your PC.* Wordwright measures itself on your machine and tells you the truth: estimated times, then measured times, nothing leaving the computer.
 - **Candidate signature moves (desktop playbook menu):** (1) *progressive onboarding empty state*: a "Try it here" box on the welcome window and the empty Snippets page where typing `;date` expands in place; (2) *ambient status*: the progress pill shows a hairline ruler that fills against the promised time, so every rewrite echoes the signature screen; (3) *command palette*: the action palette, already planned. **Chosen:** the time ruler stays the one bold visual (§5); the "Try it here" playground becomes the flagship interaction of the window, because the window's only job is to make a non-technical person trust the app in thirty seconds. The pill's ruler tick is a cheap echo worth keeping if it stays under 32 px. Both approved on 2026-10-01 (PLAN.md P3.4c and P6.6).
 - **Found in the build:** no minimum window size and no remembered size; no keyboard accelerators; Settings is a flat list with Remove buttons far from their rows; About uses the system-blue hyperlink (rule 7 of AGENTS.md) and shows no version; 4 of 5 interactive controls on About have no automation name (confirmed by automation id: WPF-UI's three title-bar buttons and the navigation toggle). DESIGN.md had no sketch for Settings or About; §8 and §9 below add them.
-- **Open questions:** Zodiak embedding licence (confirm before release). The welcome playground is also the empty state of the Snippets list (decided with D1).
+- **Open questions:** none on the font: the Zodiak licence (ITF FFL 2.0) allows embedding in the app (§01) and forbids redistributing the files through a repository (§02), so the build fetches them (docs/PLAN.md P13.12). The welcome playground is also the empty state of the Snippets list (decided with D1).
 
 ### Text Blaze, looked at closely (2026-10-01)
 Design: a web dashboard in red/white with a panda mascot and feature GIFs; folders tree, snippet list, editor, and a searchable command menu on the right. Generic SaaS; nothing to borrow in look, and the red is the opposite of Wordwright's calm ink. Mechanisms worth taking, all four approved on 2026-10-01 (PLAN.md P2.7, P3.4c, P6.6, P6.8):
@@ -56,7 +56,7 @@ Window backgrounds use the Windows 11 Mica material. No gradients anywhere.
 ### Type (at most two families, clearly different)
 | Role | Face | Source | Use |
 |---|---|---|---|
-| Display | **Zodiak** (Semibold, Bold) | Fontshare (ITF Free Font License, free for commercial use; confirm the licence allows embedding in an app before release, else fall back to Erode) | Wordmark, page titles, dialogue titles, the big numbers on the time ruler |
+| Display | **Zodiak** (Semibold, Bold) | Fontshare (ITF Free Font License, free for commercial use; embedding in an app is allowed; the files are fetched at build time, not committed (P13.12)) | Wordmark, page titles, dialogue titles, the big numbers on the time ruler |
 | Text | Segoe UI Variable Text | Built into Windows | All body text, labels, buttons, inputs |
 
 Why: a sharp, crafted serif for the maker's voice; the system face for everything the user reads and clicks, so the controls still feel native. Embed the Zodiak `.otf` files as WPF resources.

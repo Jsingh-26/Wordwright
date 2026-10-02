@@ -45,7 +45,7 @@ Two builds ship from the same source. Both keep the user's data in the same plac
 | `Velopack` | App | Installer and uninstaller (the app never checks for updates) |
 | `xunit`, `FluentAssertions` | Tests | Unit tests |
 
-Not packages but bundled assets: Zodiak font files (Fontshare, embedded as WPF resources) and Phosphor icons (MIT) copied as XAML path geometries into `Wordwright.App/Resources/Icons.xaml`. Icons and logo come from `brand/`.
+Not packages but bundled assets: Zodiak font files (Fontshare, embedded as WPF resources; not in the repository, because the ITF licence forbids passing the files on that way: the `FetchZodiak` target in `Wordwright.App.csproj` downloads the official zip on the first build and checks both files against pinned SHA-256 hashes, a build-time step like the NuGet restore; the app itself still opens no connections) and Phosphor icons (MIT) copied as XAML path geometries into `Wordwright.App/Resources/Icons.xaml`. Icons and logo come from `brand/`.
 
 Pin exact versions in `Directory.Packages.props` (central package management).
 

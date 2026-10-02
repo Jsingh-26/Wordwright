@@ -487,3 +487,7 @@ packaging/stage-bundle/
 
 # Evaluation harness outputs (docs/EVAL.md, docs/PLAN.md P9)
 eval/results/
+
+# Zodiak font files: the licence forbids redistributing them through a
+# repository (docs/PLAN.md P13.12). The build fetches them from Fontshare.
+src/Wordwright.App/Resources/Fonts/*.otf

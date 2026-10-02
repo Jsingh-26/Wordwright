@@ -25,8 +25,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Zodiak (ITF Free Font License), embedded as app resources. -->
-    <Resource Include="Resources\Fonts\*.otf" />
+    <!-- Zodiak (ITF Free Font License), embedded as app resources. Named rather
+         than globbed: on a fresh clone the files only appear during the build
+         (FetchZodiak below), after the globs were evaluated. -->
+    <Resource Include="Resources\Fonts\Zodiak-Bold.otf" />
+    <Resource Include="Resources\Fonts\Zodiak-Regular.otf" />
     <Resource Include="Resources\Fonts\LICENSE-Zodiak.txt" />
 
     <!-- The brand app icon (docs/DESIGN.md §4), embedded so each window can set
@@ -34,5 +37,45 @@
          placeholder Windows shows for a window with no icon. -->
     <Resource Include="..\..\brand\icon.ico" Link="Resources\icon.ico" />
   </ItemGroup>
+
+  <!--
+    Zodiak's licence allows embedding the fonts in an application (§01) but not
+    passing the font files on through a repository (§02), so they are not
+    committed (docs/PLAN.md P13.12). When they are missing, the build fetches
+    the official Fontshare zip once and checks the two files it embeds against
+    the hashes of the release the design was made with; a different file stops
+    the build rather than shipping an unreviewed font. This is the build
+    reaching the network, never the app.
+  -->
+  <PropertyGroup>
+    <ZodiakDirectory>$(MSBuildProjectDirectory)\Resources\Fonts\</ZodiakDirectory>
+    <ZodiakDownloadUrl>https://api.fontshare.com/v2/fonts/download/zodiak</ZodiakDownloadUrl>
+    <ZodiakWork>$(MSBuildProjectDirectory)\obj\zodiak\</ZodiakWork>
+  </PropertyGroup>
+
+  <Target Name="FetchZodiak"
+          BeforeTargets="BeforeBuild"
+          Condition="!Exists('$(ZodiakDirectory)Zodiak-Bold.otf') Or !Exists('$(ZodiakDirectory)Zodiak-Regular.otf')">
+    <Message Importance="high" Text="Fetching the Zodiak fonts from Fontshare (docs/PLAN.md P13.12)" />
+    <DownloadFile SourceUrl="$(ZodiakDownloadUrl)"
+                  DestinationFolder="$(ZodiakWork)"
+                  DestinationFileName="Zodiak_Complete.zip"
+                  Retries="2" />
+    <Unzip SourceFiles="$(ZodiakWork)Zodiak_Complete.zip" DestinationFolder="$(ZodiakWork)unzipped" />
+
+    <ItemGroup>
+      <ZodiakFont Include="$(ZodiakWork)unzipped\Zodiak_Complete\Fonts\OTF\Zodiak-Bold.otf"
+                  ExpectedHash="A2B42A08665C426C04BEC3AB378DE285487FC05C1AEC5DF1ACA354A013F69A2E" />
+      <ZodiakFont Include="$(ZodiakWork)unzipped\Zodiak_Complete\Fonts\OTF\Zodiak-Regular.otf"
+                  ExpectedHash="3FD45FE69B9C16F74184B8E8048EA5D61E387A0186D8A51AA62F0DA3B19CFFEF" />
+    </ItemGroup>
+    <GetFileHash Files="@(ZodiakFont)" Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="ZodiakFontHashed" />
+    </GetFileHash>
+    <Error Condition="'%(ZodiakFontHashed.FileHash)' != '%(ZodiakFontHashed.ExpectedHash)'"
+           Text="%(ZodiakFontHashed.Filename) from Fontshare is not the reviewed release (SHA-256 %(ZodiakFontHashed.FileHash)). Check the new version, then update ExpectedHash in Wordwright.App.csproj." />
+
+    <Copy SourceFiles="@(ZodiakFont)" DestinationFolder="$(ZodiakDirectory)" />
+  </Target>
 
 </Project>

@@ -71,15 +71,15 @@ It is not part of this application. It needs a machine with enough free memory t
 
 ## Tests and running locally
 
-Needs Windows and the .NET 10 SDK.
+Needs Windows and the .NET 10 SDK. The first build also downloads the Zodiak display font from [Fontshare](https://www.fontshare.com/fonts/zodiak), because its licence does not allow the font files to be kept in a repository; the build checks them against pinned hashes, and the app itself never goes online.
 
 ```bash
 dotnet build -c Release
-dotnet test -c Release                      # 140 xUnit tests for Wordwright.Core
+dotnet test -c Release                      # 192 xUnit tests for Wordwright.Core
 dotnet run --project src/Wordwright.App     # starts the tray app
 ```
 
-CI runs the build and the tests on Windows for every push to `main` and every pull request.
+CI runs the build and the tests on Windows for every push to `main` and every pull request, compiles the test harnesses, and runs both packaging scripts.
 
 ## Status
 
