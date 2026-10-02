@@ -28,16 +28,17 @@ public static class Motion
     /// that is already visible; the final state is the element's normal one.</summary>
     public static void Enter(FrameworkElement element, int delayMs = 0)
     {
+        // Base values are the finished state, so FillBehavior.Stop leaves the
+        // element correct even if the animation is replaced before it ends — and
+        // so the element still ends up shown when animations are off.
+        element.Opacity = 1;
+        var translate = EnsureTranslate(element);
+        translate.Y = 0;
+
         if (!Enabled)
         {
             return;
         }
-
-        // Base values are the finished state, so FillBehavior.Stop leaves the
-        // element correct even if the animation is replaced before it ends.
-        element.Opacity = 1;
-        var translate = EnsureTranslate(element);
-        translate.Y = 0;
 
         var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
         var delay = TimeSpan.FromMilliseconds(delayMs);
@@ -51,11 +52,13 @@ public static class Motion
     }
 
     /// <summary>Fade an element out, then report completion. The callback always
-    /// runs — even with animations off — so callers can defer removal to it.</summary>
+    /// runs — even with animations off — so callers can defer removal to it, and
+    /// the element is left hidden either way.</summary>
     public static void Exit(UIElement element, Action? completed = null)
     {
         if (!Enabled)
         {
+            element.Opacity = 0;
             completed?.Invoke();
             return;
         }
@@ -73,21 +76,42 @@ public static class Motion
         element.BeginAnimation(UIElement.OpacityProperty, fade);
     }
 
+    /// <summary>Fade an element from a part-way opacity back to full — the editor
+    /// field lighting up as the glide's proxy lands on it.</summary>
+    public static void Reveal(FrameworkElement element, double fromOpacity, int milliseconds = 120)
+    {
+        element.Opacity = 1;
+
+        if (!Enabled)
+        {
+            return;
+        }
+
+        element.BeginAnimation(
+            UIElement.OpacityProperty,
+            new DoubleAnimation(fromOpacity, 1, TimeSpan.FromMilliseconds(milliseconds))
+            {
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+                FillBehavior = FillBehavior.Stop,
+            });
+    }
+
     /// <summary>The D7 signature: glide a floating proxy from one on-screen rect
     /// to another (position and size), then report completion. The proxy is
     /// expected to sit on a Canvas; its base geometry is left at the target.</summary>
     public static void Glide(FrameworkElement proxy, Rect from, Rect to, Action? completed = null)
     {
+        // Leave the proxy at the target either way, so the disabled path is correct.
+        Canvas.SetLeft(proxy, to.X);
+        Canvas.SetTop(proxy, to.Y);
+        proxy.Width = to.Width;
+        proxy.Height = to.Height;
+
         if (!Enabled)
         {
             completed?.Invoke();
             return;
         }
-
-        Canvas.SetLeft(proxy, to.X);
-        Canvas.SetTop(proxy, to.Y);
-        proxy.Width = to.Width;
-        proxy.Height = to.Height;
 
         var easing = new CubicEase { EasingMode = EasingMode.EaseOut };
         proxy.BeginAnimation(

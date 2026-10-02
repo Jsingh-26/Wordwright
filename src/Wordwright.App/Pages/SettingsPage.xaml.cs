@@ -15,7 +15,12 @@ public partial class SettingsPage : Page
 
         ViewModel = new SettingsViewModel((App)Application.Current);
         DataContext = ViewModel;
+
+        Loaded += OnLoaded;
     }
+
+    /// <summary>Page entrance (docs/PLAN.md → P11.5).</summary>
+    private void OnLoaded(object sender, RoutedEventArgs e) => Motion.Enter(this);
 
     internal SettingsViewModel ViewModel { get; }
 

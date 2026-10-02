@@ -7,6 +7,15 @@
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
 
+        <!-- The shortcut reads as a chip (docs/DESIGN.md, decision D7): a small
+             tactile object for the connected animation to carry into the editor. -->
+        <Style x:Key="ShortcutChip" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource ChipBrush}" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="6,1" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+        </Style>
+
         <!-- WPF-UI has no list control, so the rows are styled here to match the
              rail: accent tint for the chosen row, no white system highlight. -->
         <Style TargetType="ListBoxItem">
@@ -47,11 +56,14 @@
         <Grid Grid.Row="0" Margin="32,24,32,16">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Style="{StaticResource PageTitle}" Text="{res:Str Snippets.Title}" />
-                <TextBlock Style="{StaticResource SecondaryText}"
+                <!-- Faded in and out by the page (docs/PLAN.md → P11.5); the
+                     base opacity is 0 and Motion leaves it at the right value. -->
+                <TextBlock x:Name="SavedText"
+                           Style="{StaticResource SecondaryText}"
                            Margin="12,0,0,4"
                            VerticalAlignment="Bottom"
-                           Text="{res:Str Snippets.Saved}"
-                           Visibility="{Binding ShowSaved, Converter={StaticResource BoolToVisibility}}" />
+                           Opacity="0"
+                           Text="{res:Str Snippets.Saved}" />
             </StackPanel>
             <ui:Button Appearance="Primary"
                        Content="{res:Str Snippets.New}"
@@ -90,15 +102,28 @@
                                 Margin="0,4,0,0"
                                 AutomationProperties.Name="{Binding EmptyTryHere}" />
                 </StackPanel>
-                <ListBox ItemsSource="{Binding Snippets}"
+                <ListBox x:Name="SnippetList"
+                         ItemsSource="{Binding Snippets}"
                          SelectedItem="{Binding SelectedSnippet}"
                          Background="Transparent"
-                         BorderThickness="0">
+                         BorderThickness="0"
+                         SelectionChanged="OnSelectionChanged"
+                         PreviewMouseLeftButtonDown="OnListPreviewMouseDown"
+                         PreviewMouseLeftButtonUp="OnListPreviewMouseUp"
+                         PreviewKeyDown="OnListPreviewKeyDown">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Margin="4,6">
-                                <TextBlock Text="{Binding Shortcut}" />
-                                <TextBlock Text="{Binding Name}" Style="{StaticResource SecondaryText}" />
+                                <Border Style="{StaticResource ShortcutChip}" Tag="ShortcutChip">
+                                    <TextBlock FontFamily="{StaticResource AppText}"
+                                               FontSize="12"
+                                               Text="{Binding Shortcut}" />
+                                </Border>
+                                <TextBlock Text="{Binding Name}"
+                                           Style="{StaticResource BodyText}"
+                                           Margin="0,3,0,0"
+                                           TextWrapping="NoWrap"
+                                           TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
@@ -116,7 +141,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0">
+                <StackPanel x:Name="NameGroup" Grid.Row="0">
                     <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Snippets.Field.Name}" />
                     <ui:TextBox x:Name="NameBox"
                                 Margin="0,4,0,0"
@@ -124,9 +149,9 @@
                                 Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
                 </StackPanel>
 
-                <StackPanel Grid.Row="1" Margin="0,16,0,0">
+                <StackPanel x:Name="ShortcutGroup" Grid.Row="1" Margin="0,16,0,0">
                     <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Snippets.Field.Shortcut}" />
-                    <Grid Margin="0,4,0,0">
+                    <Grid x:Name="ShortcutField" Margin="0,4,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
@@ -165,7 +190,7 @@
                     </TextBlock>
                 </StackPanel>
 
-                <StackPanel Grid.Row="2" Margin="0,16,0,0">
+                <StackPanel x:Name="BodyGroup" Grid.Row="2" Margin="0,16,0,0">
                     <TextBlock Style="{StaticResource SecondaryText}" Text="{res:Str Snippets.Field.Text}" />
                     <ui:TextBox x:Name="BodyBox"
                                 Margin="0,4,0,0"
@@ -221,5 +246,13 @@
                            Click="OnDeleteSnippetClicked" />
             </Grid>
         </Grid>
+
+        <!-- The connected animation's proxy floats here, above the page, so it
+             never takes a hit or a measure from the list (docs/PLAN.md → P11.5). -->
+        <Canvas x:Name="Overlay"
+                Grid.RowSpan="2"
+                Panel.ZIndex="100"
+                IsHitTestVisible="False"
+                ClipToBounds="True" />
     </Grid>
 </Page>

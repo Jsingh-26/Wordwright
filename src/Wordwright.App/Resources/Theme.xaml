@@ -15,6 +15,9 @@
     <SolidColorBrush x:Key="BrandAccentBrush" Color="{StaticResource ForgeInkColor}" />
     <SolidColorBrush x:Key="CautionBrush" Color="{StaticResource OchreColor}" />
     <SolidColorBrush x:Key="SelectionBrush" Color="{StaticResource SteelColor}" />
+    <!-- The shortcut chip in the snippet list (docs/PLAN.md → P11.5); swapped
+         with the theme like SelectionBrush. -->
+    <SolidColorBrush x:Key="ChipBrush" Color="{StaticResource SteelColor}" />
 
     <SolidColorBrush x:Key="ForgeInkBrush" Color="{StaticResource ForgeInkColor}" />
     <SolidColorBrush x:Key="InkLightBrush" Color="{StaticResource InkLightColor}" />

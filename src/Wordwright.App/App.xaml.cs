@@ -153,6 +153,14 @@ public partial class App : Application
                         ? Color.FromArgb(0x1F, Steel.R, Steel.G, Steel.B)
                         : Steel);
 
+                // The shortcut chip (docs/PLAN.md → P11.5) sits a touch lighter
+                // than the selection it lives on, so it still reads when a row is
+                // chosen: Steel at a lower alpha in dark, a light tint in light.
+                Current.Resources["ChipBrush"] = new SolidColorBrush(
+                    currentTheme == ApplicationTheme.Dark
+                        ? Color.FromArgb(0x14, Steel.R, Steel.G, Steel.B)
+                        : Color.FromArgb(0x33, ForgeInk.R, ForgeInk.G, ForgeInk.B));
+
                 Current.Resources["BrandAccentBrush"] = new SolidColorBrush(accent);
                 Current.Resources["CautionBrush"] = new SolidColorBrush(
                     currentTheme == ApplicationTheme.Dark ? OchreDarkTheme : Ochre);

@@ -1,5 +1,7 @@
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 using Wpf.Ui.Controls;
 using Wordwright.App.Resources;
@@ -9,12 +11,18 @@ namespace Wordwright.App.Pages;
 
 public partial class SnippetsPage : Page
 {
+    /// <summary>Set while a click or an arrow key is choosing a row, so the glide
+    /// runs for the user's selection but not for programmatic ones
+    /// (docs/PLAN.md → P11.5: not at window open, not after add or delete).</summary>
+    private bool _userSelecting;
+
     public SnippetsPage()
     {
         InitializeComponent();
 
         ViewModel = new SnippetsViewModel((App)Application.Current);
         DataContext = ViewModel;
+        ViewModel.PropertyChanged += OnViewModelPropertyChanged;
 
         Loaded += OnLoaded;
     }
@@ -30,12 +38,26 @@ public partial class SnippetsPage : Page
         // The window's accelerators (Ctrl+N, Ctrl+F, Delete) need to find the page
         // that is on screen (docs/PLAN.md → P3.4a).
         (Window.GetWindow(this) as MainWindow)?.OnSnippetsPageLoaded(this);
+
+        // Page entrance (docs/PLAN.md → P11.5).
+        Motion.Enter(this);
     }
 
     /// <summary>Adds an empty snippet and puts the caret in its Name field.</summary>
     internal void NewSnippet()
     {
-        ViewModel.AddNew();
+        var item = ViewModel.AddNew();
+
+        // Let the new row enter once the list has realised it (docs/PLAN.md → P11.5).
+        Dispatcher.BeginInvoke(
+            () =>
+            {
+                if (SnippetList.ItemContainerGenerator.ContainerFromItem(item) is FrameworkElement row)
+                {
+                    Motion.Enter(row);
+                }
+            },
+            DispatcherPriority.Loaded);
 
         // A new snippet has no shortcut yet, so start the user at its name.
         NameBox.Focus();
@@ -104,7 +126,116 @@ public partial class SnippetsPage : Page
 
         if (await dialog.ShowAsync() == ContentDialogResult.Primary)
         {
-            ViewModel.DeleteSelected();
+            // Fade the row out first, and delete once it has gone (P11.5). With
+            // animations off Motion.Exit just reports completion immediately.
+            if (SnippetList.ItemContainerGenerator.ContainerFromItem(snippet) is FrameworkElement row)
+            {
+                Motion.Exit(row, () => ViewModel.DeleteSelected());
+            }
+            else
+            {
+                ViewModel.DeleteSelected();
+            }
         }
+    }
+
+    /// <summary>The "Saved" line fades in and out as the view model raises it,
+    /// instead of snapping (docs/PLAN.md → P11.5).</summary>
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(SnippetsViewModel.ShowSaved))
+        {
+            return;
+        }
+
+        if (ViewModel.ShowSaved)
+        {
+            Motion.Enter(SavedText);
+        }
+        else
+        {
+            Motion.Exit(SavedText);
+        }
+    }
+
+    private void OnListPreviewMouseDown(object sender, MouseButtonEventArgs e) => _userSelecting = true;
+
+    private void OnListPreviewMouseUp(object sender, MouseButtonEventArgs e) => _userSelecting = false;
+
+    private void OnListPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key is Key.Up or Key.Down or Key.Home or Key.End or Key.PageUp or Key.PageDown)
+        {
+            _userSelecting = true;
+        }
+    }
+
+    private void OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var userInitiated = _userSelecting;
+        _userSelecting = false;
+
+        if (!userInitiated || !IsLoaded || ViewModel.SelectedSnippet is not { } item)
+        {
+            return;
+        }
+
+        GlideChipToEditor(item);
+    }
+
+    /// <summary>The D7 signature move: glide a proxy of the chosen row's shortcut
+    /// chip into the editor's Shortcut field, then settle the editor groups
+    /// (docs/PLAN.md → P11.5). A no-op when animations are off, and skipped when
+    /// the row is virtualised off-screen, in which case only the settle runs.</summary>
+    private void GlideChipToEditor(SnippetListItem item)
+    {
+        if (!Motion.Enabled)
+        {
+            return;
+        }
+
+        if (SnippetList.ItemContainerGenerator.ContainerFromItem(item) is not ListBoxItem row
+            || row.Descendants().OfType<Border>().FirstOrDefault(border => Equals(border.Tag, "ShortcutChip"))
+                is not { Child: System.Windows.Controls.TextBlock chipText } chip)
+        {
+            Motion.Settle(NameGroup, ShortcutGroup, BodyGroup);
+            return;
+        }
+
+        var from = chip.TransformToVisual(this).TransformBounds(new Rect(chip.RenderSize));
+        var to = ShortcutField.TransformToVisual(this).TransformBounds(new Rect(ShortcutField.RenderSize));
+
+        var proxy = new Border
+        {
+            Width = from.Width,
+            Height = from.Height,
+            Background = chip.Background,
+            CornerRadius = chip.CornerRadius,
+            Padding = chip.Padding,
+            Child = new System.Windows.Controls.TextBlock
+            {
+                Text = chipText.Text,
+                FontFamily = chipText.FontFamily,
+                FontSize = chipText.FontSize,
+                Foreground = chipText.Foreground,
+            },
+        };
+
+        // Decorative: it is a plain Border with no name, so a screen reader has
+        // nothing to read from it (docs/PLAN.md → P11.5), and it lives on a
+        // hit-test-invisible canvas.
+        Canvas.SetLeft(proxy, from.X);
+        Canvas.SetTop(proxy, from.Y);
+        Overlay.Children.Add(proxy);
+
+        // Dim the field so the chip reads as landing in it, then light it back up.
+        ShortcutField.Opacity = 0.5;
+
+        Motion.Glide(proxy, from, to, () =>
+        {
+            Motion.Exit(proxy, () => Overlay.Children.Remove(proxy));
+            Motion.Reveal(ShortcutField, 0.5);
+            Motion.Settle(NameGroup, ShortcutGroup, BodyGroup);
+        });
     }
 }
