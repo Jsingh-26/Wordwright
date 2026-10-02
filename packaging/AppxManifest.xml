@@ -43,7 +43,7 @@
     <Application Id="Wordwright" Executable="Wordwright.App.exe" EntryPoint="Windows.FullTrustApplication">
       <uap:VisualElements
         DisplayName="Wordwright"
-        Description="Wordwright is free and open source (MIT). Snippets and AI rewriting run entirely on this PC."
+        Description="Wordwright is free and open source (MIT). Your snippets stay on this PC."
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">
