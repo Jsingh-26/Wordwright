@@ -56,7 +56,31 @@ if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed" }
 if (Test-Path $stage) { Remove-Item $stage -Recurse -Force }
 New-Item -ItemType Directory -Path $stage | Out-Null
 Copy-Item "$publish/*" $stage -Recurse
-Copy-Item (Join-Path $root "packaging/AppxManifest.xml") (Join-Path $stage "AppxManifest.xml")
+
+# The Identity Version is what the Store checks for uniqueness, so it has to
+# follow -Version or every later upload is refused as a duplicate. The file in
+# the repository stays a template, and only the staged copy is stamped.
+# MSIX identity versions have four parts; -Version is usually given as three.
+$identityVersion = (@($Version.Split('.') + '0', '0', '0', '0') | Select-Object -First 4) -join '.'
+$manifestPath = Join-Path $stage "AppxManifest.xml"
+Copy-Item (Join-Path $root "packaging/AppxManifest.xml") $manifestPath -Force
+
+$manifest = [System.IO.File]::ReadAllText($manifestPath)
+$manifest = [regex]::Replace(
+    $manifest,
+    '(<Identity\b[^>]*?Version=")[^"]*(")',
+    '${1}' + $identityVersion + '${2}')
+
+if ($manifest -notmatch ('Version="' + [regex]::Escape($identityVersion) + '"')) {
+    throw "could not stamp version $identityVersion into the manifest"
+}
+
+# Written without a byte-order mark: makeappx accepts it, and it keeps the
+# staged file's first bytes predictable.
+[System.IO.File]::WriteAllText($manifestPath, $manifest, (New-Object System.Text.UTF8Encoding($false)))
+
+Write-Output "Packaging version $Version (manifest identity $identityVersion)"
+
 Copy-Item (Join-Path $root "packaging/Assets") (Join-Path $stage "Assets") -Recurse
 New-Item -ItemType Directory -Path $output -Force | Out-Null
 
