@@ -35,6 +35,8 @@
 
   <!-- About -->  <data name="About.Body" xml:space="preserve"><value>Wordwright is free and open source (MIT). Your snippets stay on this PC.</value></data>
   <data name="About.Privacy" xml:space="preserve"><value>Wordwright has no telemetry and never connects to the internet. Nothing you type leaves this PC.</value></data>
+  <data name="About.Publisher" xml:space="preserve"><value>by Unbound Kite</value></data>
+  <data name="About.Support" xml:space="preserve"><value>Support Wordwright</value></data>
   <data name="About.Version" xml:space="preserve"><value>Version {Version}</value></data>
   <data name="About.Source" xml:space="preserve"><value>View source on GitHub</value></data>
   <data name="About.ThirdParty" xml:space="preserve"><value>Third-party licences</value></data>

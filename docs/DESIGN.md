@@ -197,11 +197,12 @@ Group headings in Segoe UI Variable Semibold 14, not Zodiak (Zodiak is for page 
 ```
 [hero.svg, P10.0, max 320 px wide, left-aligned]
 Wordwright                     (Zodiak 26)
+by Unbound Kite                (body; the publisher, 2026-10-03)
 Version 1.0.0                  (secondary)
 About.Body
 About.Privacy
 View source on GitHub          (accent colour, not the system blue)
-Support Wordwright             (D12: GitHub Sponsors page; opens the browser, the app itself stays offline)
+Support Wordwright             (D12: the Razorpay Payment Page; opens the browser, the app itself stays offline; hidden until the page exists)
 Third-party licences ▸         (Zodiak, Phosphor, WPF-UI, H.NotifyIcon, Velopack; expands in place)
 ```
 

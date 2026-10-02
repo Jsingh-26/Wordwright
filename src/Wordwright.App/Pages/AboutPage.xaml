@@ -15,6 +15,7 @@
             <Image Source="{DynamicResource HeroImage}" MaxWidth="320"
                    HorizontalAlignment="Left" Margin="0,0,0,16" />
             <TextBlock Style="{StaticResource PageTitle}" Text="Wordwright" />
+            <TextBlock Style="{StaticResource BodyText}" Text="{res:Str About.Publisher}" />
             <TextBlock x:Name="VersionText" Style="{StaticResource SecondaryText}" Margin="0,4,0,0" />
 
             <TextBlock Style="{StaticResource BodyText}" Margin="0,16,0,0"
@@ -29,6 +30,15 @@
                            Foreground="{DynamicResource BrandAccentBrush}"
                            RequestNavigate="OnSourceLinkClicked">
                     <Run Text="{res:Str About.Source}" />
+                </Hyperlink>
+            </TextBlock>
+            <!-- D12 (P10.5): the Razorpay Payment Page. Shown once SupportUrl in
+                 the code-behind is set. -->
+            <TextBlock x:Name="SupportLink" Margin="0,8,0,0" Visibility="Collapsed">
+                <Hyperlink x:Name="SupportHyperlink"
+                           Foreground="{DynamicResource BrandAccentBrush}"
+                           RequestNavigate="OnSourceLinkClicked">
+                    <Run Text="{res:Str About.Support}" />
                 </Hyperlink>
             </TextBlock>
 

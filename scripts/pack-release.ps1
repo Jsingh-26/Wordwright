@@ -1,14 +1,14 @@
 # Builds the Velopack installer for a release (docs/PLAN.md P3.5, P10.3).
 # Produces Releases/Setup.exe, the portable zip and the update package.
 #
-#   scripts/pack-release.ps1                 (0.1.0)
+#   scripts/pack-release.ps1                 (1.0.0)
 #   scripts/pack-release.ps1 -Version 1.0.0
 #
 # Publishing is a separate, deliberate step:
 #   vpk upload github --repoUrl https://github.com/Jsingh-26/Wordwright `
 #       --token <token> --publish --releaseName "v0.1.0" --tag v0.1.0
 param(
-    [string]$Version = "0.1.0"
+    [string]$Version = "1.0.0"
 )
 
 $ErrorActionPreference = "Stop"
@@ -39,7 +39,7 @@ vpk pack `
     --mainExe Wordwright.App.exe `
     --runtime win-x64 `
     --packTitle "Wordwright" `
-    --packAuthors "Jaspreet Singh" `
+    --packAuthors "Unbound Kite" `
     --icon (Join-Path $root "brand/icon.ico") `
     --splashImage $splash `
     --outputDir $releases

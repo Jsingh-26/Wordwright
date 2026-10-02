@@ -8,7 +8,7 @@
 # The Store signs what you upload, so signing is only needed to install the
 # package on this machine for a hand check.
 param(
-    [string]$Version = "0.1.0",
+    [string]$Version = "1.0.0",
     [string]$MakeAppx,
     [string]$Certificate,
     [string]$CertificatePassword

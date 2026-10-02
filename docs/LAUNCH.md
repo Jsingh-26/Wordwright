@@ -46,6 +46,7 @@ Submit the day v1.0.0 is released (a listing without a working download is waste
 | Field | Value |
 |---|---|
 | Name | Wordwright |
+| Publisher | Unbound Kite (unboundkite.com; Partner Center publisher name, Razorpay brand name) |
 | Tagline (≤60 chars) | A private, offline text expander for Windows. |
 | Short description (~120 chars) | Type ;sig anywhere and get your full signature. Free, open-source text expander for Windows — everything stays on your PC. |
 | Long description (~480 chars) | Wordwright is a text expander for Windows: type a short trigger like ;sig or ;date and it expands into the full text, in any app — Word, Outlook, your browser, chat. It has built-in variables (date, time, clipboard, cursor position), search, import and export, and a first-run playground where you can try expansion inside the app itself. Wordwright is free and open source (MIT): no accounts, no sync, no telemetry, no AI in the cloud — your snippets never leave this PC. It sits quietly in the tray until you need it. |
@@ -55,7 +56,7 @@ Submit the day v1.0.0 is released (a listing without a working download is waste
 | Licence / price | Free, open source (MIT); optional one-time support via Razorpay |
 | Links | https://github.com/Jsingh-26/Wordwright · https://github.com/Jsingh-26/Wordwright/releases · (Microsoft Store badge after P10.4) |
 | Images | square icon from `brand/icon-256.png`; screenshots from `scripts/ui-check-*.png`; hero from P10.0 |
-| Author | Jsingh-26 (fill in the real name if a directory asks) |
+| Author | Unbound Kite (Jsingh-26 on GitHub; the real name if a directory asks) |
 
 **Per site** (each is an account + a form; ≈15 minutes each):
 1. **AlternativeTo** — list Wordwright, then also click "suggest an alternative" *on the Text Blaze, TextExpander and PhraseExpress pages*. This is where people search "X alternative Windows offline".

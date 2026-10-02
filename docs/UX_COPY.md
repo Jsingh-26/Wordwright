@@ -81,6 +81,7 @@ Group headings sit above their rows (docs/DESIGN.md §8).
 ## About
 | ID | Text |
 |---|---|
+| About.Publisher | by Unbound Kite |
 | About.Version | Version {Version} |
 | About.Body | Wordwright is free and open source (MIT). Your snippets stay on this PC. |
 | About.Privacy | Wordwright has no telemetry and never connects to the internet. Nothing you type leaves this PC. |
