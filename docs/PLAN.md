@@ -21,7 +21,7 @@ The application is a text expander: snippets with `{date}`, `{time}`, `{clipboar
 
 **Added on 2026-10-02:** the **Phase P11 craft pass** (from the UI review in `docs/UI_REVIEW.md`), inserted below before the release phase — it finishes before P10.2 so the release verification covers the final UI.
 
-**Added on 2026-10-03:** the **Phase P12 pre-publication review** (below, before P10). P12.1–P12.5 are blockers: fix them before P10.3 and P10.4; P12.6–P12.10 before the Store listing goes live; the rest is housekeeping. Its human checks are added to the list below.
+**Added on 2026-10-03:** the **Phase P12 pre-publication review** (below, before P10). P12.1–P12.5 are blockers: fix them before P10.3 and P10.4; P12.6–P12.10 before the Store listing goes live; the rest is housekeeping. Its human checks are added to the list below. **All seventeen P12 tasks are done in code (2026-10-03); what remains of P12 is the human checks below.**
 
 **Human checks still open** — the maintainer runs these on a real Windows machine, and they are the only thing gating the release:
 
