@@ -6,12 +6,15 @@ Target: **v1.0 of a snippets-only Wordwright on the Microsoft Store** — a text
 >
 > The phase sections below are kept as the historical record. **P4–P9 are parked**: they describe work that is not in this application. `main` carries no AI code.
 
-## Current status (2026-10-02)
+## Current status (2026-10-03)
 
-The application is a text expander: snippets with `{date}`, `{time}`, `{clipboard}` and `{cursor}`, a searchable list and editor, excluded apps, export and import, a tray icon, a first-run welcome with a "try it here" playground, and Start with Windows. Core is unit-tested and the solution builds with zero warnings.
+The application is a text expander: snippets with `{date}`, `{time}`, `{clipboard}` and `{cursor}`, a searchable list and editor, excluded apps, export and import, a tray icon, a first-run welcome with a "try it here" playground, and Start with Windows. The Phase P12 review fixes are in (keyboard layouts and Shift, Store data folder, per-monitor DPI, autosave, prefix validation, hook resilience, clipboard, line endings, window placement, crash safety net and the events-only log). Core is unit-tested (181 tests) and the solution builds with zero warnings.
 
-**Left to do:**
+**Left to do, in order:**
 
+- [ ] **P13.1, P13.2, P13.3, P13.4, P13.14, P13.15** — small code and doc fixes from the second review (Phase P13 below): paste only when the clipboard was taken, release notes carry the P12 changes, CI builds the harnesses and packaging, high-contrast brushes, 32 px control heights, Snap Layouts hit test.
+- [ ] **P13.12** — Zodiak font files out of the public repository (licence §02). **Blocks the release tag.**
+- [ ] **P13.13** — DESIGN.md Study note and Pass 1 rewritten for the snippets-only app.
 - [x] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and the About page slot from DESIGN.md §9.
 - [ ] **P10.1** README: a GIF of a snippet expanding, install steps, the SmartScreen "unknown publisher" explanation, and a privacy section.
 - [ ] **P10.2** Manual test pass using the checklist below and the DESIGN.md polish checklist (light, dark and a high-contrast theme; 100 %, 150 % and 200 % scaling; 800×600 and maximised; keyboard-only; Accessibility Insights for Windows with zero unnamed controls); fix blockers.
