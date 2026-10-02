@@ -85,7 +85,7 @@ Everything lives under `%AppData%\Wordwright\`.
 - **Known limitation:** Windows blocks input from a normal app into apps running as administrator (UIPI). Detect an elevated foreground window and show the message from `UX_COPY.md` instead of failing silently.
 ## Privacy summary
 - **No telemetry, and no network access at all.** There is no code path that opens a connection: no update check, no crash reporting, nothing.
-- **No content in logs.** The log file `%LocalAppData%\Wordwright\logs\wordwright-YYYYMMDD.log` records events only ("snippet expanded"), never text, and is kept for 7 days.
+- **No content in logs.** The log file `%AppData%\Wordwright\logs\wordwright-YYYYMMDD.log` (`Core/Diagnostics/EventLog`) records fixed event names only — started, hook refused, hook reinstalled, and an unhandled exception's type, HResult and stack frames, never its message — and day files older than 7 days are deleted at start-up. It sits beside the user's data so that uninstalling or deleting `%AppData%\Wordwright` removes everything. An exception on the UI thread is logged and the app keeps running.
 - The keystroke buffer holds at most the last 64 characters, in memory only, and is cleared on focus change, mouse click, Enter, Escape and navigation keys. It is never persisted.
 - Windows does not reliably tell other apps when a password field is focused, so `excludedApps` lets users turn Wordwright off in specific programs. The README says this plainly.
 

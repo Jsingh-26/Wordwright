@@ -79,6 +79,7 @@ Group headings sit above their rows (docs/DESIGN.md §8).
 | Settings.ImportDone | Added {Count} snippets. |
 | Settings.ImportSkipped | Skipped {Count} whose shortcut is already in use. |
 | Settings.ImportFailed | That file isn't a snippets export. |
+| Settings.ExportFailed | Couldn't save to that folder. Choose another one. |
 
 ## About
 | ID | Text |

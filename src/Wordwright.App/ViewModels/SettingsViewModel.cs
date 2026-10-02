@@ -134,8 +134,9 @@ internal sealed partial class SettingsViewModel : ObservableObject
 
     public void Export(string path)
     {
-        SnippetExchange.Export(path, _app.Snippets);
-        Message = null;
+        Message = SnippetExchange.Export(path, _app.Snippets)
+            ? null
+            : Strings.Get("Settings.ExportFailed");
     }
 
     /// <summary>Adds the file's snippets to the library and reports what happened.</summary>

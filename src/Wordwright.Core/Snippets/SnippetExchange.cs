@@ -17,10 +17,23 @@ public sealed record SnippetMerge(SnippetDocument Document, int Added, int Skipp
 /// </summary>
 public static class SnippetExchange
 {
-    /// <summary>Writes the library to a file the user picked.</summary>
-    public static void Export(string path, SnippetDocument document)
+    /// <summary>Writes the library to a file the user picked; false when it
+    /// cannot be written there (a read-only or protected folder, a locked file).</summary>
+    public static bool Export(string path, SnippetDocument document)
     {
-        File.WriteAllText(path, JsonSerializer.Serialize(document, ExportOptions));
+        try
+        {
+            File.WriteAllText(path, JsonSerializer.Serialize(document, ExportOptions));
+            return true;
+        }
+        catch (IOException)
+        {
+            return false;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return false;
+        }
     }
 
     /// <summary>Reads a file the user picked; null when it is not a snippets
@@ -36,6 +49,10 @@ public static class SnippetExchange
             return null;
         }
         catch (IOException)
+        {
+            return null;
+        }
+        catch (UnauthorizedAccessException)
         {
             return null;
         }

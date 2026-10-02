@@ -89,6 +89,7 @@
   <data name="Settings.ImportDone" xml:space="preserve"><value>Added {Count} snippets.</value></data>
   <data name="Settings.ImportSkipped" xml:space="preserve"><value>Skipped {Count} whose shortcut is already in use.</value></data>
   <data name="Settings.ImportFailed" xml:space="preserve"><value>That file isn't a snippets export.</value></data>
+  <data name="Settings.ExportFailed" xml:space="preserve"><value>Couldn't save to that folder. Choose another one.</value></data>
 
   <!-- Shared -->
   <data name="Dialog.Cancel" xml:space="preserve"><value>Cancel</value></data>

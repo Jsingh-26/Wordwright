@@ -72,6 +72,19 @@ public class SnippetExchangeTests : IDisposable
     }
 
     [Fact]
+    public void Import_withAFileItCannotRead_returnsNull()
+    {
+        // Reading a folder as a file is refused, as a protected file would be.
+        SnippetExchange.Import(Path.GetTempPath()).Should().BeNull();
+    }
+
+    [Fact]
+    public void Export_whereItCannotWrite_returnsFalse()
+    {
+        SnippetExchange.Export(Path.GetTempPath(), Library()).Should().BeFalse();
+    }
+
+    [Fact]
     public void Import_withAMissingFile_returnsNull()
     {
         SnippetExchange.Import(FilePath("nowhere.json")).Should().BeNull();

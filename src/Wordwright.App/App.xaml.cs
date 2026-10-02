@@ -9,6 +9,7 @@ using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using Wordwright.App.Snippets;
 using Wordwright.App.Tray;
+using Wordwright.Core.Diagnostics;
 using Wordwright.Core.Settings;
 using Wordwright.Core.Snippets;
 using Microsoft.Win32;
@@ -47,6 +48,7 @@ public partial class App : Application
     }
 
     private Mutex? _mutex;
+    private EventLog? _log;
     private EventWaitHandle? _showWindowEvent;
     private MainWindow? _mainWindow;
     private TrayIconController? _trayIcon;
@@ -91,6 +93,15 @@ public partial class App : Application
 
         var userData = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Wordwright");
+
+        // The events-only log, and the safety net that keeps a tray app from
+        // vanishing on an unexpected exception (docs/PLAN.md P12.10).
+        _log = new EventLog(Path.Combine(userData, "logs"), () => DateTimeOffset.Now);
+        _log.Prune();
+        _log.Write("started");
+        DispatcherUnhandledException += OnDispatcherUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
+        TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
 
         _settingsStore = new SettingsStore(userData);
         Settings = _settingsStore.Load();
@@ -151,8 +162,33 @@ public partial class App : Application
         if (Settings.SnippetsEnabled && _keyboardHook is not null)
         {
             _keyboardHook.Restart();
+            _log?.Write(_keyboardHook.IsInstalled ? "hook reinstalled" : "hook refused");
             _trayIcon?.RefreshTooltip();
         }
+    }
+
+    /// <summary>An exception on the UI thread is logged and survived: the tray
+    /// app keeps running rather than disappearing.</summary>
+    private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        _log?.Write("unhandled exception", e.Exception);
+        e.Handled = true;
+    }
+
+    /// <summary>On any other thread .NET ends the process; at least the log
+    /// says why.</summary>
+    private void OnDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        if (e.ExceptionObject is Exception exception)
+        {
+            _log?.Write("fatal exception", exception);
+        }
+    }
+
+    private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+    {
+        _log?.Write("unobserved task exception", e.Exception);
+        e.SetObserved();
     }
 
     /// <summary>True when snippets are on but Windows would not install the
@@ -303,6 +339,10 @@ public partial class App : Application
         if (Settings.SnippetsEnabled)
         {
             _keyboardHook.Start();
+            if (!_keyboardHook.IsInstalled)
+            {
+                _log?.Write("hook refused");
+            }
         }
         else
         {
