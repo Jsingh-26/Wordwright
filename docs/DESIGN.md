@@ -71,7 +71,7 @@ Left-aligned throughout. Structure varies by screen (split list/editor, a single
 The time ruler's drawn stroke was the motion idea, and it is parked with the AI feature. The shipping app gets **one system, one pattern** instead, with the connected animation as its flagship (desktop playbook menu item 3):
 
 - **Signature move:** selecting a snippet glides a proxy of its shortcut chip from the list row into the editor's Shortcut field (200 ms, decelerate), while the editor fields settle in a single choreographed stagger.
-- **Entrances** (page navigation, "Saved", playground completion, list add): fade plus an 8 px slide, 200 ms, decelerate `cubic-bezier(0,0,0,1)`.
+- **Entrances** ("Saved", playground completion, list add): fade plus an 8 px slide, 200 ms, decelerate `cubic-bezier(0,0,0,1)`. Page navigation fades only, no slide: Fluent 2's top-level transition rule for large elements (craft pass, 2026-10-03).
 - **Exits** (list remove, dismissed indicators): fade, 120 ms, accelerate.
 - Nothing loops and nothing animates on a timer; motion responds to the user's own actions only.
 - Everything goes through one helper (`Motion.cs`) and is a strict no-op when Windows animations are off (`SystemParameters.ClientAreaAnimation`), honouring reduced motion. With animations off, behaviour is identical to having no motion code at all.

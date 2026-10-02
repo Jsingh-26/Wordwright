@@ -42,7 +42,7 @@ public partial class SnippetsPage : Page
         (Window.GetWindow(this) as MainWindow)?.OnSnippetsPageLoaded(this);
 
         // Page entrance (docs/PLAN.md → P11.5).
-        Motion.Enter(this);
+        Motion.EnterPage(this);
 
         // The empty state's playground acknowledges its first expansion (P11.6).
         if (((App)Application.Current).SnippetEngine is { } engine)

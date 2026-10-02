@@ -38,7 +38,7 @@ public partial class AboutPage : Page
             DispatcherPriority.Loaded);
 
         // Page entrance (docs/PLAN.md → P11.5).
-        Motion.Enter(this);
+        Motion.EnterPage(this);
     }
 
     /// <summary>The app's version, as "1.0.0" (docs/DESIGN.md §9), or null when

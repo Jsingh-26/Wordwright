@@ -51,6 +51,27 @@ public static class Motion
             new DoubleAnimation(RiseDistance, 0, EnterDuration) { BeginTime = delay, EasingFunction = easing, FillBehavior = FillBehavior.Stop });
     }
 
+    /// <summary>Fade a whole page into place on navigation: Fluent 2's top-level
+    /// transition is a quick fade only, with no slide, because the element is
+    /// large (fluent2.microsoft.design/motion, read 2026-10-03). In-page elements
+    /// keep the rise of <see cref="Enter"/>.</summary>
+    public static void EnterPage(FrameworkElement page)
+    {
+        page.Opacity = 1;
+        if (!Enabled)
+        {
+            return;
+        }
+
+        page.BeginAnimation(
+            UIElement.OpacityProperty,
+            new DoubleAnimation(0, 1, EnterDuration)
+            {
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+                FillBehavior = FillBehavior.Stop,
+            });
+    }
+
     /// <summary>Fade an element out, then report completion. The callback always
     /// runs — even with animations off — so callers can defer removal to it, and
     /// the element is left hidden either way.</summary>
