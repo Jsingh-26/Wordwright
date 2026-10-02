@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Probe for Wordwright.Platform.Keyboard.KeyboardHook (docs/PLAN.md P12.1 and
+    P12.6), not part of the solution and never shipped. It asks two questions
+    the unit tests cannot: does the hook see Shift, Caps Lock and AltGr the way
+    the target window does, and does the hook survive a garbage collection?
+
+    Printable keys are only injected while the probe's own window owns the
+    foreground, so nothing is typed into another program; the GC check taps a
+    bare Ctrl, which types nothing anywhere. Nothing typed is ever written out.
+
+    Run it with:  dotnet run (with the project argument) scripts/HookProbe
+    Expected after P12.1:  Shift+S seen as [S], Shift+1 as [!], Caps+s as [S]
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Wordwright.Platform\Wordwright.Platform.csproj" />
+  </ItemGroup>
+
+</Project>
