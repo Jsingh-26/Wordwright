@@ -2,7 +2,12 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-      xmlns:res="clr-namespace:Wordwright.App.Resources">
+      xmlns:res="clr-namespace:Wordwright.App.Resources"
+      ScrollViewer.CanContentScroll="False">
+    <!-- CanContentScroll="False" keeps WPF-UI's page scroller off (it copies this
+         value into IsDynamicScrollViewerEnabled on navigation), so
+         the page is measured at the window's height and its own ScrollViewer
+         scrolls (P10.2: at 800x600 nothing scrolled). -->
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     </Page.Resources>

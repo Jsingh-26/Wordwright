@@ -17,6 +17,12 @@ public partial class MainWindow : FluentWindow
 
         RestorePlacement();
         Loaded += OnLoaded;
+
+        // Each page scrolls itself (P10.2), so each brings its own scrollbar;
+        // name its buttons once the page has been laid out.
+        RootNavigation.Navigated += (_, _) => Dispatcher.BeginInvoke(
+            () => Accessibility.NameScrollButtons(RootNavigation),
+            DispatcherPriority.Loaded);
     }
 
     /// <summary>Which page the window opens on; the welcome can ask for another

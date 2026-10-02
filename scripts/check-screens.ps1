@@ -3,6 +3,12 @@
 # scripts/ui-check-<page>.png (ignored by git). Also counts interactive
 # controls on the last page that have no UI Automation name, which a screen
 # reader would read as "button".
+#
+#   scripts/check-screens.ps1                  the window as it is
+#   scripts/check-screens.ps1 -Size 800x600    resized first (logical pixels)
+#   scripts/check-screens.ps1 -Size max        maximised first
+# With -Size, captures are named ui-check-<page>-<size>.png.
+param([string]$Size = "")
 Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName UIAutomationClient
@@ -14,6 +20,8 @@ public static class W {
   [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr h);
   [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h, int n);
   [DllImport("user32.dll")] public static extern bool SetProcessDPIAware();
+  [DllImport("user32.dll")] public static extern bool MoveWindow(IntPtr h, int x, int y, int w, int ht, bool repaint);
+  [DllImport("user32.dll")] public static extern uint GetDpiForWindow(IntPtr h);
   [StructLayout(LayoutKind.Sequential)] public struct R { public int L,T,Rt,B; }
 }
 public static class M {
@@ -27,6 +35,16 @@ if (-not $p) { Write-Output "Wordwright.App is not running"; exit 1 }
 $hwnd = $p.MainWindowHandle
 if ($hwnd -eq 0) { Write-Output "no main window; open it from the tray first"; exit 1 }
 [W]::ShowWindow($hwnd, 9) | Out-Null; [W]::SetForegroundWindow($hwnd) | Out-Null; Start-Sleep -Milliseconds 800
+$suffix = ""
+if ($Size -eq "max") {
+  [W]::ShowWindow($hwnd, 3) | Out-Null; Start-Sleep -Milliseconds 800; $suffix = "-max"
+} elseif ($Size -match '^(\d+)x(\d+)$') {
+  # The window works in physical pixels here (DPI-aware), so scale the logical size.
+  $scale = [W]::GetDpiForWindow($hwnd) / 96.0
+  $r = New-Object W+R; [W]::GetWindowRect($hwnd, [ref]$r) | Out-Null
+  [W]::MoveWindow($hwnd, $r.L, $r.T, [int]([int]$Matches[1] * $scale), [int]([int]$Matches[2] * $scale), $true) | Out-Null
+  Start-Sleep -Milliseconds 800; $suffix = "-$Size"
+}
 
 function Snap($name) {
   $r = New-Object W+R; [W]::GetWindowRect($hwnd, [ref]$r) | Out-Null
@@ -55,7 +73,7 @@ foreach ($n in @("Snippets","Settings","About")) {
     [M]::mouse_event(2, 0, 0, 0, [UIntPtr]::Zero); [M]::mouse_event(4, 0, 0, 0, [UIntPtr]::Zero)
   }
   Start-Sleep -Milliseconds 700
-  Snap ($n -replace ' ','-')
+  Snap (($n -replace ' ','-') + $suffix)
 
   # Count interactive controls on this page that a screen reader would read as
   # "button" (docs/PLAN.md P3.4b: Settings and About must report zero).

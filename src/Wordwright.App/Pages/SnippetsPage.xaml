@@ -3,7 +3,12 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:res="clr-namespace:Wordwright.App.Resources"
-      xmlns:core="clr-namespace:Wordwright.Core.Snippets;assembly=Wordwright.Core">
+      xmlns:core="clr-namespace:Wordwright.Core.Snippets;assembly=Wordwright.Core"
+      ScrollViewer.CanContentScroll="False">
+    <!-- CanContentScroll="False" keeps WPF-UI's page scroller off (it copies this
+         value into IsDynamicScrollViewerEnabled on navigation), so
+         the page is measured at the window's height and its own ScrollViewer
+         scrolls (P10.2: at 800x600 nothing scrolled). -->
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
 
@@ -142,9 +147,17 @@
                 </ListBox>
             </DockPanel>
 
-            <!-- The editor -->
-            <Grid Grid.Column="1"
-                  Margin="24,0,0,0"
+            <!-- The editor. It scrolls when the window is too short for it
+                 (800x600, P10.2); held at least as tall as the view, so on a
+                 larger window the text box still takes the spare height. -->
+            <ScrollViewer x:Name="EditorScroller"
+                          Grid.Column="1"
+                          Margin="24,0,0,0"
+                          VerticalScrollBarVisibility="Auto"
+                          Focusable="False">
+            <!-- The 12 px on the right keeps the scroll bar off the fields. -->
+            <Grid MinHeight="{Binding ViewportHeight, ElementName=EditorScroller}"
+                  Margin="0,0,12,0"
                   IsEnabled="{Binding HasSelection}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -221,29 +234,31 @@
                         <Run Text="{res:Str Snippets.Preview}" />
                         <Run Text="{Binding Preview}" />
                     </TextBlock>
-                    <!-- Insert a variable where the caret is (docs/DESIGN.md §2). -->
-                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <!-- Insert a variable where the caret is (docs/DESIGN.md §2). Wraps
+                         so a narrow window (800x600) does not clip the buttons; the
+                         6 px under each button is the gap between wrapped rows. -->
+                    <WrapPanel Margin="0,8,0,-6">
                         <TextBlock Style="{StaticResource SecondaryText}"
                                    VerticalAlignment="Center"
-                                   Margin="2,0,8,0"
+                                   Margin="2,0,8,6"
                                    Text="{res:Str Snippets.Insert}" />
-                        <ui:Button Margin="0,0,6,0" Padding="10,4"
+                        <ui:Button Margin="0,0,6,6" Padding="10,4"
                                    Content="{res:Str Snippets.Insert.Date}"
                                    Tag="{x:Static core:SnippetVariables.Date}"
                                    Click="OnInsertClicked" />
-                        <ui:Button Margin="0,0,6,0" Padding="10,4"
+                        <ui:Button Margin="0,0,6,6" Padding="10,4"
                                    Content="{res:Str Snippets.Insert.Time}"
                                    Tag="{x:Static core:SnippetVariables.Time}"
                                    Click="OnInsertClicked" />
-                        <ui:Button Margin="0,0,6,0" Padding="10,4"
+                        <ui:Button Margin="0,0,6,6" Padding="10,4"
                                    Content="{res:Str Snippets.Insert.Clipboard}"
                                    Tag="{x:Static core:SnippetVariables.Clipboard}"
                                    Click="OnInsertClicked" />
-                        <ui:Button Padding="10,4"
+                        <ui:Button Margin="0,0,0,6" Padding="10,4"
                                    Content="{res:Str Snippets.Insert.Cursor}"
                                    Tag="{x:Static core:SnippetVariables.Cursor}"
                                    Click="OnInsertClicked" />
-                    </StackPanel>
+                    </WrapPanel>
                     <TextBlock Margin="2,8,0,0"
                                TextWrapping="Wrap"
                                Foreground="{DynamicResource CautionBrush}"
@@ -257,6 +272,7 @@
                            Content="{res:Str Snippets.Delete}"
                            Click="OnDeleteSnippetClicked" />
             </Grid>
+            </ScrollViewer>
         </Grid>
 
         <!-- The connected animation's proxy floats here, above the page, so it
