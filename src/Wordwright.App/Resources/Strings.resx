@@ -101,7 +101,12 @@
   <data name="Ai.Rec.StepDownRam" xml:space="preserve"><value>We picked a smaller model because only {FreeRam} of memory is free right now.</value></data>
   <data name="Ai.Rec.Minimal" xml:space="preserve"><value>This PC can run only a very small model. It fixes basic grammar and may be slow. You can skip AI and keep using snippets.</value></data>
   <data name="Ai.Rec.NoDisk" xml:space="preserve"><value>You need {Needed} of free space on {Drive}. Free up space and try again.</value></data>
-  <data name="Ai.Rec.NoRam" xml:space="preserve"><value>There isn't enough free memory to run a model right now. Close some other apps and try again.</value></data>
+  <data name="Ai.Rec.NoRam" xml:space="preserve"><value>There isn't enough free memory to run a model right now. Wordwright checks again the next time it starts.</value></data>
+  <data name="Ai.Unavailable.Title" xml:space="preserve"><value>Offline AI isn't available on this PC right now</value></data>
+  <data name="Ai.Unavailable.Ram" xml:space="preserve"><value>There isn't enough free memory to run a model. Wordwright checks again each time it starts, so this can change by itself. Snippets still work.</value></data>
+  <data name="Ai.Unavailable.Disk" xml:space="preserve"><value>There isn't enough free disk space to download a model. Wordwright checks again each time it starts. Snippets still work.</value></data>
+  <data name="Ai.Unavailable.None" xml:space="preserve"><value>Wordwright has no model for a PC this size. Snippets still work.</value></data>
+  <data name="Ai.Unavailable.Import" xml:space="preserve"><value>Offline AI isn't available on this PC right now, so Wordwright didn't add that model.</value></data>
   <data name="Ai.Rec.None" xml:space="preserve"><value>There's no model ready to offer yet. Wordwright will check again later.</value></data>
   <data name="Ai.Rec.Primary" xml:space="preserve"><value>Download and turn on</value></data>
   <data name="Ai.Rec.Secondary" xml:space="preserve"><value>Not now</value></data>

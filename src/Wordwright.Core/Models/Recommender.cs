@@ -48,11 +48,13 @@ public sealed record ModelRecommendation
 /// </summary>
 public static class Recommender
 {
-    /// <summary>Memory the PC needs beyond the model's own requirement.</summary>
-    private const double RamHeadroomGB = 1;
+    /// <summary>Memory the PC needs beyond the model's own requirement.
+    /// Shared with <see cref="AiEligibility"/>, so the two cannot disagree.</summary>
+    internal const double RamHeadroomGB = 1;
 
-    /// <summary>Disk the download needs, as a multiple of the file size.</summary>
-    private const double DiskHeadroomFactor = 1.2;
+    /// <summary>Disk the download needs, as a multiple of the file size.
+    /// Shared with <see cref="AiEligibility"/>, so the two cannot disagree.</summary>
+    internal const double DiskHeadroomFactor = 1.2;
 
     /// <summary>
     /// The best model for this PC, or null when no approved model fits anywhere —
@@ -106,7 +108,7 @@ public static class Recommender
     }
 
     /// <summary>The PC's tier first, then the smaller ones.</summary>
-    private static IEnumerable<HardwareTier> StepDownOrder(HardwareTier tier) => tier switch
+    internal static IEnumerable<HardwareTier> StepDownOrder(HardwareTier tier) => tier switch
     {
         HardwareTier.Gpu => [HardwareTier.Gpu, HardwareTier.Cpu16, HardwareTier.Cpu8, HardwareTier.Minimal],
         HardwareTier.Cpu16 => [HardwareTier.Cpu16, HardwareTier.Cpu8, HardwareTier.Minimal],
@@ -114,9 +116,9 @@ public static class Recommender
         _ => [HardwareTier.Minimal],
     };
 
-    private static bool HasRam(CatalogEntry model, HardwareProfile profile) =>
+    internal static bool HasRam(CatalogEntry model, HardwareProfile profile) =>
         profile.AvailableRamBytes / 1e9 >= model.RamRequiredGB + RamHeadroomGB;
 
-    private static bool HasDisk(CatalogEntry model, HardwareProfile profile) =>
+    internal static bool HasDisk(CatalogEntry model, HardwareProfile profile) =>
         profile.FreeDiskBytes >= model.SizeBytes * DiskHeadroomFactor;
 }

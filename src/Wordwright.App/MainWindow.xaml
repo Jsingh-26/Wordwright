@@ -73,7 +73,10 @@
                         <ui:ImageIcon Width="16" Height="16" Source="{StaticResource IconMagicWand}" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="{res:Str Nav.OfflineAi}" TargetPageType="{x:Type pages:OfflineAiPage}">
+                <!-- Starts hidden and is shown only once the startup check finds a
+                     model this PC can carry (docs/PLAN.md -> startup resource
+                     eligibility). Showing it first would let it blink away. -->
+                <ui:NavigationViewItem x:Name="OfflineAiItem" Visibility="Collapsed" Content="{res:Str Nav.OfflineAi}" TargetPageType="{x:Type pages:OfflineAiPage}">
                     <ui:NavigationViewItem.Icon>
                         <ui:ImageIcon Width="16" Height="16" Source="{StaticResource IconCpu}" />
                     </ui:NavigationViewItem.Icon>

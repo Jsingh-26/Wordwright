@@ -135,7 +135,12 @@ Placeholders use `{Name}`.
 | Ai.Rec.Paragraph | Short paragraph |
 | Ai.Rec.Range | {Min}–{Max} seconds |
 | Ai.Rec.RangeOver | {Max}+ seconds |
-| Ai.Rec.NoRam | There isn't enough free memory to run a model right now. Close some other apps and try again. |
+| Ai.Rec.NoRam | There isn't enough free memory to run a model right now. Wordwright checks again the next time it starts. |
+| Ai.Unavailable.Title | Offline AI isn't available on this PC right now |
+| Ai.Unavailable.Ram | There isn't enough free memory to run a model. Wordwright checks again each time it starts, so this can change by itself. Snippets still work. |
+| Ai.Unavailable.Disk | There isn't enough free disk space to download a model. Wordwright checks again each time it starts. Snippets still work. |
+| Ai.Unavailable.None | Wordwright has no model for a PC this size. Snippets still work. |
+| Ai.Unavailable.Import | Offline AI isn't available on this PC right now, so Wordwright didn't add that model. |
 | Ai.Rec.None | There's no model ready to offer yet. Wordwright will check again later. |
 | Ai.Rec.GoodAt | Good at: {Strengths} |
 | Ai.Rec.NotSoGood | Not so good at: {Weaknesses} |

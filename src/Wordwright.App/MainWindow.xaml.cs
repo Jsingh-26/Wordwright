@@ -5,7 +5,9 @@ using System.Windows.Threading;
 using Wpf.Ui.Controls;
 using Wordwright.App.Pages;
 using Wordwright.App.Resources;
+using Wordwright.Core.Models;
 using Wordwright.Core.Settings;
+using Wordwright.Platform.Hardware;
 
 namespace Wordwright.App;
 
@@ -35,6 +37,8 @@ public partial class MainWindow : FluentWindow
     {
         RootNavigation.Navigate(_startPage);
 
+        _ = ShowOfflineAiIfEligibleAsync();
+
 #if DEBUG
         // The hardware page exists to work on the app, so only a debug build
         // offers a way to reach it (docs/PLAN.md P4.1).
@@ -54,6 +58,27 @@ public partial class MainWindow : FluentWindow
                 Accessibility.NameScrollButtons(RootNavigation);
             },
             DispatcherPriority.Loaded);
+    }
+
+    /// <summary>
+    /// Offline AI appears in the sidebar only while this PC has the memory and
+    /// disk for something in the catalog (docs/PLAN.md → "Maintainer requirement:
+    /// startup resource eligibility", 2026-10-02). The probe reads WMI and DXGI,
+    /// so it runs off the UI thread, and the item starts hidden in XAML rather
+    /// than blinking into view and out again.
+    ///
+    /// The same check is made again before a model is set up or used, so a PC
+    /// that frees memory later — or loses it — is judged on how it is then.
+    /// </summary>
+    private async Task ShowOfflineAiIfEligibleAsync()
+    {
+        var availability = await Task.Run(
+            () => AiEligibility.Check(CatalogParser.Embedded(), HardwareProbe.Read()));
+
+        if (!Dispatcher.HasShutdownStarted)
+        {
+            OfflineAiItem.Visibility = availability.IsAvailable ? Visibility.Visible : Visibility.Collapsed;
+        }
     }
 
     /// <summary>
