@@ -9,6 +9,7 @@
                 <ui:ControlsDictionary />
                 <ResourceDictionary Source="Resources/Theme.xaml" />
                 <ResourceDictionary Source="Resources/Icons.xaml" />
+                <ResourceDictionary Source="Resources/Hero.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

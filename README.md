@@ -1,5 +1,7 @@
 # Wordwright
 
+<img src="brand/hero.svg" width="320" alt="A hand drawing one line with a fountain pen: rough on the left, smooth to the right of the nib">
+
 A free, open-source text expander for Windows: type a shortcut like `;sig` and your saved text appears, in any app. No account, no sign-in, no network access.
 
 [![CI](https://github.com/Jsingh-26/Wordwright/actions/workflows/ci.yml/badge.svg)](https://github.com/Jsingh-26/Wordwright/actions/workflows/ci.yml)

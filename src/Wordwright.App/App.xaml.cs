@@ -28,6 +28,7 @@ public partial class App : Application
     private static readonly Color InkLight = Color.FromRgb(0xA4, 0xB6, 0xF0);
     private static readonly Color Ochre = Color.FromRgb(0x9A, 0x5B, 0x00);
     private static readonly Color Steel = Color.FromRgb(0xE9, 0xEC, 0xF3);
+    private static readonly Color Anvil = Color.FromRgb(0x1A, 0x20, 0x30);
     private static readonly Color OchreDarkTheme = Color.FromRgb(0xE8, 0xB4, 0x5A);
 
     /// <summary>
@@ -162,6 +163,8 @@ public partial class App : Application
                         : Color.FromArgb(0x33, ForgeInk.R, ForgeInk.G, ForgeInk.B));
 
                 Current.Resources["BrandAccentBrush"] = new SolidColorBrush(accent);
+                Current.Resources["HeroPaperBrush"] = new SolidColorBrush(
+                    currentTheme == ApplicationTheme.Dark ? Anvil : Colors.White);
                 Current.Resources["CautionBrush"] = new SolidColorBrush(
                     currentTheme == ApplicationTheme.Dark ? OchreDarkTheme : Ochre);
             },

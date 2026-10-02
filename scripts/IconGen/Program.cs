@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Markup;
 using System.Windows.Media.Imaging;
 
 // Renders brand/icon.svg (transcribed as geometry) to the app's image assets.
@@ -8,6 +9,9 @@ using System.Windows.Media.Imaging;
 //   dotnet run --project scripts/IconGen -- [output.ico]      the app icon
 //   dotnet run --project scripts/IconGen -- --msix <dir>      the Microsoft Store
 //                                                             tile assets
+//   dotnet run --project scripts/IconGen -- --hero <png>      the installer splash,
+//                                                             from the app's own
+//                                                             Resources/Hero.xaml
 //
 // The MSIX assets all come from the same geometry, so the package cannot drift
 // from the brand (docs/AGENTS.md rule 7).
@@ -17,6 +21,7 @@ namespace IconGen;
 internal static class Program
 {
     private static readonly Color ForgeInk = Color.FromRgb(0x23, 0x40, 0x8E);
+    private static readonly Color Ember = Color.FromRgb(0xC7, 0x62, 0x1E);
 
     // From brand/icon.svg: the white "W" and the two pen-nib slits on the tile.
     private const string WPathData =
@@ -43,6 +48,12 @@ internal static class Program
         if (args.Length >= 2 && args[0] == "--msix")
         {
             WriteMsixAssets(args[1]);
+            return 0;
+        }
+
+        if (args.Length >= 2 && args[0] == "--hero")
+        {
+            WriteHero(args[1]);
             return 0;
         }
 
@@ -119,6 +130,40 @@ internal static class Program
                 }
             }
         }
+    }
+
+    /// <summary>Renders the hero illustration (docs/PLAN.md P10.0) on white at
+    /// twice its 340x165 design size, for the installer splash. It loads the
+    /// app's own Resources/Hero.xaml, so the splash cannot drift from the About
+    /// page.</summary>
+    private static void WriteHero(string outputPath)
+    {
+        const int scale = 2;
+        const int width = 340, height = 165;
+        var heroXaml = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..",
+            "src", "Wordwright.App", "Resources", "Hero.xaml");
+
+        // Hero.xaml takes its brushes from the app's resources; give it the
+        // light-theme ones.
+        var app = new Application();
+        app.Resources["BrandAccentBrush"] = new SolidColorBrush(ForgeInk);
+        app.Resources["EmberBrush"] = new SolidColorBrush(Ember);
+        app.Resources["HeroPaperBrush"] = Brushes.White;
+        using (var stream = File.OpenRead(heroXaml))
+        {
+            app.Resources.MergedDictionaries.Add((ResourceDictionary)XamlReader.Load(stream));
+        }
+
+        var hero = (DrawingImage)app.Resources["HeroImage"];
+        var visual = new DrawingVisual();
+        using (var dc = visual.RenderOpen())
+        {
+            dc.DrawRectangle(Brushes.White, null, new Rect(0, 0, width * scale, height * scale));
+            dc.DrawImage(hero, new Rect(0, 0, width * scale, height * scale));
+        }
+
+        File.WriteAllBytes(outputPath, Encode(visual, width * scale, height * scale));
+        Console.WriteLine($"Wrote the hero ({width * scale}x{height * scale}) to {Path.GetFullPath(outputPath)}");
     }
 
     private static byte[] RenderTile(int width, int height)

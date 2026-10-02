@@ -26,6 +26,12 @@ dotnet publish (Join-Path $root "src/Wordwright.App") `
     -o $publish
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed" }
 
+# The installer splash is the hero illustration (docs/PLAN.md P10.0), rendered
+# from the app's own Resources/Hero.xaml.
+$splash = Join-Path ([System.IO.Path]::GetTempPath()) "wordwright-splash.png"
+dotnet run --project (Join-Path $root "scripts/IconGen") -- --hero $splash
+if ($LASTEXITCODE -ne 0) { throw "rendering the splash failed" }
+
 vpk pack `
     --packId Wordwright `
     --packVersion $Version `
@@ -35,6 +41,7 @@ vpk pack `
     --packTitle "Wordwright" `
     --packAuthors "Jaspreet Singh" `
     --icon (Join-Path $root "brand/icon.ico") `
+    --splashImage $splash `
     --outputDir $releases
 if ($LASTEXITCODE -ne 0) { throw "vpk pack failed" }
 

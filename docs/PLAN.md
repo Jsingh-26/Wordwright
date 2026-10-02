@@ -12,7 +12,7 @@ The application is a text expander: snippets with `{date}`, `{time}`, `{clipboar
 
 **Left to do:**
 
-- [ ] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and the About page slot from DESIGN.md §9.
+- [x] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and the About page slot from DESIGN.md §9.
 - [ ] **P10.1** README: a GIF of a snippet expanding, install steps, the SmartScreen "unknown publisher" explanation, and a privacy section.
 - [ ] **P10.2** Manual test pass using the checklist below and the DESIGN.md polish checklist (light, dark and a high-contrast theme; 100 %, 150 % and 200 % scaling; 800×600 and maximised; keyboard-only; Accessibility Insights for Windows with zero unnamed controls); fix blockers.
 - [ ] **P10.3** Release **v1.0.0** on GitHub with notes.
@@ -160,7 +160,7 @@ From the UI review in `docs/UI_REVIEW.md`; per-task implementation detail (files
 - [x] **P11.7** Housekeeping: drop the parked "AI actions"/"Offline AI" pages from `check-screens.ps1`; gitignore `scripts/ui-check-*.png` and untrack the checked-in captures.
 
 ## Phase P10: Release (day 13–14)
-- [ ] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and the About page slot from DESIGN.md §9.
+- [x] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and the About page slot from DESIGN.md §9.
 - [ ] **P10.1** README: a GIF of a snippet expanding, install steps, the SmartScreen "unknown publisher" explanation, and a privacy section.
 - [ ] **P10.2** Manual test pass using the checklist below and the DESIGN.md polish checklist (light, dark and a high-contrast theme; 100 %, 150 % and 200 % scaling; 800×600 and maximised; keyboard-only; Accessibility Insights for Windows with zero unnamed controls); fix blockers.
 - [ ] **P10.3** Release **v1.0.0** on GitHub with notes.

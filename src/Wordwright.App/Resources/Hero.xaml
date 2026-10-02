@@ -1,0 +1,72 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- The hero illustration (docs/PLAN.md P10.0), transcribed from
+         brand/hero.svg; keep the two in step. The ink follows the theme accent
+         (Forge ink / Ink light) and the hand and nib slit are cut from the page
+         colour, so it reads in light and dark. scripts/IconGen renders this same
+         file to the installer splash image. -->
+    <DrawingImage x:Key="HeroImage">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Fixes the bounds to the SVG's viewBox, so the round line caps
+                     do not shift the picture. -->
+                <GeometryDrawing Brush="Transparent" Geometry="M0,-10 H340 V155 H0 Z" />
+
+                <GeometryDrawing Geometry="M12 131 L21 118 L29 141 L37 121 L46 138 L54 115 L63 143 L71 123 L80 135 L89 119 L98 140 L107 125 L117 136 L127 126 L138 133 L150 130 C188 130 214 146 256 142 S310 128 330 130">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="{DynamicResource BrandAccentBrush}" Thickness="6"
+                             StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+
+                <DrawingGroup>
+                    <DrawingGroup.Transform>
+                        <TransformGroup>
+                            <RotateTransform Angle="35" />
+                            <TranslateTransform X="150" Y="130" />
+                        </TransformGroup>
+                    </DrawingGroup.Transform>
+
+                    <GeometryDrawing Brush="{DynamicResource BrandAccentBrush}">
+                        <GeometryDrawing.Geometry>
+                            <RectangleGeometry Rect="-11,-160,22,118" RadiusX="7" RadiusY="7" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="{DynamicResource BrandAccentBrush}"
+                                     Geometry="M-8 -32 L8 -32 L10 -46 L-10 -46 Z" />
+
+                    <GeometryDrawing Brush="{DynamicResource EmberBrush}"
+                                     Geometry="M0 0 L-9 -22 Q-9 -32 0 -33 Q9 -32 9 -22 Z" />
+                    <GeometryDrawing Geometry="M0 -5 L0 -19">
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="{DynamicResource HeroPaperBrush}" Thickness="2.5"
+                                 StartLineCap="Round" EndLineCap="Round" />
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Brush="{DynamicResource HeroPaperBrush}">
+                        <GeometryDrawing.Geometry>
+                            <EllipseGeometry Center="0,-22" RadiusX="2.6" RadiusY="2.6" />
+                        </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+
+                    <GeometryDrawing Brush="{DynamicResource HeroPaperBrush}"
+                                     Geometry="M-13 -52 C-19 -62 -16 -76 -5 -84 Q14 -124 50 -142 L78 -98 C58 -84 40 -64 24 -48 C16 -40 7 -40 4 -46 C0 -44 -4 -44 -7 -46 C-11 -46 -14 -48 -13 -52 Z">
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="{DynamicResource BrandAccentBrush}" Thickness="5" LineJoin="Round" />
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                    <GeometryDrawing Geometry="M4 -46 C10 -58 22 -68 38 -72">
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="{DynamicResource BrandAccentBrush}" Thickness="5"
+                                 StartLineCap="Round" EndLineCap="Round" />
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+
+                    <GeometryDrawing Brush="{DynamicResource BrandAccentBrush}"
+                                     Geometry="M50 -142 L78 -98 L98 -110 L70 -154 Z" />
+                </DrawingGroup>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+</ResourceDictionary>

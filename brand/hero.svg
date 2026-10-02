@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -10 340 165" role="img" aria-label="A hand drawing one line with a fountain pen: rough on the left, smooth to the right of the nib">
+  <!-- docs/DESIGN.md "Logo system", brand/HERO_BRIEF.md. Forge ink #23408E on
+       white, one Ember #C7621E accent at the nib. The same shapes are
+       transcribed for the app in src/Wordwright.App/Resources/Hero.xaml; keep
+       the two in step. -->
+
+  <!-- The line: jagged until the nib, one clean stroke after it. -->
+  <path d="M12 131 L21 118 L29 141 L37 121 L46 138 L54 115 L63 143 L71 123 L80 135 L89 119 L98 140 L107 125 L117 136 L127 126 L138 133 L150 130 C188 130 214 146 256 142 S310 128 330 130"
+        fill="none" stroke="#23408E" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Pen and hand, drawn upright with the nib tip at the origin, then leaned. -->
+  <g transform="translate(150 130) rotate(35)">
+    <!-- Barrel and grip -->
+    <rect x="-11" y="-160" width="22" height="118" rx="7" fill="#23408E"/>
+    <path d="M-8 -32 L8 -32 L10 -46 L-10 -46 Z" fill="#23408E"/>
+    <!-- Nib: the one Ember accent, with its slit and breather hole -->
+    <path d="M0 0 L-9 -22 Q-9 -32 0 -33 Q9 -32 9 -22 Z" fill="#C7621E"/>
+    <path d="M0 -5 L0 -19" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="0" cy="-22" r="2.6" fill="#FFFFFF"/>
+    <!-- Hand: white with an ink outline, gripping the barrel -->
+    <path d="M-13 -52 C-19 -62 -16 -76 -5 -84 Q14 -124 50 -142 L78 -98 C58 -84 40 -64 24 -48 C16 -40 7 -40 4 -46 C0 -44 -4 -44 -7 -46 C-11 -46 -14 -48 -13 -52 Z"
+          fill="#FFFFFF" stroke="#23408E" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M4 -46 C10 -58 22 -68 38 -72" fill="none" stroke="#23408E" stroke-width="5" stroke-linecap="round"/>
+    <!-- Cuff -->
+    <path d="M50 -142 L78 -98 L98 -110 L70 -154 Z" fill="#23408E"/>
+  </g>
+</svg>

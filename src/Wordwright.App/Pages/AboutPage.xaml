@@ -3,9 +3,12 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:res="clr-namespace:Wordwright.App.Resources">
-    <!-- docs/DESIGN.md §9. The hero illustration (P10.0) goes above the title. -->
+    <!-- docs/DESIGN.md §9, with the hero illustration (P10.0) above the title. -->
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="32,24" MaxWidth="560" HorizontalAlignment="Left">
+            <!-- Decorative: the title below says what the page is. -->
+            <Image Source="{DynamicResource HeroImage}" MaxWidth="320"
+                   HorizontalAlignment="Left" Margin="0,0,0,16" />
             <TextBlock Style="{StaticResource PageTitle}" Text="Wordwright" />
             <TextBlock x:Name="VersionText" Style="{StaticResource SecondaryText}" Margin="0,4,0,0" />
 

@@ -18,6 +18,9 @@
     <!-- The shortcut chip in the snippet list (docs/PLAN.md → P11.5); swapped
          with the theme like SelectionBrush. -->
     <SolidColorBrush x:Key="ChipBrush" Color="{StaticResource SteelColor}" />
+    <!-- The page colour the hero illustration (Hero.xaml) cuts its hand and nib
+         slit from: white in light theme, Anvil in dark; swapped with the theme. -->
+    <SolidColorBrush x:Key="HeroPaperBrush" Color="White" />
 
     <SolidColorBrush x:Key="ForgeInkBrush" Color="{StaticResource ForgeInkColor}" />
     <SolidColorBrush x:Key="InkLightBrush" Color="{StaticResource InkLightColor}" />

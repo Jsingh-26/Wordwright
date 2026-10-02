@@ -90,7 +90,7 @@ Files in `brand/`.
 - **Mark:** a bold "W" whose two lower points are pen nibs with slits. It reads as a letter at 16 px and as two pens at full size. `mark.svg` (ink), `tray-light-taskbar.svg` (anvil), `tray-dark-taskbar.svg` (white).
 - **App icon:** the mark in white on a forge-ink rounded tile. `icon.svg`. Export `.ico` at 16, 20, 24, 32, 48, 64, 256 px.
 - **Wordmark:** "Wordwright" in Zodiak Semibold, sentence case, forge ink, the mark to its left at cap height.
-- **Hero illustration (README, installer, About page):** see `brand/HERO_BRIEF.md`. Generated with a free tool, then simplified to the palette.
+- **Hero illustration (README, installer, About page):** see `brand/HERO_BRIEF.md`. `brand/hero.svg` was drawn by hand to the brief as a few flat shapes rather than generated (P10.0), so it needs no recolouring. The app draws it from `Resources/Hero.xaml` (same shapes; the ink follows the theme accent and the hand is cut from white or Anvil), and `scripts/IconGen --hero` renders that file to the installer splash.
 
 ## Screens
 
