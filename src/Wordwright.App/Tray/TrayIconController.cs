@@ -26,6 +26,7 @@ internal sealed class TrayIconController : IDisposable
     private readonly App _app;
     private readonly TaskbarIcon _trayIcon;
     private readonly ResourceDictionary _menuResources;
+    private readonly AcrylicContextMenu _menu;
     private Icon? _currentIcon;
 
     public TrayIconController(App app)
@@ -56,19 +57,19 @@ internal sealed class TrayIconController : IDisposable
                 UriKind.Absolute),
         };
 
-        var menu = new ContextMenu();
-        menu.Resources.MergedDictionaries.Add(_menuResources);
-        menu.Items.Add(openItem);
-        menu.Items.Add(snippetsItem);
-        menu.Items.Add(new Separator());
-        menu.Items.Add(quitItem);
+        _menu = new AcrylicContextMenu();
+        _menu.Resources.MergedDictionaries.Add(_menuResources);
+        _menu.Items.Add(openItem);
+        _menu.Items.Add(snippetsItem);
+        _menu.Items.Add(new Separator());
+        _menu.Items.Add(quitItem);
 
         _trayIcon = new TaskbarIcon
         {
             ToolTipText = Strings.Get(
                 "Tray.Tooltip",
                 ("Prefix", _app.Snippets.TriggerPrefix)),
-            ContextMenu = menu,
+            ContextMenu = _menu,
             LeftClickCommand = new RelayCommand(() => _app.ShowMainWindow()),
         };
 
@@ -110,18 +111,23 @@ internal sealed class TrayIconController : IDisposable
 
     /// <summary>Sets the menu's concrete colours for the current taskbar theme:
     /// dark taskbar sits on Anvil with Steel text; light taskbar sits on Steel
-    /// with Anvil text. Hover and separators are 8 % and 12 % overlays.</summary>
+    /// with Anvil text. Hover and separators are 8 % and 12 % overlays. On the
+    /// Acrylic material (P13.14) the surface is a 60 % tint over it, and the
+    /// border is Windows' own.</summary>
     private void ApplyMenuPalette()
     {
         var light = SystemTheme.TaskbarUsesLightTheme();
         var text = light ? Anvil : Steel;
         var tint = light ? ForgeInk : Steel;
+        var surface = light ? Steel : Anvil;
+        var acrylic = AcrylicContextMenu.IsSupported;
 
-        Set("TrayMenuBackground", light ? Steel : Anvil);
+        _menu.UseDarkMaterial = !light;
+        Set("TrayMenuBackground", acrylic ? WithAlpha(surface, 0x99) : surface);
         Set("TrayMenuForeground", text);
         Set("TrayMenuHover", WithAlpha(tint, 0x14));
         Set("TrayMenuSeparator", WithAlpha(tint, 0x1F));
-        Set("TrayMenuBorder", WithAlpha(tint, 0x1F));
+        Set("TrayMenuBorder", WithAlpha(tint, acrylic ? (byte)0 : (byte)0x1F));
     }
 
     private void Set(string key, MediaColor color) => _menuResources[key] = new MediaBrush(color);

@@ -246,19 +246,19 @@
                                    VerticalAlignment="Center"
                                    Margin="2,0,8,6"
                                    Text="{res:Str Snippets.Insert}" />
-                        <ui:Button Margin="0,0,6,6" Padding="10,4"
+                        <ui:Button Margin="0,0,6,6" Padding="10,4" MinHeight="32"
                                    Content="{res:Str Snippets.Insert.Date}"
                                    Tag="{x:Static core:SnippetVariables.Date}"
                                    Click="OnInsertClicked" />
-                        <ui:Button Margin="0,0,6,6" Padding="10,4"
+                        <ui:Button Margin="0,0,6,6" Padding="10,4" MinHeight="32"
                                    Content="{res:Str Snippets.Insert.Time}"
                                    Tag="{x:Static core:SnippetVariables.Time}"
                                    Click="OnInsertClicked" />
-                        <ui:Button Margin="0,0,6,6" Padding="10,4"
+                        <ui:Button Margin="0,0,6,6" Padding="10,4" MinHeight="32"
                                    Content="{res:Str Snippets.Insert.Clipboard}"
                                    Tag="{x:Static core:SnippetVariables.Clipboard}"
                                    Click="OnInsertClicked" />
-                        <ui:Button Margin="0,0,0,6" Padding="10,4"
+                        <ui:Button Margin="0,0,0,6" Padding="10,4" MinHeight="32"
                                    Content="{res:Str Snippets.Insert.Cursor}"
                                    Tag="{x:Static core:SnippetVariables.Cursor}"
                                    Click="OnInsertClicked" />
