@@ -37,7 +37,7 @@ public partial class MainWindow : FluentWindow
     {
         RootNavigation.Navigate(_startPage);
 
-        _ = ShowOfflineAiIfEligibleAsync();
+        _ = UpdateOfflineAiItemAsync();
 
 #if DEBUG
         // The hardware page exists to work on the app, so only a debug build
@@ -61,17 +61,26 @@ public partial class MainWindow : FluentWindow
     }
 
     /// <summary>
-    /// Offline AI appears in the sidebar only while this PC has the memory and
-    /// disk for something in the catalog (docs/PLAN.md → "Maintainer requirement:
-    /// startup resource eligibility", 2026-10-02). The probe reads WMI and DXGI,
-    /// so it runs off the UI thread, and the item starts hidden in XAML rather
-    /// than blinking into view and out again.
+    /// Decides whether the Offline AI item belongs in the sidebar
+    /// (docs/PLAN.md → "Maintainer requirement: startup resource eligibility",
+    /// 2026-10-02). It is shown when this PC has the memory and disk for
+    /// something in the catalog, and hidden otherwise — but a PC that already
+    /// has AI on always keeps it, because that page is where the installed model
+    /// is changed or removed and hiding it would strand the user with no way
+    /// back. New downloads and imports are refused either way, so a PC short of
+    /// resources can never gain a model it cannot run.
     ///
-    /// The same check is made again before a model is set up or used, so a PC
-    /// that frees memory later — or loses it — is judged on how it is then.
+    /// The probe reads WMI and DXGI, so it runs off the UI thread and the item
+    /// starts hidden in XAML rather than blinking into view and out again.
     /// </summary>
-    private async Task ShowOfflineAiIfEligibleAsync()
+    private async Task UpdateOfflineAiItemAsync()
     {
+        if (((App)Application.Current).Settings.AiEnabled)
+        {
+            OfflineAiItem.Visibility = Visibility.Visible;
+            return;
+        }
+
         var availability = await Task.Run(
             () => AiEligibility.Check(CatalogParser.Embedded(), HardwareProbe.Read()));
 
