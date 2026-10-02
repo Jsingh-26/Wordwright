@@ -48,7 +48,14 @@ internal static class Program
 
         var outputPath = args.Length > 0 ? args[0] : Path.Combine("brand", "icon.ico");
 
-        var frames = Sizes.Select(RenderPng).ToArray();
+        // Small sizes are written as 32bpp BMP (DIB) frames, not PNG: the shell's
+        // icon extractor cannot read PNG-compressed entries at taskbar and
+        // Explorer sizes and falls back to a generic placeholder (so the taskbar
+        // button and shortcuts lose the mark). PNG is used only for 256, the one
+        // size Windows documents PNG frames for.
+        var frames = Sizes
+            .Select(size => size >= 256 ? RenderPng(size) : RenderDib(size))
+            .ToArray();
 
         using (var stream = File.Create(outputPath))
         using (var writer = new BinaryWriter(stream))
@@ -80,7 +87,7 @@ internal static class Program
             }
         }
 
-        Console.WriteLine($"Wrote {Sizes.Length} PNG frames to {Path.GetFullPath(outputPath)}");
+        Console.WriteLine($"Wrote {Sizes.Length} frames (BMP up to 64, PNG at 256) to {Path.GetFullPath(outputPath)}");
         return 0;
     }
 
@@ -166,6 +173,55 @@ internal static class Program
 
     private static byte[] RenderPng(int size)
     {
+        var bitmap = RenderBitmap(size);
+
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(bitmap));
+        using var stream = new MemoryStream();
+        encoder.Save(stream);
+        return stream.ToArray();
+    }
+
+    /// <summary>Renders one icon frame and packs it as a 32bpp BMP entry: a
+    /// BITMAPINFOHEADER with the height doubled (the colour bitmap plus an AND
+    /// mask), the BGRA pixels bottom-up, then a zeroed 1bpp mask — the alpha
+    /// channel, not the mask, carries the rounded tile.</summary>
+    private static byte[] RenderDib(int size)
+    {
+        // Pbgra32 is premultiplied; an icon frame wants straight BGRA.
+        var converted = new FormatConvertedBitmap(RenderBitmap(size), PixelFormats.Bgra32, null, 0);
+
+        var stride = size * 4;
+        var pixels = new byte[stride * size];
+        converted.CopyPixels(pixels, stride, 0);
+
+        using var stream = new MemoryStream();
+        using var writer = new BinaryWriter(stream);
+
+        writer.Write(40);                 // biSize
+        writer.Write(size);               // biWidth
+        writer.Write(size * 2);           // biHeight (XOR bitmap + AND mask)
+        writer.Write((ushort)1);          // biPlanes
+        writer.Write((ushort)32);         // biBitCount
+        writer.Write(0);                  // biCompression: BI_RGB
+        writer.Write(stride * size);      // biSizeImage
+        writer.Write(0);                  // biXPelsPerMeter
+        writer.Write(0);                  // biYPelsPerMeter
+        writer.Write(0);                  // biClrUsed
+        writer.Write(0);                  // biClrImportant
+
+        for (var y = size - 1; y >= 0; y--)
+        {
+            writer.Write(pixels, y * stride, stride);
+        }
+
+        writer.Write(new byte[((size + 31) / 32) * 4 * size]);
+
+        return stream.ToArray();
+    }
+
+    private static RenderTargetBitmap RenderBitmap(int size)
+    {
         const double grid = 88;
         var visual = new DrawingVisual();
         using (var dc = visual.RenderOpen())
@@ -189,11 +245,6 @@ internal static class Program
 
         var bitmap = new RenderTargetBitmap(size, size, 96, 96, PixelFormats.Pbgra32);
         bitmap.Render(visual);
-
-        var encoder = new PngBitmapEncoder();
-        encoder.Frames.Add(BitmapFrame.Create(bitmap));
-        using var stream = new MemoryStream();
-        encoder.Save(stream);
-        return stream.ToArray();
+        return bitmap;
     }
 }
