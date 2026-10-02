@@ -17,7 +17,7 @@ The application is a text expander: snippets with `{date}`, `{time}`, `{clipboar
 - [ ] **P10.2** Manual test pass using the checklist below and the DESIGN.md polish checklist (light, dark and a high-contrast theme; 100 %, 150 % and 200 % scaling; 800×600 and maximised; keyboard-only; Accessibility Insights for Windows with zero unnamed controls); fix blockers.
 - [ ] **P10.3** Release **v1.0.0** on GitHub with notes.
 - [ ] **P10.4** Publish the MSIX package (P3.6) to the Microsoft Store.
-- [ ] **P10.5** Support links (D12): `.github/FUNDING.yml` (GitHub Sponsors + Ko-fi), `About.Support` copy and an About-page link, README support section (with P10.1).
+- [ ] **P10.5** Support link (D12): `.github/FUNDING.yml` (custom Razorpay URL), `About.Support` copy and an About-page link, README support section (with P10.1).
 
 **Added on 2026-10-02:** the **Phase P11 craft pass** (from the UI review in `docs/UI_REVIEW.md`), inserted below before the release phase — it finishes before P10.2 so the release verification covers the final UI.
 
@@ -80,7 +80,10 @@ All five approved by the maintainer on 2026-10-02; details in DESIGN.md and the 
 - [x] **D11 Theme setting.** Build the Settings "Theme" row (System / Light / Dark); the copy already exists in UX_COPY.md. → **P11.2**.
 
 ### Monetization (approved 2026-10-02; research in docs/LAUNCH.md)
-- [x] **D12 No ads; free at launch; donations.** Ads are rejected: ad revenue needs window views an invisible-by-design tray app never gets (≈$4–20/month even at optimistic install counts), Microsoft's own Store ad platform shut down in 2020, and any ad SDK would break hard rule 1 (no network) and the no-telemetry privacy positioning. v1.0 launches **free with a "Support Wordwright" donation link — GitHub Sponsors (primary, 0% platform fees, repo-native) and Ko-fi (secondary, 0% on one-time donations)**; links open the browser, so the app itself stays offline. A paid model (one-time Pro unlock of future on-device features, e.g. fill-in forms) is reconsidered only once such features exist. → **P10.5**.
+- [x] **D12 No ads; free at launch; one-time support payments only.** Ads are rejected: ad revenue needs window views an invisible-by-design tray app never gets (≈$4–20/month even at optimistic install counts), Microsoft's own Store ad platform shut down in 2020, and any ad SDK would break hard rule 1 (no network) and the no-telemetry privacy positioning. v1.0 launches **free with a "Support Wordwright" link to a Razorpay Payment Page** ("customer decides amount" — one-time by nature, no monthly anything): UPI for Indian supporters, cards for international, pays out to an Indian bank account, and needs only the standard Indian KYC (PAN) — no foreign tax forms. GitHub Sponsors was ruled out (mandatory W-8BEN + subscription-shaped tiers); Ko-fi has no UPI and pays out via PayPal/Stripe. The link opens the browser, so the app itself stays offline. A paid model (one-time Pro unlock of future on-device features, e.g. fill-in forms) is reconsidered only once such features exist. → **P10.5**.
+
+### Marketing (2026-10-02)
+- [x] **D13 Discovery starts with directories.** Week 1 of the launch sequence (AlternativeTo, SourceForge, Softpedia, SaaSHub, Slant, Awesome-Windows PR) begins once v1.0.0 is released; Product Hunt, Show HN and Reddit follow only if Week 1 goes well. Full sequence and the paste-ready listing kit: `docs/LAUNCH.md`.
 
 ## Phase P3: Snippet manager UI (day 4–5)
 - [x] **P3.1** Snippets page: searchable list + editor (DESIGN.md §2), auto-save, "Saved" indicator, validation messages, delete with confirmation.
@@ -162,8 +165,8 @@ From the UI review in `docs/UI_REVIEW.md`; per-task implementation detail (files
 - [ ] **P10.2** Manual test pass using the checklist below and the DESIGN.md polish checklist (light, dark and a high-contrast theme; 100 %, 150 % and 200 % scaling; 800×600 and maximised; keyboard-only; Accessibility Insights for Windows with zero unnamed controls); fix blockers.
 - [ ] **P10.3** Release **v1.0.0** on GitHub with notes.
 - [ ] **P10.4** Publish the MSIX package (P3.6) to the Microsoft Store. Store listing keywords: "text expander", "snippets", "typing". A privacy-policy URL is not required when nothing is collected; point it at the README privacy section anyway.
-- [ ] **P10.5** Support links (D12): create `.github/FUNDING.yml` (GitHub Sponsors + Ko-fi entries), add `About.Support` ("Support Wordwright") to UX_COPY.md and `Strings.resx` with a link on the About page under the GitHub link (opens the browser; the app itself stays offline), and a Support section in the README as part of P10.1.
-  *Done when:* the Sponsor button shows on the repo and the About link opens the sponsorship page. *Human step:* the maintainer enables GitHub Sponsors (Stripe Connect, tax form) and creates the Ko-fi page — both accounts must exist before the links go live. Discovery/launch sequence: `docs/LAUNCH.md`.
+- [ ] **P10.5** Support link (D12): create `.github/FUNDING.yml` with the custom Razorpay URL (shows a Sponsor heart on the repo pointing at the payment page), add `About.Support` ("Support Wordwright") to UX_COPY.md and `Strings.resx` with a link on the About page under the GitHub link (opens the browser; the app itself stays offline), and a Support section in the README as part of P10.1.
+  *Done when:* the Sponsor button shows on the repo and the About link opens the payment page. *Human step:* the maintainer creates the Razorpay Payment Page ("Customer Decides Amount", UPI + cards enabled) — the link goes live only once that page exists. Discovery/launch sequence: `docs/LAUNCH.md`.
 
 ## Release checklist
 - Fresh Windows user account install and uninstall leave no files outside `%AppData%\Wordwright`.
