@@ -1,6 +1,6 @@
 # Wordwright v1.0.0 — release notes (draft for P10.3)
 
-Paste everything below the line into the GitHub release body. Title: **v1.0.0 (first stable release)**. Assets: `Releases/Wordwright-win-Setup.exe`, `Wordwright-win-Portable.zip`, `Wordwright-1.0.0-full.nupkg`, `Wordwright-1.0.0-delta.nupkg`, `RELEASES`, `releases.win.json`, `assets.win.json` (build with `scripts/pack-release.ps1 -Version 1.0.0`). Fill in the verification numbers from the final run before publishing.
+Paste everything below the line into the GitHub release body. Title: **v1.0.0 (first stable release)**. Assets: everything in `Releases/v1.0.0/`, which is exactly `Wordwright-win-Setup.exe`, `Wordwright-win-Portable.zip`, `Wordwright-1.0.0-full.nupkg`, `RELEASES`, `releases.win.json` and `assets.win.json` (build with `scripts/pack-release.ps1 -Version 1.0.0`; there is no delta package). Fill in the verification numbers from the final run before publishing.
 
 ---
 

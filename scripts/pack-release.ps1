@@ -1,5 +1,10 @@
 # Builds the Velopack installer for a release (docs/PLAN.md P3.5, P10.3).
-# Produces Releases/Setup.exe, the portable zip and the update package.
+# Produces Releases/v<version>/: Setup.exe, the portable zip, the full package
+# and the feed files, and nothing else.
+#
+# Each version is packed into its own empty folder with no delta package
+# (docs/PLAN.md P12.16): the app never checks for updates, so a delta helps no
+# one, and an empty folder keeps unpublished local builds out of the feed.
 #
 #   scripts/pack-release.ps1                 (1.0.0)
 #   scripts/pack-release.ps1 -Version 1.0.0
@@ -14,7 +19,10 @@ param(
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $publish = Join-Path $root "publish"
-$releases = Join-Path $root "Releases"
+$releases = Join-Path $root "Releases/v$Version"
+
+if (Test-Path $releases) { Remove-Item $releases -Recurse -Force }
+New-Item -ItemType Directory -Path $releases | Out-Null
 
 # The version the app reports on its About page comes from the assembly, so the
 # build and the package are given the same one.
@@ -45,6 +53,7 @@ vpk pack `
     --packAuthors "Unbound Kite" `
     --icon (Join-Path $root "brand/icon.ico") `
     --splashImage $splash `
+    --delta None `
     --outputDir $releases
 if ($LASTEXITCODE -ne 0) { throw "vpk pack failed" }
 
