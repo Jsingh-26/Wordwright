@@ -144,7 +144,7 @@ From the UI review in `docs/UI_REVIEW.md`; per-task implementation detail (files
   *Done when:* `check-screens.ps1` shows panels at 6 px; an "already used" error reads as an error and the very-long warning stays Ochre.
 - [x] **P11.2** Settings "Theme" row (D11): System / Light / Dark in the Wordwright group (copy exists: `Settings.Theme`), persisted in `settings.json`, applied through the existing accent-swap path in `App.xaml.cs`; the OS watcher only applies in System. Core test for the persisted value.
   *Human check:* each choice re-skins the window immediately and survives a restart.
-- [ ] **P11.3** Tray menu theming (D10): Fluent-styled context menu (palette brushes, 4 px radius, light/dark following the taskbar via the tray icon's `SystemTheme` logic). No new dependency.
+- [x] **P11.3** Tray menu theming (D10): Fluent-styled context menu (palette brushes, 4 px radius, light/dark following the taskbar via the tray icon's `SystemTheme` logic). No new dependency.
   *Human check:* the menu matches the taskbar theme in both modes.
 - [ ] **P11.4** `Motion.cs` (D7): one entrance factory (fade + 8 px slide, 200 ms decelerate `cubic-bezier(0,0,0,1)`), one exit (fade, 120 ms accelerate), both strict no-ops when `SystemParameters.ClientAreaAnimation` is false. All later motion goes through it.
 - [ ] **P11.5** Signature move (D7): connected animation from snippet list to editor (a proxy of the shortcut chip glides from the selected row into the Shortcut field, 200 ms), a choreographed editor settle, page-entrance transitions on navigation, the "Saved" fade-in/out, and list add/remove transitions.

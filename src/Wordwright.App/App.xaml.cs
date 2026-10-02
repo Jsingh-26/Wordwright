@@ -324,7 +324,7 @@ public partial class App : Application
         if (msg == WM_SETTINGCHANGE
             && Marshal.PtrToStringUni(lParam) == "ImmersiveColorSet")
         {
-            Dispatcher.Invoke(_trayIcon!.RefreshIcon);
+            Dispatcher.Invoke(_trayIcon!.RefreshTheme);
         }
 
         return IntPtr.Zero;

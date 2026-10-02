@@ -1,23 +1,33 @@
 using System.Drawing;
 using System.IO;
+using System.Windows;
 using System.Windows.Controls;
 using CommunityToolkit.Mvvm.Input;
 using H.NotifyIcon;
 using Wordwright.App.Resources;
+using MediaBrush = System.Windows.Media.SolidColorBrush;
+using MediaColor = System.Windows.Media.Color;
 
 namespace Wordwright.App.Tray;
 
 /// <summary>
-/// Owns the tray icon and its menu (docs/DESIGN.md §1). The glyph colour
-/// follows the taskbar theme; the menu opens the window and quits the app.
+/// Owns the tray icon and its menu (docs/DESIGN.md §1). The glyph and the menu
+/// colours both follow the taskbar theme; the menu opens the window and quits.
 /// </summary>
 internal sealed class TrayIconController : IDisposable
 {
+    // Palette (docs/DESIGN.md). The menu derives its surfaces from these with
+    // alpha overlays, resolved at apply time because the menu has no owner
+    // window and cannot read the app-theme brushes.
+    private static readonly MediaColor ForgeInk = MediaColor.FromRgb(0x23, 0x40, 0x8E);
+    private static readonly MediaColor Steel = MediaColor.FromRgb(0xE9, 0xEC, 0xF3);
+    private static readonly MediaColor Anvil = MediaColor.FromRgb(0x1A, 0x20, 0x30);
+
     private readonly App _app;
     private readonly TaskbarIcon _trayIcon;
+    private readonly ResourceDictionary _menuResources;
     private Icon? _currentIcon;
 
-    /// <summary>Offline AI is not built yet (phase P5), so this stays false.</summary>
     public TrayIconController(App app)
     {
         _app = app;
@@ -37,7 +47,17 @@ internal sealed class TrayIconController : IDisposable
         var quitItem = new MenuItem { Header = Strings.Get("Tray.Quit") };
         quitItem.Click += (_, _) => _app.Quit();
 
+        // The styled menu lives in its own dictionary, merged only here, so it
+        // never touches the app window's resources (docs/P11_CRAFT_PASS.md).
+        _menuResources = new ResourceDictionary
+        {
+            Source = new Uri(
+                "pack://application:,,,/Wordwright.App;component/Tray/TrayMenu.xaml",
+                UriKind.Absolute),
+        };
+
         var menu = new ContextMenu();
+        menu.Resources.MergedDictionaries.Add(_menuResources);
         menu.Items.Add(openItem);
         menu.Items.Add(snippetsItem);
         menu.Items.Add(new Separator());
@@ -52,14 +72,20 @@ internal sealed class TrayIconController : IDisposable
             LeftClickCommand = new RelayCommand(() => _app.ShowMainWindow()),
         };
 
-        RefreshIcon();
+        RefreshTheme();
         // Efficiency mode (the bool argument) stays off: the keyboard hook must
         // stay responsive, and EcoQoS would slow it down.
         _trayIcon.ForceCreate(false);
     }
 
-    /// <summary>Re-renders the glyph after the taskbar theme changes.</summary>
-    internal void RefreshIcon()
+    /// <summary>Re-skins the glyph and the menu after the taskbar theme changes.</summary>
+    internal void RefreshTheme()
+    {
+        RefreshIcon();
+        ApplyMenuPalette();
+    }
+
+    private void RefreshIcon()
     {
         var glyph = SystemTheme.TaskbarUsesLightTheme()
             ? MarkRenderer.LightTaskbarGlyph
@@ -72,6 +98,27 @@ internal sealed class TrayIconController : IDisposable
         _currentIcon?.Dispose();
         _currentIcon = newIcon;
     }
+
+    /// <summary>Sets the menu's concrete colours for the current taskbar theme:
+    /// dark taskbar sits on Anvil with Steel text; light taskbar sits on Steel
+    /// with Anvil text. Hover and separators are 8 % and 12 % overlays.</summary>
+    private void ApplyMenuPalette()
+    {
+        var light = SystemTheme.TaskbarUsesLightTheme();
+        var text = light ? Anvil : Steel;
+        var tint = light ? ForgeInk : Steel;
+
+        Set("TrayMenuBackground", light ? Steel : Anvil);
+        Set("TrayMenuForeground", text);
+        Set("TrayMenuHover", WithAlpha(tint, 0x14));
+        Set("TrayMenuSeparator", WithAlpha(tint, 0x1F));
+        Set("TrayMenuBorder", WithAlpha(tint, 0x1F));
+    }
+
+    private void Set(string key, MediaColor color) => _menuResources[key] = new MediaBrush(color);
+
+    private static MediaColor WithAlpha(MediaColor color, byte alpha) =>
+        MediaColor.FromArgb(alpha, color.R, color.G, color.B);
 
     public void Dispose()
     {

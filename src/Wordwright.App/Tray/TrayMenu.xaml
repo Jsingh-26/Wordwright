@@ -1,0 +1,107 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+      Tray context menu, styled to Fluent (docs/DESIGN.md §1, decision D10).
+      The tray menu is the most-seen surface, so no stock WPF chrome. It is a
+      window unto itself: outer radius 8, items 4 px, 4 px padding.
+
+      The palette is resolved from TrayIconController once the taskbar theme is
+      known (light or dark), so these brushes are set from code, not by another
+      dictionary — the menu has no owner window and must not read the app theme.
+      The values here are the dark-taskbar defaults.
+    -->
+    <SolidColorBrush x:Key="TrayMenuBackground" Color="#FF1A2030" />
+    <SolidColorBrush x:Key="TrayMenuForeground" Color="#FFE9ECF3" />
+    <SolidColorBrush x:Key="TrayMenuHover" Color="#14E9ECF3" />
+    <SolidColorBrush x:Key="TrayMenuSeparator" Color="#1FE9ECF3" />
+    <SolidColorBrush x:Key="TrayMenuBorder" Color="#1FE9ECF3" />
+
+    <Style TargetType="ContextMenu">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource TrayMenuForeground}" />
+        <Setter Property="FontFamily" Value="{DynamicResource AppText}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border Background="{DynamicResource TrayMenuBackground}"
+                            BorderBrush="{DynamicResource TrayMenuBorder}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="4">
+                        <StackPanel IsItemsHost="True"
+                                    KeyboardNavigation.DirectionalNavigation="Cycle" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- A full template, because the stock MenuItem ignores most setters. -->
+    <Style TargetType="MenuItem">
+        <Setter Property="Foreground" Value="{DynamicResource TrayMenuForeground}" />
+        <Setter Property="FontFamily" Value="{DynamicResource AppText}" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Padding" Value="8,0" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <Border x:Name="Root"
+                            MinHeight="28"
+                            Background="Transparent"
+                            CornerRadius="4"
+                            Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <!-- The Phosphor check stroke, shown only while checked. -->
+                            <Path x:Name="Check"
+                                  Grid.Column="0"
+                                  Visibility="Collapsed"
+                                  VerticalAlignment="Center"
+                                  HorizontalAlignment="Left"
+                                  Stroke="{DynamicResource TrayMenuForeground}"
+                                  StrokeThickness="1.5"
+                                  StrokeStartLineCap="Round"
+                                  StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round"
+                                  Data="M2,7 L5.5,10.5 L12,3" />
+                            <ContentPresenter Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              ContentSource="Header"
+                                              RecognizesAccessKey="True" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Root" Property="Background"
+                                    Value="{DynamicResource TrayMenuHover}" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Check" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.55" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="Separator">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Separator">
+                    <Rectangle Height="1" Margin="4,4"
+                               Fill="{DynamicResource TrayMenuSeparator}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

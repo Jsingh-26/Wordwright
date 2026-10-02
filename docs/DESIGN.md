@@ -101,7 +101,7 @@ Snippets on                    ✓
 ───────────────────────────────
 Quit Wordwright
 ```
-(The "Offline AI on" row is parked with the AI feature.) Styled to Fluent: palette brushes, 4 px radius, light or dark following the taskbar theme through the same `SystemTheme` check as the tray icon (decision D10, 2026-10-02). The tray menu is the most-seen surface of the app — the window is opened rarely — so stock WPF chrome is not acceptable here. An Ember dot on the tray icon means a better model is available (parked with the AI feature).
+(The "Offline AI on" row is parked with the AI feature.) Styled to Fluent: palette brushes, 8 px outer radius (it is a window unto itself) and 4 px items, light or dark following the taskbar theme through the same `SystemTheme` check as the tray icon (decision D10, 2026-10-02). The tray menu is the most-seen surface of the app — the window is opened rarely — so stock WPF chrome is not acceptable here. An Ember dot on the tray icon means a better model is available (parked with the AI feature).
 
 ### 2. Main window (NavigationView, left rail)
 ```
