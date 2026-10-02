@@ -4,6 +4,13 @@ Target: a public v1.0 on GitHub Releases in about 14 working days, with a snippe
 
 ## Current status and next handoff (reviewed 2026-10-02)
 
+### Maintainer requirement: startup resource eligibility (2026-10-02)
+
+Evaluate available RAM and free disk space at startup under normal laptop usage. Show the Offline AI sidebar option only when a suitable model fits both documented resource requirements, including headroom. Otherwise hide that option and refuse model download, import and activation. Customers should not have to close their normal apps to qualify. Recheck before model setup/use to prevent a stale startup result from bypassing refusal. Keep existing RAM/disk thresholds unchanged.
+
+The 16 GB laptop's latest ~2.01 GB available RAM is below the Qwen candidate's 2.5 GB requirement. The expected outcome is Offline AI unavailable/hidden. v0.1.3's observed import/activation despite insufficient RAM is a gap against this clarified requirement; file integrity and persistence passes do not establish resource eligibility. Startup/sidebar and setup safeguards need implementation and validation before the relevant gates are cleared. P7 remains gated. See [the maintainer requirement in issue #3](https://github.com/Jsingh-26/Wordwright/issues/3#issuecomment-5945510280).
+
+
 Reviewed baseline: installed release **v0.1.3**; source rechecked at `bb5b29e`. P0–P6 implementation tasks are ticked; **P7–P10 remain incomplete**. A tick records implementation, not confirmation of a phase's human checks.
 
 The [Windows installation and AI setup report](WINDOWS_TEST_2026-10-01.md) records a successful install and launch on the 16 GB laptop, the no-approved-model dialogue, both placeholder AI pages, and **196 passing Core tests** at the pre-P6 baseline `62d588e`. Since that test, **P6.1–P6.8 (on-device rewriting: engine, prompt/cleaner, actions, hotkeys, palette, pill and snippet picker) have been implemented and pushed**; the Core suite now reports **258 passing tests** and the solution builds with zero warnings. The report is a record of the v0.1.2 release and does **not** confirm live inference, model import/download in the installed app, calibration, the full build at that time, or the P4/P5/P6 human checks. v0.1.3 is now installed on the 16 GB laptop and contains P6; the remaining desktop checks are listed in issue #3.
