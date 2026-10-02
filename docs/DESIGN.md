@@ -201,7 +201,8 @@ Version 1.0.0                  (secondary)
 About.Body
 About.Privacy
 View source on GitHub          (accent colour, not the system blue)
-Third-party licences ▸         (Zodiak, Phosphor, WPF-UI, H.NotifyIcon, LLamaSharp, Velopack; expands in place)
+Support Wordwright             (D12: GitHub Sponsors page; opens the browser, the app itself stays offline)
+Third-party licences ▸         (Zodiak, Phosphor, WPF-UI, H.NotifyIcon, Velopack; expands in place)
 ```
 
 ## Polish checklist (run before each release, craft-studio §7 and the desktop playbook's verify list)

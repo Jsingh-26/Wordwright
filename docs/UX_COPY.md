@@ -85,6 +85,7 @@ Group headings sit above their rows (docs/DESIGN.md §8).
 | About.Body | Wordwright is free and open source (MIT). Your snippets stay on this PC. |
 | About.Privacy | Wordwright has no telemetry and sends nothing anywhere. It uses the internet only to check for updates, and only if you turned that on. |
 | About.Source | View source on GitHub |
+| About.Support | Support Wordwright |
 | About.ThirdParty | Third-party licences |
 | About.Licence.Zodiak | Zodiak — ITF Free Font Licence |
 | About.Licence.Phosphor | Phosphor — MIT |
