@@ -36,6 +36,8 @@ internal static class Program
         Native.MakeDpiAware();
         var root = FindRepoRoot();
         var exe = Arg(args, "--exe") ?? Path.Combine(root, @"src\Wordwright.App\bin\Release\net10.0-windows10.0.19041.0\Wordwright.App.exe");
+        if (args.Contains("--screenshots"))
+            return Screens.Run(exe, Arg(args, "--screenshots") is { } d && !d.StartsWith("--") ? d : Path.Combine(root, "packaging", "store", "screenshots"));
         Only = Arg(args, "--only")?.Split(',').ToHashSet(StringComparer.OrdinalIgnoreCase);
         Out = Path.Combine(root, "scripts", "e2e-results", DateTime.Now.ToString("yyyyMMdd-HHmmss"));
         Directory.CreateDirectory(Out);
@@ -394,7 +396,8 @@ internal static class Program
             var owner = OwnClipboard(marker);
             TypeInto(target, ";sig");
             var expanded = Ui.WaitTrue(() => TargetText(target).StartsWith(SigBody), 3000);
-            Thread.Sleep(1200);
+            // When a background app reads the text first, the restore waits for its 3 s deadline.
+            Ui.WaitTrue(() => Clip.GetText() == marker, 4000, 200);
             var clip = Clip.GetText();
             var history = Clip.HistoryContains(SigBody);
             try { owner.Kill(); } catch { }

@@ -31,7 +31,7 @@ Everything Partner Center asks for, ready to paste. The package is `Releases/Wor
 | Website | https://github.com/Jsingh-26/Wordwright |
 | Support contact info | *(maintainer: a support email, e.g. one on unboundkite.com once the domain is set up)* |
 | Product declarations | Leave all unchecked. Tick "This app has been tested to meet accessibility guidelines" only after the Accessibility Insights and screen-reader pass in P10.2 has actually been run (zero unnamed controls alone is not that test) |
-| System requirements | Keyboard: required. Mouse: recommended. Memory: 4 GB recommended |
+| System requirements | Windows 11 (x64; the package floor is 10.0.22000). Keyboard: required. Mouse: recommended. Memory: 4 GB recommended |
 
 ## Age ratings (IARC questionnaire)
 
@@ -92,7 +92,7 @@ Upload `Releases/Wordwright-1.0.0.msixbundle`. Device family: **Desktop** only.
 
 | Asset | Requirement | Source |
 |---|---|---|
-| Screenshots (1–10) | PNG, at least 1366×768 | *To capture on the release build with tidy example snippets* (Snippets page, the editor, Settings, About, the welcome window), light theme first, then one dark |
+| Screenshots (1–10) | PNG, at least 1366×768 | `packaging/store/screenshots/`, in file order: welcome mid-expansion, editor, Settings, About, editor in dark theme (2026-10-03, retaken by `E2E.exe --screenshots`; example names and places are made up) |
 | Store logo | 1:1, 300×300 or larger | `brand/icon-256.png` re-rendered at 300 px by `scripts/IconGen` if Partner Center asks for it; otherwise the package's own tiles are used |
 | Hero image (optional) | 1920×1080 | `brand/hero.svg` on white |
 

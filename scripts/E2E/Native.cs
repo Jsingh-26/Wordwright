@@ -37,6 +37,16 @@ internal static class Native
     [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr h, int cmd);
     [DllImport("user32.dll")] public static extern bool SetCursorPos(int x, int y);
     [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr h, out Rect r);
+    [DllImport("dwmapi.dll")] private static extern int DwmGetWindowAttribute(IntPtr h, int attribute, out Rect value, int size);
+
+    /// <summary>The window as drawn, without the invisible resize border that
+    /// GetWindowRect includes on Windows 10 and 11.</summary>
+    public static Rect VisibleFrame(IntPtr h)
+    {
+        if (DwmGetWindowAttribute(h, 9, out var r, Marshal.SizeOf<Rect>()) == 0) return r; // DWMWA_EXTENDED_FRAME_BOUNDS
+        GetWindowRect(h, out r);
+        return r;
+    }
     [DllImport("user32.dll")] public static extern bool MoveWindow(IntPtr h, int x, int y, int w, int ht, bool repaint);
     [DllImport("user32.dll")] public static extern uint GetDpiForWindow(IntPtr h);
     [DllImport("user32.dll")] public static extern bool SetProcessDpiAwarenessContext(IntPtr value);
