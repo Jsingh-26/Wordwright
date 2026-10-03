@@ -2,9 +2,14 @@
 <!--
   The Microsoft Store package (docs/PLAN.md P3.6).
 
-  Identity Name and Publisher are placeholders: both must be replaced with the
-  values Partner Center reserves for Wordwright before a Store upload, and
-  Publisher must match the signing certificate exactly.
+  Identity Name, Publisher and PublisherDisplayName are the values Partner
+  Center assigned when the name was reserved (product 9PP6SR2R3FS3,
+  2026-10-03); an upload is refused if any of them differ. The Store re-signs
+  the package, so it is built unsigned.
+
+  The execution alias lets "wordwright.exe" start the packaged app from a
+  command line, which is how scripts/E2E runs its tests against the
+  Store-installed build (docs/STORE_RELEASE_PLAN.md, Phase 3).
 
   The startup task is how the packaged build starts with Windows — Store policy
   forbids the HKCU Run key that the installer build uses. It starts disabled and
@@ -21,13 +26,15 @@
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
   xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
+  xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  IgnorableNamespaces="uap desktop desktop6 rescap">
+  IgnorableNamespaces="uap desktop desktop4 desktop6 uap5 rescap">
 
   <Identity
-    Name="Jsingh26.Wordwright"
-    Publisher="CN=Jsingh26"
+    Name="UnboundKite.Wordwright"
+    Publisher="CN=785E0A85-0C77-4BFB-8871-297326220CCD"
     Version="0.1.0.0"
     ProcessorArchitecture="x64" />
 
@@ -61,6 +68,11 @@
         <desktop:Extension Category="windows.startupTask" Executable="Wordwright.App.exe" EntryPoint="Windows.FullTrustApplication">
           <desktop:StartupTask TaskId="Wordwright" Enabled="false" DisplayName="Wordwright" />
         </desktop:Extension>
+        <uap5:Extension Category="windows.appExecutionAlias" Executable="Wordwright.App.exe" EntryPoint="Windows.FullTrustApplication">
+          <uap5:AppExecutionAlias desktop4:Subsystem="windows">
+            <uap5:ExecutionAlias Alias="wordwright.exe" />
+          </uap5:AppExecutionAlias>
+        </uap5:Extension>
       </Extensions>
     </Application>
   </Applications>

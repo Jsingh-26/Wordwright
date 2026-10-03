@@ -23,7 +23,7 @@ Not done: anything that needs your Microsoft account, and any test of the **Stor
 | Publisher display name | The name Partner Center lets you use | An individual account publishes "under your own name". If Partner Center does not accept "Unbound Kite", the manifest, the Store listing and the About line ("by Unbound Kite") change to match. That is one string each, and Claude does it. |
 | First submission to a private audience | **Yes** | Only you see and install it, from a private link. You can choose Private only *before* the app is ever public. |
 
-## Phase 1: Developer account (You, about 30 minutes)
+## Phase 1: Developer account (You, about 30 minutes) — done 2026-10-03, Individual, publisher "Unbound Kite"
 
 1. Go to **storedeveloper.microsoft.com**, choose "Get started for free", then **Individual developer**. This is the only route without a fee; Partner Center's own sign-up page uses the old paid flow.
 2. Sign in with the Microsoft account you want to own the app.
@@ -32,7 +32,7 @@ Not done: anything that needs your Microsoft account, and any test of the **Stor
 
 Done when: the Partner Center **Apps and games** page opens. Claude cannot do this part: it creates an account and verifies your identity.
 
-## Phase 2: Reserve the name and get the identity (You sign in; Claude drives)
+## Phase 2: Reserve the name and get the identity (You sign in; Claude drives) — done 2026-10-03
 
 Before this phase, connect the browser. Install the Claude in Chrome extension (https://chromewebstore.google.com/detail/fcoeoabgfenejglbffodgkkbkcdhcgfn), open its side panel and sign in with the same Claude account. It was not connected on 2026-10-03. The fallback is that you sign in to Partner Center inside the Claude app's own browser pane.
 
@@ -114,10 +114,10 @@ Done when: the listing is public, the GitHub release is out, and the final E2E r
 
 | Field | Value |
 |---|---|
-| Package/Identity/Name | *pending* |
-| Package/Identity/Publisher | *pending* |
-| Package/Properties/PublisherDisplayName | *pending* (Unbound Kite if accepted) |
-| Store ID / private link | *pending* |
+| Package/Identity/Name | `UnboundKite.Wordwright` |
+| Package/Identity/Publisher | `CN=785E0A85-0C77-4BFB-8871-297326220CCD` |
+| Package/Properties/PublisherDisplayName | `Unbound Kite` |
+| Store ID | `9PP6SR2R3FS3` (https://apps.microsoft.com/detail/9PP6SR2R3FS3; package family `UnboundKite.Wordwright_y6mjg7tfeg67g`). Reserved 2026-10-03: submit by 2027-01-03 or the name is released |
 
 ## Sources (opened 2026-10-03)
 
