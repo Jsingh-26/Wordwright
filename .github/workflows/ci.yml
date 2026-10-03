@@ -59,3 +59,65 @@ jobs:
       - name: Installer and portable zip
         shell: pwsh
         run: scripts/pack-release.ps1 -Version 1.0.0
+
+  # The Windows App Certification Kit on the Store package (docs/STORE_RELEASE_PLAN.md,
+  # Phase 3). It installs and launches the package, so the package is signed here with
+  # a throwaway test certificate whose subject matches the Partner Center publisher,
+  # trusted on this runner only. The Store re-signs what is uploaded; nothing here is
+  # published. The kit's report is kept as an artifact.
+  certify:
+    runs-on: windows-latest
+    needs: build-and-test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Test certificate for the package publisher
+        shell: pwsh
+        run: |
+          $manifest = [xml](Get-Content packaging/AppxManifest.xml)
+          $publisher = $manifest.Package.Identity.Publisher
+          $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject $publisher `
+            -CertStoreLocation Cert:\CurrentUser\My -KeyUsage DigitalSignature `
+            -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3", "2.5.29.19={text}")
+          $password = ConvertTo-SecureString -String "ci-only" -Force -AsPlainText
+          Export-PfxCertificate -Cert $cert -FilePath "$env:RUNNER_TEMP\ci.pfx" -Password $password | Out-Null
+          Import-PfxCertificate -FilePath "$env:RUNNER_TEMP\ci.pfx" -CertStoreLocation Cert:\LocalMachine\TrustedPeople -Password $password | Out-Null
+          Write-Output "test certificate for $publisher"
+
+      - name: Store package (signed with the test certificate)
+        shell: pwsh
+        run: scripts/pack-msix.ps1 -Version 1.0.0 -Certificate "$env:RUNNER_TEMP\ci.pfx" -CertificatePassword ci-only
+
+      - name: Windows App Certification Kit
+        shell: pwsh
+        run: |
+          $appcert = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\appcert.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $appcert) {
+            Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10" -Directory | ForEach-Object { Write-Output "found: $($_.Name)" }
+            throw "appcert.exe is not on this runner image"
+          }
+          $report = Join-Path $env:RUNNER_TEMP "wack-report.xml"
+          & $appcert.FullName reset
+          & $appcert.FullName test -appxpackagepath (Resolve-Path "Releases/Wordwright-1.0.0-x64.msix") -reportoutputpath $report
+          if (-not (Test-Path $report)) { throw "the kit wrote no report" }
+          $xml = [xml](Get-Content $report)
+          $overall = $xml.REPORT.OVERALL_RESULT
+          Write-Output "OVERALL_RESULT: $overall"
+          foreach ($test in $xml.SelectNodes("//TEST")) {
+            Write-Output ("{0,-8} {1}" -f $test.RESULT.InnerText, $test.NAME)
+          }
+          if ($overall -eq "FAIL") { throw "Windows App Certification Kit: FAIL" }
+
+      - name: Keep the kit's report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wack-report
+          path: ${{ runner.temp }}/wack-report.xml
+          if-no-files-found: ignore
