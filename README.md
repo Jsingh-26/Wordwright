@@ -19,6 +19,8 @@ By **Unbound Kite**. A free, open-source text expander for Windows: type a short
 
 ## Install
 
+Wordwright runs on Windows 11 (x64).
+
 1. Download **`Wordwright-win-Setup.exe`** from the [latest release](https://github.com/Jsingh-26/Wordwright/releases/latest) and run it. It installs for your user account only, so no administrator rights are needed.
 2. Wordwright starts in the tray (the "W" by the clock; on Windows 11 it may sit in the overflow, behind the ^). A short welcome lets you try it: type `;date` and today's date appears.
 3. Open the tray icon to add your own snippets.

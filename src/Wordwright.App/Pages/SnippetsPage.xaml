@@ -240,6 +240,7 @@
                                 Margin="0,4,0,0"
                                 AutomationProperties.Name="{res:Str Snippets.Field.Text}"
                                 MinHeight="180"
+                                TextAlignment="Left"
                                 AcceptsReturn="True"
                                 TextWrapping="Wrap"
                                 VerticalContentAlignment="Top"

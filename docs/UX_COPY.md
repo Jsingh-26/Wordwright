@@ -22,6 +22,15 @@ Placeholders use `{Name}`.
 | Welcome.TryHere | Try it: type {Prefix}date here |
 | Welcome.TryHere.Done | That works everywhere: Word, Outlook, your browser, any app. |
 
+## Seeded snippets (a new install starts with these; `Core/Snippets/SnippetSeeds.cs`)
+| Shortcut | Name | Text |
+|---|---|---|
+| date | Today's date | {date} |
+| thanks | Thanks | Thanks! |
+| sig | Email signature | Best regards, (new line) Your name |
+
+The signature is a placeholder the user replaces. Until 2026-10-03 it shipped with the maintainer's own name.
+
 ## Navigation
 | ID | Text |
 |---|---|
@@ -88,6 +97,7 @@ Group headings sit above their rows (docs/DESIGN.md §8).
 | About.Version | Version {Version} |
 | About.Body | Wordwright is free and open source (MIT). Your snippets stay on this PC. |
 | About.Privacy | Wordwright has no telemetry and never connects to the internet. Nothing you type leaves this PC. |
+| About.TestedOn | Made for Windows 11. Tested with Notepad, Word, Edge, Chrome and VS Code, and with English, German, Spanish, French and UK keyboards. |
 | About.Source | View source on GitHub |
 | About.ThirdParty | Third-party licences |
 | About.Licence.Zodiak | Zodiak — ITF Free Font Licence |

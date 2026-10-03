@@ -32,7 +32,7 @@ Two builds ship from the same source. Both keep the user's data in the same plac
 
 - **Installer (GitHub Releases):** `scripts/pack-release.ps1` publishes the app self-contained and packs it with Velopack. `App.xaml.cs` calls `VelopackApp.Build().Run()` in its constructor, the first thing the generated entry point does, so an install or uninstall can finish. The app never checks for updates itself (hard rule 1): new versions are installed by running the new `Setup.exe`, or by the Store for the MSIX package.
 - **Microsoft Store package:** `scripts/pack-msix.ps1` packs `packaging/AppxManifest.xml` with the tile assets `scripts/IconGen --msix` renders from the brand geometry. It is a full-trust (`runFullTrust`) desktop package; the manifest's Identity is a placeholder until Partner Center reserves the name.
-- Both builds target `net10.0-windows10.0.19041.0`, which is what gives the app the WinRT `StartupTask` API; the manifest declares Windows 10 19045 as the floor.
+- Both builds target `net10.0-windows10.0.19041.0`, which is what gives the app the WinRT `StartupTask` API; the Store manifest declares Windows 11 (10.0.22000) as the floor for v1.0, because Windows 10 could not be tested (maintainer, 2026-10-03).
 - **Start with Windows** goes through `Wordwright.Platform.Startup.StartWithWindows`: the `HKCU\...\Run` key when unpackaged, the manifest's `desktop:startupTask` when packaged (Store policy forbids the Run key). `PackageIdentity.IsPackaged` decides which.
 
 ## Dependencies (the complete allowed list)

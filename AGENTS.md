@@ -29,6 +29,6 @@ You are building **Wordwright**, a Windows tray app: a text expander, and nothin
 
 ## Environment
 
-- Windows 10 (19045+) / Windows 11, x64. ARM64 is out of scope for v1.
+- Windows 11 (22000+), x64, for v1.0 (maintainer, 2026-10-03: Windows 10 could not be tested). ARM64 is out of scope for v1.
 - .NET 10 SDK (LTS). If a listed dependency does not support .NET 10, use .NET 8 and note it in `docs/ARCHITECTURE.md`.
 - The maintainer runs manual tests on a real Windows machine; ask for a human check where `docs/PLAN.md` says so.

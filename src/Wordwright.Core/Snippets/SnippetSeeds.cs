@@ -17,7 +17,7 @@ public static class SnippetSeeds
             [
                 Create("date", "Today's date", "{date}", now),
                 Create("thanks", "Thanks", "Thanks!", now),
-                Create("sig", "Email signature", "Best regards,\nJaspreet", now),
+                Create("sig", "Email signature", "Best regards,\nYour name", now),
             ],
         };
     }

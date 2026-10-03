@@ -81,7 +81,7 @@ Rows marked *E2E* are run by the end-to-end runner ([E2E.md](E2E.md)): it types 
 
 | # | Check | How | Kind | Result | Date | Build |
 |---|---|---|---|---|---|---|
-| W1 | Windows 10 22H2 (19045) in a VM: installs; Mica falls back to a plain background (not black or transparent); Segoe UI fallback reads fine; tray icon and the solid tray menu; `;date` expands | VM | Gate, machine | | | |
+| W1 | Windows 10 22H2 (19045) in a VM: installs; Mica falls back to a plain background (not black or transparent); Segoe UI fallback reads fine; tray icon and the solid tray menu; `;date` expands | VM | Gate, machine | n/a: v1.0 is Windows 11 only (maintainer, 2026-10-03); the Store manifest floor is 10.0.22000 | 2026-10-03 | |
 
 ### Robustness and privacy
 

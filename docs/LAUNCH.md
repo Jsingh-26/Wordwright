@@ -52,7 +52,7 @@ Submit the day v1.0.0 is released (a listing without a working download is waste
 | Long description (~480 chars) | Wordwright is a text expander for Windows: type a short trigger like ;sig or ;date and it expands into the full text, in any app — Word, Outlook, your browser, chat. It has built-in variables (date, time, clipboard, cursor position), search, import and export, and a first-run playground where you can try expansion inside the app itself. Wordwright is free and open source (MIT): no accounts, no sync, no telemetry, no AI in the cloud — your snippets never leave this PC. It sits quietly in the tray until you need it. |
 | Category | Productivity → Text expansion / Utilities |
 | Keywords | text expander, text expansion, snippets, autotext, text replacement, typing, clipboard, offline, privacy, Windows |
-| Platforms | Windows 10 (19045+) / Windows 11, x64 |
+| Platforms | Windows 11, x64 |
 | Licence / price | Free, open source (MIT); optional one-time support via Razorpay |
 | Links | https://github.com/Jsingh-26/Wordwright · https://github.com/Jsingh-26/Wordwright/releases · (Microsoft Store badge after P10.4) |
 | Images | square icon from `brand/icon-256.png`; screenshots from `scripts/ui-check-*.png`; hero from P10.0 |
