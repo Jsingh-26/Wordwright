@@ -71,6 +71,16 @@ Partner Center → Wordwright → Start your submission. All text is in STORE_LI
 
 Done when: the submission is *In the Store* for the private audience.
 
+*Progress 2026-10-03 (maintainer's choice: public, link only, not private):* Submission 1 is filled in and every section reads Complete:
+- **Pricing and availability:** all 240 markets; Public audience; "available but not discoverable", **direct link only**; free (USD 0).
+- **Properties:** Productivity. Personal information: **Yes**, because the keyboard hook reads typed text even though nothing is collected or sent. Privacy policy: README#privacy. Website: the GitHub repository. Support: GitHub issues. Keyboard required, 4 GB recommended.
+- **Age ratings:** IARC questionnaire, all No; 3+ / Everyone (ESRB Everyone, PEGI 3, USK Everyone). The maintainer accepted the IARC terms.
+- **Packages:** `Wordwright-1.0.0.msixbundle` (75 MB) **Validated**; Desktop only; "let Microsoft decide future device families" unticked.
+- **Store listing (en-US):** description, ten features, five screenshots, seven keywords, short description, copyright, MIT licence terms, "Developed by Unbound Kite". "What's new" is blank, as Microsoft asks for a first submission.
+- **Submission options:** publish as soon as certified. The restricted-capability explanations for `runFullTrust` and `unvirtualizedResources` (the second shortened to under 500 characters). Testing notes on the Additional Testing Information page.
+
+The Partner Center pages were filled through Claude in Chrome. The 75 MB package and the screenshots went through the chrome-devtools browser, because Claude in Chrome caps uploads at 10 MB. **Submit for certification is the maintainer's click.**
+
 ## Phase 5: Test the real Store build (Claude, with you clicking Install once)
 
 1. **You:** open the private Store link while signed in with the tester account, and click *Get*. The Store installs it; this is the build users will get.
