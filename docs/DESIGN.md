@@ -109,15 +109,15 @@ Quit Wordwright
 │ [W] Word-   │ Snippets      [Delete snippet] [New snippet] │
 │     wright  │ ┌──────────────────┐ ┌─────────────────────┐ │
 │ Snippets    │ │ Search snippets  │ │ Name                 │ │
-│ AI actions  │ │──────────────────│ │ Shortcut   ;sig      │ │
-│ Offline AI  │ │ ;sig   Email sig │ │ Text                 │ │
-│ Settings    │ │ ;addr  Office    │ │ ┌─────────────────┐  │ │
+│             │ │──────────────────│ │ Shortcut   ;sig      │ │
+│             │ │ ;sig   Email sig │ │ Text                 │ │
+│             │ │ ;addr  Office    │ │ ┌─────────────────┐  │ │
 │             │ │ ;ty    Thank you │ │ │ Best regards,   │  │ │
-│             │ └──────────────────┘ │ └─────────────────┘  │ │
+│ Settings    │ └──────────────────┘ │ └─────────────────┘  │ │
 │ About       │                      │ Insert: Date Time …  │ │
 └─────────────┴──────────────────────────────────────────────┘
 ```
-Page titles in Zodiak. Auto-save with a quiet "Saved" beside the title. Delete sits in the header beside New, enabled while a snippet is selected, so it is on screen at every window size down to 800×600 (P13.18).
+Snippets is the one item at the top of the rail; Settings and About sit at its foot (`FooterMenuItems`, decision D26, 2026-10-03). Page titles in Zodiak. Auto-save with a quiet "Saved" beside the title. Delete sits in the header beside New, enabled while a snippet is selected, so it is on screen at every window size down to 800×600 (P13.18).
 
 ### 3. AI actions page
 Same split layout. Editor fields: Name, Letter (palette shortcut), **Hotkey** (a hotkey recorder: click, press the combination, shows it or the "already in use" error), Instruction, Enabled. A "Try it" box below.

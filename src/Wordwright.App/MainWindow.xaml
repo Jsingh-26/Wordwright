@@ -69,6 +69,11 @@
                         <ui:ImageIcon Width="16" Height="16" Source="{StaticResource IconKeyboard}" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
+            </ui:NavigationView.MenuItems>
+            <!-- Settings and About sit at the foot of the pane, where Windows apps
+                 keep them (NavigationView guidance, FooterMenuItems; decision D26,
+                 2026-10-03). The work, Snippets, stays at the top. -->
+            <ui:NavigationView.FooterMenuItems>
                 <ui:NavigationViewItem Content="{res:Str Nav.Settings}" TargetPageType="{x:Type pages:SettingsPage}">
                     <ui:NavigationViewItem.Icon>
                         <ui:ImageIcon Width="16" Height="16" Source="{StaticResource IconGear}" />
@@ -79,7 +84,7 @@
                         <ui:ImageIcon Width="16" Height="16" Source="{StaticResource IconInfo}" />
                     </ui:NavigationViewItem.Icon>
                 </ui:NavigationViewItem>
-            </ui:NavigationView.MenuItems>
+            </ui:NavigationView.FooterMenuItems>
         </ui:NavigationView>
 
         <!-- WPF-UI allows one dialog host per window ("attempting to register
