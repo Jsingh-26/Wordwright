@@ -52,6 +52,8 @@ Done when: the name is reserved and the three values are in this file's *Identit
 
 Done when: CI is green with the certification kit passing, the E2E report shows no app failures, and `Releases/Wordwright-1.0.0.msixbundle` carries the real identity.
 
+*Progress 2026-10-03:* steps 1–4 done. The manifest carries the Partner Center identity and the `wordwright.exe` alias. `Releases/Wordwright-1.0.0.msixbundle` (75 MB) was rebuilt and its manifest checked: `UnboundKite.Wordwright` 1.0.0.0, floor 10.0.22000. The new CI job `certify` signs the package with a throwaway test certificate and runs the Windows App Certification Kit 10.0.26100 on Windows Server 2025. **Overall PASS** (run 37116875954): 23 of 24 tests pass. The 24th, "Blocked executables", is marked optional and lists `Process.Start`, `ShellExecute` and `cmd`/`reg` string references inside the bundled .NET, WPF and library DLLs. Every self-contained .NET desktop app shows it, so it is accepted for full-trust apps. Still open: step 5 (full E2E run on this build) and step 6 (optional).
+
 ## Phase 4: First submission, private audience (Claude fills; You submit)
 
 Partner Center → Wordwright → Start your submission. All text is in STORE_LISTING.md.
