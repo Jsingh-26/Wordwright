@@ -23,6 +23,17 @@ internal sealed class SnippetEngine : IDisposable
     /// another expansion inside the window reuses the saved clipboard.</summary>
     private static readonly TimeSpan RestoreDelay = TimeSpan.FromMilliseconds(400);
 
+    /// <summary>After the target has read our text (ClipboardService.TextRead),
+    /// a short grace for any further format it asks for; the restore never comes
+    /// earlier than <see cref="RestoreDelay"/> after the paste either.</summary>
+    private static readonly TimeSpan AfterReadGrace = TimeSpan.FromMilliseconds(150);
+
+    /// <summary>When nothing reads the text (the paste went nowhere), the user's
+    /// clipboard goes back after this.</summary>
+    private static readonly TimeSpan RestoreDeadline = TimeSpan.FromSeconds(3);
+
+    private readonly Stopwatch _sincePaste = new();
+
     private readonly KeyboardHook _hook;
     private readonly ClipboardService _clipboard;
     private readonly Dispatcher _dispatcher;
@@ -45,8 +56,12 @@ internal sealed class SnippetEngine : IDisposable
         _restoreTimer.Tick += (_, _) =>
         {
             _restoreTimer.Stop();
-            _clipboard.RestoreSaved();
+            var waited = (int)_sincePaste.ElapsedMilliseconds;
+            _log?.Write(_clipboard.RestoreSaved()
+                ? $"clipboard restored {waited} ms after paste"
+                : $"clipboard restore skipped {waited} ms after paste");
         };
+        _clipboard.TextRead += OnTextRead;
 
         _hook.CharacterTyped += OnCharacterTyped;
         _hook.BackspacePressed += OnBackspacePressed;
@@ -103,10 +118,17 @@ internal sealed class SnippetEngine : IDisposable
             // whatever it holds, so the typed shortcut stays as it is
             // (docs/PLAN.md P13.1); a restore still waiting from an earlier
             // expansion goes ahead as planned.
+            _restoreTimer.Interval = RestoreDelay;
             _restoreTimer.Start();
             _log?.Write("clipboard busy");
             return;
         }
+
+        // The wait starts before the paste: a quick target reads the text while
+        // the Ctrl+V keys are still going out, and that read must count.
+        _sincePaste.Restart();
+        _restoreTimer.Interval = RestoreDeadline;
+        _restoreTimer.Start();
 
         InputSender.SendBackspaces(match.TypedLength);
         InputSender.Paste();
@@ -118,11 +140,30 @@ internal sealed class SnippetEngine : IDisposable
             InputSender.SendLeftArrows(expanded.CharactersAfterCursor);
         }
 
-        _restoreTimer.Start();
+        // The user's clipboard goes back once the target has read the text
+        // (OnTextRead), or at the deadline if nothing does.
 
         Debug.WriteLine($"snippet {match.Snippet.Trigger} expanded ({expanded.Text.Length} characters)");
 
         Expanded?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>The target app has read our text: restore the user's clipboard
+    /// shortly, and never sooner than the old fixed delay after the paste.</summary>
+    private void OnTextRead(object? sender, bool byPasteTarget)
+    {
+        // Numbers and who, never content (AGENTS.md rule 2).
+        _log?.Write($"clipboard read {(int)_sincePaste.ElapsedMilliseconds} ms after paste by {(byPasteTarget ? "the paste target" : "another app")}");
+        if (!byPasteTarget || !_restoreTimer.IsEnabled)
+        {
+            // A background reader got the text first; the target will read the
+            // now-ready text without telling us, so the deadline stands.
+            return;
+        }
+        var wait = RestoreDelay - _sincePaste.Elapsed;
+        _restoreTimer.Stop();
+        _restoreTimer.Interval = wait > AfterReadGrace ? wait : AfterReadGrace;
+        _restoreTimer.Start();
     }
 
     private void OnBackspacePressed(object? sender, EventArgs e) => _buffer.Backspace();

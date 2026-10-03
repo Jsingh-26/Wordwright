@@ -24,6 +24,11 @@
         <!-- WPF-UI has no list control, so the rows are styled here to match the
              rail: accent tint for the chosen row, no white system highlight. -->
         <Style TargetType="ListBoxItem">
+            <!-- Screen readers read the snippet's name, then its shortcut; without
+                 these WPF reads the view model's type name (found by scripts/E2E,
+                 docs/PLAN.md P13.20). -->
+            <Setter Property="AutomationProperties.Name" Value="{Binding Name}" />
+            <Setter Property="AutomationProperties.HelpText" Value="{Binding Shortcut}" />
             <Setter Property="Padding" Value="8,6" />
             <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
             <Setter Property="Template">
@@ -132,6 +137,7 @@
                                 AutomationProperties.Name="{Binding EmptyTryHere}" />
                 </StackPanel>
                 <ListBox x:Name="SnippetList"
+                         AutomationProperties.Name="{res:Str Snippets.Title}"
                          ItemsSource="{Binding Snippets}"
                          SelectedItem="{Binding SelectedSnippet}"
                          Background="Transparent"

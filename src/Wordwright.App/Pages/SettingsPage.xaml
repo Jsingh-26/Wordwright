@@ -57,7 +57,8 @@
             <TextBlock Style="{StaticResource SecondaryText}"
                        Margin="0,2,0,0"
                        Text="{res:Str Settings.ExcludedAppsHelp}" />
-            <ItemsControl ItemsSource="{Binding ExcludedApps}" Margin="0,8,0,0">
+            <ItemsControl ItemsSource="{Binding ExcludedApps}" Margin="0,8,0,0"
+                          AutomationProperties.Name="{res:Str Settings.ExcludedApps}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <!-- The Remove button sits inside the app's own row. -->

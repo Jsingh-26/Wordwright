@@ -109,5 +109,8 @@ Group headings sit above their rows (docs/DESIGN.md §8).
 | A11y.Maximize | Maximise |
 | A11y.Close | Close |
 | A11y.NavToggle | Show or hide the menu |
+| A11y.NavPages | Pages |
+| A11y.NavFooter | Settings and About |
+| A11y.ClearText | Clear text |
 | A11y.PageUp | Page up |
 | A11y.PageDown | Page down |

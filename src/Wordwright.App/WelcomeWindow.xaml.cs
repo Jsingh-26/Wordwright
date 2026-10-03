@@ -37,6 +37,11 @@ public partial class WelcomeWindow : FluentWindow
         }
 
         Closed += OnClosed;
+
+        // The title-bar buttons exist once the template is applied (docs/PLAN.md P13.20).
+        Loaded += (_, _) => Dispatcher.BeginInvoke(
+            () => Accessibility.NameTitleBarButtons(WelcomeTitleBar),
+            System.Windows.Threading.DispatcherPriority.Loaded);
     }
 
     /// <summary>Once a snippet has expanded in the box itself, the user has seen

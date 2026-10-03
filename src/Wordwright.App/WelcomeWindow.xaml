@@ -19,7 +19,7 @@
 
         <!-- Mica needs the title bar extended, and an extended title bar needs a
              TitleBar control (the same arrangement as the main window). -->
-        <ui:TitleBar Grid.Row="0" Title="Wordwright" CloseWindowByDoubleClickOnIcon="True" />
+        <ui:TitleBar x:Name="WelcomeTitleBar" Grid.Row="0" Title="Wordwright" CloseWindowByDoubleClickOnIcon="True" />
 
         <StackPanel Grid.Row="1" Margin="28,8,28,24">
             <TextBlock FontFamily="{StaticResource Zodiak}"

@@ -57,6 +57,31 @@ public sealed class ClipboardService
     /// <summary>True between <see cref="PutTextForPaste"/> and the restore.</summary>
     private bool _restorePending;
 
+    /// <summary>Owns the clipboard while our text is on it, so Windows can ask it
+    /// for the text when an app pastes (delayed rendering).</summary>
+    private OwnerWindow? _owner;
+
+    /// <summary>The text promised to the clipboard and not yet handed over.</summary>
+    private string? _promisedText;
+
+    /// <summary>
+    /// An app has just read our text off the clipboard. Raised on the thread that
+    /// called <see cref="PutTextForPaste"/>. Our text goes on as a promise
+    /// (delayed rendering), so Windows tells us the moment a paste asks for it;
+    /// the user's clipboard can go back after that rather than on a fixed timer,
+    /// which a slow app could outlast and then paste the old clipboard
+    /// (found by scripts/E2E, docs/PLAN.md P13.22).
+    /// </summary>
+    /// <para>The argument says whether the reader was the app the paste went to
+    /// (the foreground app when the text went on). Background readers such as
+    /// clipboard monitors also ask, sometimes first, and must not count as the
+    /// paste.</para>
+    public event EventHandler<bool>? TextRead;
+
+    /// <summary>The process the paste is aimed at: the foreground app when our
+    /// text went on.</summary>
+    private uint _pasteTargetProcess;
+
     /// <summary>The clipboard sequence number right after our text went on, so a
     /// restore can tell whether anyone has written to the clipboard since.</summary>
     private uint _ownSequence;
@@ -123,21 +148,30 @@ public sealed class ClipboardService
     /// Puts the user's clipboard back, unless something else has written to it
     /// since our text went on: that is newer than what we saved, so it stays.
     /// </summary>
-    public void RestoreSaved()
+    /// <returns>True when the user's clipboard went back; false when nothing was
+    /// waiting or someone else had written to the clipboard since.</returns>
+    public bool RestoreSaved()
     {
         if (!_restorePending)
         {
-            return;
+            return false;
         }
 
         _restorePending = false;
         var saved = _saved;
         _saved = null;
 
-        if (GetClipboardSequenceNumber() == _ownSequence)
+        // Still ours if nobody has written since: either the sequence number is
+        // where we left it, or (after Windows asked us for the promised text,
+        // which moves the number) our window still owns the clipboard.
+        var ours = GetClipboardSequenceNumber() == _ownSequence
+            || (_owner is not null && GetClipboardOwner() == _owner.Handle);
+        if (ours)
         {
             Restore(saved);
         }
+
+        return ours;
     }
 
     /// <summary>
@@ -245,9 +279,10 @@ public sealed class ClipboardService
     /// Win32 clipboard, so the marker payload is exactly the DWORD Windows reads.
     /// Returns false when the text did not go on.
     /// </summary>
-    private static bool SetOwnText(string text)
+    private bool SetOwnText(string text)
     {
-        if (!OpenClipboardWithRetries())
+        _owner ??= new OwnerWindow(this);
+        if (!OpenClipboardWithRetries(_owner.Handle))
         {
             return false;
         }
@@ -256,22 +291,14 @@ public sealed class ClipboardService
         {
             _ = EmptyClipboard();
 
-            var textSet = false;
-            var textHandle = AllocateGlobal(Encoding.Unicode.GetByteCount(text + '\0'));
-            if (textHandle != IntPtr.Zero && WriteGlobal(textHandle, Encoding.Unicode.GetBytes(text + '\0')))
+            // A promise: no data yet. Windows sends WM_RENDERFORMAT to the owner
+            // window when an app asks for the text (see OwnerWindow).
+            _promisedText = text;
+            _ = GetWindowThreadProcessId(GetForegroundWindow(), out _pasteTargetProcess);
+            _ = SetClipboardData(CF_UNICODETEXT, IntPtr.Zero);
+            if (!IsClipboardFormatAvailable(CF_UNICODETEXT))
             {
-                if (SetClipboardData(CF_UNICODETEXT, textHandle) == IntPtr.Zero)
-                {
-                    _ = GlobalFree(textHandle);
-                }
-                else
-                {
-                    textSet = true;
-                }
-            }
-
-            if (!textSet)
-            {
+                _promisedText = null;
                 return false;
             }
 
@@ -303,11 +330,11 @@ public sealed class ClipboardService
         }
     }
 
-    private static bool OpenClipboardWithRetries()
+    private static bool OpenClipboardWithRetries(IntPtr owner)
     {
         for (var attempt = 0; attempt < 10; attempt++)
         {
-            if (OpenClipboard(IntPtr.Zero))
+            if (OpenClipboard(owner))
             {
                 return true;
             }
@@ -333,10 +360,122 @@ public sealed class ClipboardService
         return true;
     }
 
+    /// <summary>Hands the promised text over: inside WM_RENDERFORMAT the
+    /// clipboard is already open for us; for WM_RENDERALLFORMATS we open it,
+    /// and only while we still own it.</summary>
+    private void Render(bool open)
+    {
+        var text = _promisedText;
+        if (text is null || _owner is null)
+        {
+            return;
+        }
+
+        // Inside WM_RENDERFORMAT the reader holds the clipboard open, so its
+        // window says who is asking.
+        var reader = 0u;
+        if (!open)
+        {
+            _ = GetWindowThreadProcessId(GetOpenClipboardWindow(), out reader);
+        }
+
+        if (open)
+        {
+            if (!OpenClipboard(_owner.Handle))
+            {
+                return;
+            }
+
+            if (GetClipboardOwner() != _owner.Handle)
+            {
+                _ = CloseClipboard();
+                return;
+            }
+        }
+
+        try
+        {
+            var handle = AllocateGlobal(Encoding.Unicode.GetByteCount(text + '\0'));
+            if (handle != IntPtr.Zero && WriteGlobal(handle, Encoding.Unicode.GetBytes(text + '\0'))
+                && SetClipboardData(CF_UNICODETEXT, handle) == IntPtr.Zero)
+            {
+                _ = GlobalFree(handle);
+            }
+        }
+        finally
+        {
+            if (open)
+            {
+                _ = CloseClipboard();
+            }
+        }
+
+        _promisedText = null;
+
+        // Handing the text over counts as a clipboard change; it is still ours,
+        // so the restore must not mistake it for someone else's copy.
+        _ownSequence = GetClipboardSequenceNumber();
+        TextRead?.Invoke(this, reader != 0 && reader == _pasteTargetProcess);
+    }
+
+    /// <summary>A message-only window on the calling (UI) thread that owns the
+    /// clipboard while our text is promised on it.</summary>
+    private sealed class OwnerWindow : NativeWindow
+    {
+        private const int WM_RENDERFORMAT = 0x0305;
+        private const int WM_RENDERALLFORMATS = 0x0306;
+        private const int WM_DESTROYCLIPBOARD = 0x0307;
+
+        private readonly ClipboardService _service;
+
+        public OwnerWindow(ClipboardService service)
+        {
+            _service = service;
+            CreateHandle(new CreateParams { Parent = new IntPtr(-3) }); // HWND_MESSAGE
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            switch (m.Msg)
+            {
+                case WM_RENDERFORMAT when (uint)m.WParam == CF_UNICODETEXT:
+                    _service.Render(open: false);
+                    m.Result = IntPtr.Zero;
+                    return;
+                case WM_RENDERALLFORMATS:
+                    // Going away with the text still promised: hand it over.
+                    _service.Render(open: true);
+                    m.Result = IntPtr.Zero;
+                    return;
+                case WM_DESTROYCLIPBOARD:
+                    // Someone else emptied the clipboard; the promise is void.
+                    _service._promisedText = null;
+                    break;
+            }
+
+            base.WndProc(ref m);
+        }
+    }
+
+    [DllImport("user32.dll")]
+    private static extern bool IsClipboardFormatAvailable(uint format);
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetClipboardOwner();
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetOpenClipboardWindow();
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    private static extern uint GetWindowThreadProcessId(IntPtr window, out uint processId);
+
     /// <summary>Restores the clipboard when the paste is done.</summary>
     private sealed class RestoredClipboard(ClipboardService owner) : IDisposable
     {
-        public void Dispose() => owner.RestoreSaved();
+        public void Dispose() => _ = owner.RestoreSaved();
     }
 
     [DllImport("user32.dll")]

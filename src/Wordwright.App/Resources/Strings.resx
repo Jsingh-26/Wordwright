@@ -101,6 +101,9 @@
   <data name="A11y.Maximize" xml:space="preserve"><value>Maximise</value></data>
   <data name="A11y.Close" xml:space="preserve"><value>Close</value></data>
   <data name="A11y.NavToggle" xml:space="preserve"><value>Show or hide the menu</value></data>
+  <data name="A11y.NavPages" xml:space="preserve"><value>Pages</value></data>
+  <data name="A11y.NavFooter" xml:space="preserve"><value>Settings and About</value></data>
+  <data name="A11y.ClearText" xml:space="preserve"><value>Clear text</value></data>
   <data name="A11y.PageUp" xml:space="preserve"><value>Page up</value></data>
   <data name="A11y.PageDown" xml:space="preserve"><value>Page down</value></data>
 </root>

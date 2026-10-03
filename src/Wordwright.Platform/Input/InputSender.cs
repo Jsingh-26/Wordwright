@@ -33,17 +33,27 @@ public static class InputSender
     /// <summary>Presses and releases Ctrl+V.</summary>
     public static void Paste() => Combo(VK_V);
 
+    /// <summary>A short gap between the four events of a shortcut. Sent as one
+    /// batch, the Windows 11 Notepad and Edge took Ctrl+V as a plain "v" or
+    /// dropped it; Espanso has the same setting, paste_shortcut_event_delay
+    /// (docs/PLAN.md P13.19).</summary>
+    private const int ShortcutEventGapMs = 10;
+
     private static void Combo(ushort virtualKey)
     {
-        var inputs = new[]
-        {
+        Input[] events =
+        [
             Key(VK_CONTROL, down: true),
             Key(virtualKey, down: true),
             Key(virtualKey, down: false),
             Key(VK_CONTROL, down: false),
-        };
+        ];
 
-        _ = SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<Input>());
+        foreach (var input in events)
+        {
+            _ = SendInput(1, [input], Marshal.SizeOf<Input>());
+            Thread.Sleep(ShortcutEventGapMs);
+        }
     }
 
     private static void Tap(ushort virtualKey, int count)
@@ -64,6 +74,11 @@ public static class InputSender
         }
     }
 
+    /// <summary>One key event with its real scan code. Apps that read scan codes
+    /// rather than virtual keys (the Windows 11 Notepad, Edge, Word, the Start
+    /// search box) did not see a Ctrl sent with scan code 0, so Ctrl+V arrived as
+    /// a plain "v" or not at all (found by scripts/E2E, docs/PLAN.md P13.19).
+    /// The arrows are extended keys and say so.</summary>
     private static Input Key(ushort virtualKey, bool down) => new()
     {
         Type = INPUT_KEYBOARD,
@@ -72,11 +87,17 @@ public static class InputSender
             Keyboard = new KeyboardInput
             {
                 VirtualKey = virtualKey,
-                ScanCode = 0,
-                Flags = down ? 0 : KEYEVENTF_KEYUP,
+                ScanCode = (ushort)MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC),
+                Flags = (down ? 0 : KEYEVENTF_KEYUP) | (virtualKey == VK_LEFT ? KEYEVENTF_EXTENDEDKEY : 0),
             },
         },
     };
+
+    private const uint MAPVK_VK_TO_VSC = 0;
+    private const uint KEYEVENTF_EXTENDEDKEY = 0x0001;
+
+    [DllImport("user32.dll")]
+    private static extern uint MapVirtualKey(uint code, uint mapType);
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern uint SendInput(uint count, Input[] inputs, int size);

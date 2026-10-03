@@ -62,21 +62,11 @@ public partial class MainWindow : FluentWindow
     {
         Accessibility.Name(RootNavigation.Part("NavigationToggleButton"), "A11y.NavToggle");
 
-        foreach (var button in WindowTitleBar.Descendants().OfType<TitleBarButton>())
-        {
-            var stringId = button.ButtonType switch
-            {
-                TitleBarButtonType.Minimize => "A11y.Minimize",
-                TitleBarButtonType.Close => "A11y.Close",
-                TitleBarButtonType.Maximize or TitleBarButtonType.Restore => "A11y.Maximize",
-                _ => null,
-            };
-
-            if (stringId is not null)
-            {
-                Accessibility.Name(button, stringId);
-            }
-        }
+        // The pane's two lists (the pages, and Settings and About at its foot),
+        // which Axe.Windows found unnamed (docs/PLAN.md P13.20).
+        Accessibility.Name(RootNavigation.Part("NavigationItems"), "A11y.NavPages");
+        Accessibility.Name(RootNavigation.Part("NavigationFooterItems"), "A11y.NavFooter");
+        Accessibility.NameTitleBarButtons(WindowTitleBar);
     }
 
     /// <summary>Open on a particular page the next time the window appears.</summary>

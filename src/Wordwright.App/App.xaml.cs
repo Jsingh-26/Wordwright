@@ -70,12 +70,24 @@ public partial class App : Application
     /// <summary>The user's snippets, as last loaded or saved.</summary>
     internal SnippetDocument Snippets { get; private set; } = null!;
 
+    /// <summary>End-to-end test mode (docs/ARCHITECTURE.md): set only by
+    /// scripts/E2E through the <c>WORDWRIGHT_E2E_DATA</c> environment variable.
+    /// The data folder is that path, the instance has its own single-instance
+    /// names, start-with-Windows is never touched, and the hook accepts input the
+    /// runner tags. Null in every normal launch.</summary>
+    private static readonly string? E2EDataFolder =
+        Environment.GetEnvironmentVariable("WORDWRIGHT_E2E_DATA") is { Length: > 0 } folder ? folder : null;
+
+    internal static bool IsE2E => E2EDataFolder is not null;
+
     protected override void OnStartup(StartupEventArgs e)
     {
-        // Created before the mutex so a second launch can always find it once the mutex exists.
-        _showWindowEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowWindowEventName);
+        var instanceSuffix = IsE2E ? ".E2E" : "";
 
-        _mutex = new Mutex(initiallyOwned: true, MutexName, out bool createdNew);
+        // Created before the mutex so a second launch can always find it once the mutex exists.
+        _showWindowEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowWindowEventName + instanceSuffix);
+
+        _mutex = new Mutex(initiallyOwned: true, MutexName + instanceSuffix, out bool createdNew);
         if (!createdNew)
         {
             // Second launch: tell the running instance to open its window, then exit.
@@ -93,7 +105,9 @@ public partial class App : Application
 
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
-        var userData = Path.Combine(
+        Accessibility.NameTextBoxClearButtons();
+
+        var userData = E2EDataFolder ?? Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Wordwright");
 
         // The events-only log, and the safety net that keeps a tray app from
@@ -117,7 +131,14 @@ public partial class App : Application
             _settingsStore.Save(Settings);
         }
 
-        StartWithWindows.Apply(Settings.StartWithWindows, Environment.ProcessPath!);
+        if (IsE2E)
+        {
+            _log.Write("e2e mode");
+        }
+        else
+        {
+            StartWithWindows.Apply(Settings.StartWithWindows, Environment.ProcessPath!);
+        }
 
         _snippetStore = new SnippetStore(userData);
         var firstRun = !File.Exists(Path.Combine(userData, "snippets.json"));
@@ -369,7 +390,10 @@ public partial class App : Application
     {
         if (settings.StartWithWindows != Settings.StartWithWindows)
         {
-            StartWithWindows.Apply(settings.StartWithWindows, Environment.ProcessPath!);
+            if (!IsE2E)
+            {
+                StartWithWindows.Apply(settings.StartWithWindows, Environment.ProcessPath!);
+            }
         }
 
         var snippetsToggled = settings.SnippetsEnabled != Settings.SnippetsEnabled;
@@ -388,7 +412,7 @@ public partial class App : Application
     private void StartSnippetEngine()
     {
         _clipboard = new ClipboardService();
-        _keyboardHook = new KeyboardHook(Settings.ExcludedApps);
+        _keyboardHook = new KeyboardHook(Settings.ExcludedApps, acceptTaggedInput: IsE2E);
         _snippetEngine = new SnippetEngine(_keyboardHook, _clipboard, Dispatcher, _log);
         _snippetEngine.Apply(Snippets);
 

@@ -93,16 +93,28 @@ public sealed class KeyboardHook : IDisposable
     /// synthesise — including Wordwright's own backspaces and paste — is ignored,
     /// so the hook cannot react to itself. Kept as a switch for the diagnostics
     /// harness, which has no other way to feed the hook.</param>
-    public KeyboardHook(IEnumerable<string> excludedApps, bool ignoreInjectedInput = true)
+    /// <param name="acceptTaggedInput">End-to-end test mode only: synthesised
+    /// input whose <c>dwExtraInfo</c> is <see cref="TestInputTag"/> is treated as
+    /// typing. Wordwright's own input is never tagged, so the hook still cannot
+    /// react to itself (docs/ARCHITECTURE.md → End-to-end test mode).</param>
+    public KeyboardHook(IEnumerable<string> excludedApps, bool ignoreInjectedInput = true, bool acceptTaggedInput = false)
     {
         _excludedApps = excludedApps.ToList();
         IgnoreInjectedInput = ignoreInjectedInput;
+        AcceptTaggedInput = acceptTaggedInput;
         _keyboardProcedure = OnKeyboardMessage;
         _mouseProcedure = OnMouseMessage;
     }
 
     /// <summary>Whether synthesised input is filtered out (the production default).</summary>
     internal bool IgnoreInjectedInput { get; }
+
+    /// <summary>Whether synthesised input carrying <see cref="TestInputTag"/> counts as typing.</summary>
+    internal bool AcceptTaggedInput { get; }
+
+    /// <summary>The <c>dwExtraInfo</c> value the end-to-end runner (scripts/E2E)
+    /// stamps on every key and click it sends: "WWE2" in ASCII.</summary>
+    public const long TestInputTag = 0x57574532;
 
     /// <summary>A printable character was typed. Raised on a background thread.</summary>
     public event EventHandler<char>? CharacterTyped;
@@ -226,7 +238,7 @@ public sealed class KeyboardHook : IDisposable
         if (code >= 0 && (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN))
         {
             var data = Marshal.PtrToStructure<KeyboardMessage>(lParam);
-            if (!IsInjected(data.Flags, LLKHF_INJECTED))
+            if (!IsInjected(data.Flags, LLKHF_INJECTED, data.ExtraInfo))
             {
                 // Our own typing (backspaces, the paste) is injected and never lands here.
                 // The modifiers are read now: by the time the worker translates the
@@ -246,7 +258,7 @@ public sealed class KeyboardHook : IDisposable
                 || wParam == WM_MBUTTONDOWN || wParam == WM_XBUTTONDOWN))
         {
             var data = Marshal.PtrToStructure<MouseMessage>(lParam);
-            if (!IsInjected(data.Flags, LLMHF_INJECTED))
+            if (!IsInjected(data.Flags, LLMHF_INJECTED, data.ExtraInfo))
             {
                 _ = _events.TryAdd(HookEvent.Forget());
             }
@@ -386,8 +398,10 @@ public sealed class KeyboardHook : IDisposable
 
     private static bool IsDown(uint virtualKey) => (GetAsyncKeyState((int)virtualKey) & 0x8000) != 0;
 
-    private bool IsInjected(uint flags, uint injectedFlag)
-        => IgnoreInjectedInput && (flags & injectedFlag) != 0;
+    private bool IsInjected(uint flags, uint injectedFlag, IntPtr extraInfo)
+        => IgnoreInjectedInput
+            && (flags & injectedFlag) != 0
+            && !(AcceptTaggedInput && extraInfo == (IntPtr)TestInputTag);
 
     private bool IsExcluded(IntPtr window)
     {

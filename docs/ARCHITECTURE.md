@@ -44,6 +44,7 @@ Two builds ship from the same source. Both keep the user's data in the same plac
 | `CommunityToolkit.Mvvm` | App | MVVM boilerplate |
 | `Velopack` | App | Installer and uninstaller (the app never checks for updates) |
 | `xunit`, `FluentAssertions` | Tests | Unit tests |
+| `Axe.Windows` (Microsoft, MIT) | `scripts/E2E` only | The accessibility rules engine behind Accessibility Insights, run by the end-to-end runner. Test tooling: never referenced by the app and never shipped |
 
 Not packages but bundled assets: Zodiak font files (Fontshare, embedded as WPF resources; not in the repository, because the ITF licence forbids passing the files on that way: the `FetchZodiak` target in `Wordwright.App.csproj` downloads the official zip on the first build and checks both files against pinned SHA-256 hashes, a build-time step like the NuGet restore; the app itself still opens no connections) and Phosphor icons (MIT) copied as XAML path geometries into `Wordwright.App/Resources/Icons.xaml`. Icons and logo come from `brand/`.
 
@@ -72,7 +73,7 @@ Everything lives under `%AppData%\Wordwright\`.
 ## Snippet engine
 
 1. `Wordwright.Platform.KeyboardHook` installs `SetWindowsHookEx(WH_KEYBOARD_LL)` on a dedicated thread with its own message loop. The callback must return in well under 1 ms: enqueue and return; never block.
-2. Ignore events with the `LLKHF_INJECTED` flag (our own `SendInput` output) to avoid loops.
+2. Ignore events with the `LLKHF_INJECTED` flag (our own `SendInput` output) to avoid loops. In end-to-end test mode only, injected events whose `dwExtraInfo` is the runner's tag are kept (see *End-to-end test mode*).
 3. Translate printable keys with `ToUnicodeEx` using the foreground window's keyboard layout and append to a rolling in-memory buffer (max 64 chars). The hook callback reads Shift, Ctrl, Alt (left and right) and Caps Lock as each key arrives and the worker builds the key state from them, because the worker thread's own key state never shows a modifier; `ToUnicodeEx` runs with flag `0x4` so it cannot consume a dead key the user is typing. Backspace removes one char. Enter, Esc, Tab, arrows, Home/End, PgUp/PgDn, mouse clicks and foreground-window changes clear the buffer, and so does a pause of more than 5 s between two typed characters (decision D3), so a trigger typed with a long gap in the middle of it never expands. Nothing happens while the foreground process is in `excludedApps`.
 4. After each character, `Wordwright.Core.Snippets.TriggerMatcher` checks whether the buffer ends with `prefix + trigger`, on a word boundary (the char before the prefix is start-of-buffer, whitespace or punctuation). If one trigger is a prefix of another (`;s` and `;sig`), expand only when the next typed char is a space or punctuation (then the space/punctuation is kept after the expansion). Otherwise expand immediately.
 5. On a match: send Backspaces for the typed trigger (prefix + trigger length), then paste the expanded body.
@@ -80,14 +81,24 @@ Everything lives under `%AppData%\Wordwright\`.
 
 ## Paste
 
-- **Paste:** save clipboard (Unicode text, text, RTF, HTML, CSV and file lists, plus a bitmap only when there is no text, within a 200 ms budget) → set clipboard to our text, also adding the `ExcludeClipboardContentFromMonitorProcessing` format so it stays out of Windows clipboard history (Win+V) → `SendInput` Ctrl+V → 400 ms later, without blocking, restore the saved clipboard unless something else has written to it since (clipboard sequence number). A second expansion inside those 400 ms keeps the first one's saved clipboard.
+- **Paste:** save clipboard (Unicode text, text, RTF, HTML, CSV and file lists, plus a bitmap only when there is no text, within a 200 ms budget) → put our text on the clipboard as a *promise* (delayed rendering: `SetClipboardData(CF_UNICODETEXT, NULL)` from a message-only owner window), also adding the `ExcludeClipboardContentFromMonitorProcessing` format so it stays out of Windows clipboard history (Win+V) → `SendInput` Backspaces and Ctrl+V → when an app asks for the text, Windows sends `WM_RENDERFORMAT` and the owner window hands it over → restore the saved clipboard once **the paste target** (the foreground app when the text went on, identified by `GetOpenClipboardWindow` during the render) has read it, never sooner than 400 ms after the paste; if another app reads first (a clipboard monitor) or nothing reads, the restore comes at a 3 s deadline. The restore is skipped if something else has written to the clipboard since (sequence number, or our window no longer owns it). A second expansion before the restore keeps the first one's saved clipboard. *Why:* on a fixed 400 ms timer, an app that reads late (Remote Desktop, a busy PC, the Start search box) pasted the user's old clipboard instead of the snippet (P13.22, reproduced by E2E check E7).
+- **Keystrokes:** every key Wordwright sends carries its real scan code (`MapVirtualKey`), and the four events of Ctrl+V go out 10 ms apart. With scan code 0 and one batch, the Windows 11 Notepad typed a plain "v", and Edge, Word and the Start search box dropped the paste (P13.19, found by E2E check E1; Espanso has the same setting, `paste_shortcut_event_delay`).
 - **Line endings:** every expansion goes out with `\r\n` line breaks (`ExpandedText.WithWindowsLineEndings`); classic Win32 edit controls show a bare `\n` as nothing. The `{cursor}` arrow count treats each `\r\n` as one caret step.
 - **Known limitation:** Windows blocks a normal app's hook and input from reaching apps running as administrator (UIPI), so nothing expands there. The app does not detect this; the README's Limitations section says so.
 ## Privacy summary
 - **No telemetry, and no network access at all.** There is no code path that opens a connection: no update check, no crash reporting, nothing.
-- **No content in logs.** The log file `%AppData%\Wordwright\logs\wordwright-YYYYMMDD.log` (`Core/Diagnostics/EventLog`) records fixed event names only — started, hook refused, hook reinstalled, clipboard busy (an expansion skipped because another program held the clipboard), and an unhandled exception's type, HResult and stack frames, never its message — and day files older than 7 days are deleted at start-up. It sits beside the user's data so that uninstalling or deleting `%AppData%\Wordwright` removes everything. An exception on the UI thread is logged and the app keeps running.
+- **No content in logs.** The log file `%AppData%\Wordwright\logs\wordwright-YYYYMMDD.log` (`Core/Diagnostics/EventLog`) records fixed event names only — started, hook refused, hook reinstalled, clipboard busy (an expansion skipped because another program held the clipboard), clipboard read *N* ms after paste by the paste target or by another app, clipboard restored or restore skipped *N* ms after paste, e2e mode (end-to-end test mode only), and an unhandled exception's type, HResult and stack frames, never its message — and day files older than 7 days are deleted at start-up. It sits beside the user's data so that uninstalling or deleting `%AppData%\Wordwright` removes everything. An exception on the UI thread is logged and the app keeps running.
 - The keystroke buffer holds at most the last 64 characters, in memory only, and is cleared on focus change, mouse click, Enter, Escape and navigation keys. It is never persisted.
 - Windows does not reliably tell other apps when a password field is focused, so `excludedApps` lets users turn Wordwright off in specific programs. The README says this plainly.
+
+## End-to-end test mode
+
+`scripts/E2E` (docs/E2E.md) drives the real Release build. Two things stopped a script from doing that, and one seam answers both, switched on only by the environment variable `WORDWRIGHT_E2E_DATA`:
+
+- **The hook ignores injected keys** (rule 2 of the snippet engine), so scripted typing never expanded anything. In test mode `KeyboardHook` also accepts injected keys and clicks whose `dwExtraInfo` is `KeyboardHook.TestInputTag` ("WWE2"); the runner stamps that on everything it sends. Wordwright's own keystrokes are never tagged, so it still cannot react to itself.
+- **A fresh-user run would touch the real data and startup entry.** The data folder comes from the known-folder API, so `APPDATA` cannot redirect it. In test mode the data folder is the variable's path, the single-instance names get an `.E2E` suffix (so a test instance runs beside an installed copy, which ignores the tagged keys), start-with-Windows is never applied or removed, and the log records `e2e mode`.
+
+Without the variable nothing changes: no tag is accepted, the data folder, the names and the Run key behave as before.
 
 ## The AI writing assistant (parked)
 
