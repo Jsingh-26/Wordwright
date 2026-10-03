@@ -19,7 +19,7 @@ Rows marked *E2E* are run by the end-to-end runner ([E2E.md](E2E.md)): it types 
 | B5 | Hook probe passes, US and German layouts | `dotnet run --project scripts/HookProbe` | Gate, script | Pass (US and German) | 2026-10-03 | `47f31e2` |
 | B6 | Installer, portable zip and MSIX build | `scripts/pack-release.ps1`, `scripts/pack-msix.ps1` | Gate, script | Pass (Setup 85.6 MB, MSIX 74.9 MB) | 2026-10-03 | `9d42dd1` |
 | B7 | A fresh clone builds: the Zodiak fonts are fetched and verified | delete `Resources/Fonts/*.otf`, build | Gate, script | Pass | 2026-10-03 | `0e91590` |
-| B8 | No Zodiak `.otf` anywhere in the public history or tags | `git log --all -- '*.otf'` is empty | Gate, script | **Fail** (purge pending, P13.12) | 2026-10-03 | `0e91590` |
+| B8 | No Zodiak `.otf` anywhere in the public history or tags | `git log --all -- '*.otf'` is empty | Gate, script | Pass for every branch and tag (mirror clone of GitHub, 0 font commits). GitHub's read-only `refs/pull/1/head` still holds them until GitHub Support removes it | 2026-10-03 | `8a72710` |
 
 ### Install and data
 
