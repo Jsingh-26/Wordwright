@@ -14,7 +14,7 @@ Rows marked *E2E* are run by the end-to-end runner ([E2E.md](E2E.md)): it types 
 |---|---|---|---|---|---|---|
 | B1 | Release build has 0 warnings, 0 errors | `dotnet build -c Release` | Gate, script | Pass | 2026-10-03 | `0e91590` |
 | B2 | Core tests pass | `dotnet test -c Release` (192 today) | Gate, script | Pass (192/192) | 2026-10-03 | `0e91590` |
-| B3 | CI is green, including the harness builds and both packaging scripts | GitHub Actions on the release commit | Gate, script | | | |
+| B3 | CI is green, including the harness builds and both packaging scripts | GitHub Actions on the release commit | Gate, script | Pass (build, test, harnesses, MSIX and installer jobs; first run on the purged history, run 37112298363) | 2026-10-03 | `bc944a2` |
 | B4 | Paste harness passes | `dotnet run --project scripts/PasteHarness` | Gate, script | Pass (12 checks, after the clipboard change) | 2026-10-03 | `47f31e2` |
 | B5 | Hook probe passes, US and German layouts | `dotnet run --project scripts/HookProbe` | Gate, script | Pass (US and German) | 2026-10-03 | `47f31e2` |
 | B6 | Installer, portable zip and MSIX build | `scripts/pack-release.ps1`, `scripts/pack-msix.ps1` | Gate, script | Pass (Setup 85.6 MB, MSIX 74.9 MB) | 2026-10-03 | `9d42dd1` |
