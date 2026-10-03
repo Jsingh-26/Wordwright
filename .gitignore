@@ -491,3 +491,6 @@ eval/results/
 # Zodiak font files: the licence forbids redistributing them through a
 # repository (docs/PLAN.md P13.12). The build fetches them from Fontshare.
 src/Wordwright.App/Resources/Fonts/*.otf
+
+# End-to-end runner output (scripts/E2E)
+scripts/e2e-results/

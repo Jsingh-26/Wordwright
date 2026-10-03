@@ -15,6 +15,9 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="4.0.0" />
+
+    <!-- scripts/E2E only (test tooling, never shipped): the Accessibility Insights engine, MIT. -->
+    <PackageVersion Include="Axe.Windows" Version="2.4.2" />
   </ItemGroup>
 
 </Project>
