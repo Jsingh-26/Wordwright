@@ -12,6 +12,7 @@ using Wordwright.App.Tray;
 using Wordwright.Core.Diagnostics;
 using Wordwright.Core.Settings;
 using Wordwright.Core.Snippets;
+using Wordwright.Core.Storage;
 using Microsoft.Win32;
 using Velopack;
 using Velopack.Locators;
@@ -107,14 +108,26 @@ public partial class App : Application
 
         Accessibility.NameTextBoxClearButtons();
 
-        var userData = E2EDataFolder ?? Path.Combine(
+        var appDataFolder = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Wordwright");
+        var userData = E2EDataFolder ?? PackageIdentity.DataFolder ?? appDataFolder;
+
+        // The Store build keeps its own folder (docs/PLAN.md P14.1); on its first
+        // run it starts from the installer build's snippets and settings, if any.
+        var importedData = E2EDataFolder is null
+            && PackageIdentity.DataFolder is not null
+            && TryImportData(appDataFolder, PackageIdentity.DataFolder);
 
         // The events-only log, and the safety net that keeps a tray app from
         // vanishing on an unexpected exception (docs/PLAN.md P12.10).
         _log = new EventLog(Path.Combine(userData, "logs"), () => DateTimeOffset.Now);
         _log.Prune();
         _log.Write("started");
+        if (importedData)
+        {
+            _log.Write("data imported from the installer build");
+        }
+
         DispatcherUnhandledException += OnDispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
@@ -227,6 +240,21 @@ public partial class App : Application
     /// <summary>True when snippets are on but Windows would not install the
     /// keyboard hook, so nothing can expand; the tray says so.</summary>
     internal bool HookRefused => Settings.SnippetsEnabled && _keyboardHook is { IsInstalled: false };
+
+    /// <summary>Copies the installer build's data into the Store build's folder
+    /// once. A failure only means the user starts from the examples, so it never
+    /// stops the app; it runs before the log exists, so it is not logged.</summary>
+    private static bool TryImportData(string source, string destination)
+    {
+        try
+        {
+            return DataFolderImport.CopyIfEmpty(source, destination);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
 
     /// <summary>True for the Store package and for a copy Setup installed;
     /// false for the portable zip and for a build run where it was built.</summary>

@@ -16,21 +16,19 @@
   the app turns it on when the user's "Start Wordwright when I sign in" setting
   says so. Description matches docs/UX_COPY.md About.Body.
 
-  File-system write virtualisation is off (docs/PLAN.md P12.2), so the packaged
-  build reads and writes the real %AppData%\Wordwright like the installer build:
-  "Open data folder" shows the user's actual files, both builds share snippets,
-  and uninstalling the Store app does not delete them. It needs the
-  unvirtualizedResources capability below.
+  File-system write virtualisation stays on: Microsoft refused the
+  restricted capability that turning it off needs (certification report,
+  2026-10-07; docs/PLAN.md P14.1). The packaged build keeps its data in
+  the package's own LocalState folder instead (PackageIdentity.DataFolder).
 -->
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
   xmlns:desktop4="http://schemas.microsoft.com/appx/manifest/desktop/windows10/4"
-  xmlns:desktop6="http://schemas.microsoft.com/appx/manifest/desktop/windows10/6"
   xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  IgnorableNamespaces="uap desktop desktop4 desktop6 uap5 rescap">
+  IgnorableNamespaces="uap desktop desktop4 uap5 rescap">
 
   <Identity
     Name="UnboundKite.Wordwright"
@@ -42,7 +40,6 @@
     <DisplayName>Wordwright</DisplayName>
     <PublisherDisplayName>Unbound Kite</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
-    <desktop6:FileSystemWriteVirtualization>disabled</desktop6:FileSystemWriteVirtualization>
   </Properties>
 
   <Dependencies>
@@ -81,7 +78,5 @@
     <!-- Required by any packaged app that leaves the sandbox, which Wordwright's
          global keyboard hook and SendInput do. -->
     <rescap:Capability Name="runFullTrust" />
-    <!-- Required by FileSystemWriteVirtualization above. -->
-    <rescap:Capability Name="unvirtualizedResources" />
   </Capabilities>
 </Package>

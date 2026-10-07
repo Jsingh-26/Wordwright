@@ -13,7 +13,7 @@ By **Unbound Kite**. A free, open-source text expander for Windows: type a short
 - **Snippets.** No limit on how many you keep or how long they are.
 - **Variables.** `{date}`, `{time}`, `{clipboard}` and `{cursor}` fill themselves in as the snippet expands.
 - **Private by design.** Nothing you type is written to disk or to a log, and the app makes no network connections of its own.
-- **Your data, in one place.** Everything lives in `%AppData%\Wordwright`, and snippets export and import as JSON.
+- **Your data, in one place.** Everything lives in one folder on your PC, and snippets export and import as JSON.
 
 > A *wright* is a maker: a shipwright builds ships, a wheelwright builds wheels. Wordwright builds your words.
 
@@ -40,7 +40,7 @@ To continue, click **More info**, then **Run anyway**. If you would rather check
 - **No network access.** Wordwright opens no connections at all: no telemetry, no analytics, no crash reports, no update check. You can confirm it in Resource Monitor's Network tab.
 - **Nothing you type is stored.** To spot a shortcut, Wordwright keeps the last 64 characters you typed in memory only, and clears them whenever you click, switch windows or press Enter, Escape or an arrow key. Typed text, your clipboard and your snippet text are never written to a log.
 - **Your clipboard comes back.** A snippet is pasted through the clipboard, and whatever you had copied is put back straight afterwards. Wordwright asks Windows to keep its paste out of clipboard history (Win+V).
-- **Your data, in one place.** Snippets and settings are plain JSON in `%AppData%\Wordwright`, beside a small log that records events such as "started" and never any text. Nothing is kept anywhere else.
+- **Your data, in one place.** Snippets and settings are plain JSON in `%AppData%\Wordwright`, beside a small log that records events such as "started" and never any text. Nothing is kept anywhere else. The Microsoft Store version keeps the same files in its own app folder instead, which Windows removes when you uninstall it; on its first run it copies your snippets from `%AppData%\Wordwright` if you used the downloaded version before. In either version, **Settings → Open data folder** opens the folder in use.
 - **Quiet where it matters.** Wordwright cannot always tell when you are typing a password, so Settings lets you turn it off in chosen apps, such as your password manager.
 
 ## How it works

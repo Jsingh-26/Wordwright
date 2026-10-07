@@ -52,7 +52,7 @@ Pin exact versions in `Directory.Packages.props` (central package management).
 
 ## Data files
 
-Everything lives under `%AppData%\Wordwright\`.
+Everything lives under `%AppData%\Wordwright\`. The Microsoft Store build is the exception: it keeps the same files in its package's own `%LocalAppData%\Packages\<package family name>\LocalState\` (`Platform/Packaging/PackageIdentity.DataFolder`), because Microsoft refused the `unvirtualizedResources` capability that would let it write the real `%AppData%` (docs/PLAN.md P14.1). On its first run it copies `settings.json` and `snippets.json` from `%AppData%\Wordwright` if that folder has them and its own folder has neither (`Core/Storage/DataFolderImport`). Windows deletes `LocalState` when the Store app is uninstalled.
 
 ### `snippets.json`
 ```json

@@ -26,10 +26,10 @@ Rows marked *E2E* are run by the end-to-end runner ([E2E.md](E2E.md)): it types 
 | # | Check | How | Kind | Result | Date | Build |
 |---|---|---|---|---|---|---|
 | I1 | Installer on a fresh user account: create, edit and delete snippets; all persist after a restart | Setup.exe, new Windows account | Gate, E2E + machine | Pass for the app (E2E I1a, I1b: fresh data folder, welcome, seeds, create, edit, delete, restart). A new Windows account: not run | 2026-10-03 | `47f31e2` |
-| I2 | Install and uninstall leave nothing outside `%AppData%\Wordwright` | compare `%LocalAppData%`, `%AppData%`, `HKCU\Software` before and after | Gate, machine | | | |
+| I2 | Install and uninstall leave nothing outside `%AppData%\Wordwright` (Store build: nothing outside its package folder, which uninstall removes) | compare `%LocalAppData%`, `%AppData%`, `HKCU\Software` before and after | Gate, machine | | | |
 | I3 | The editor never loses an edit: type, then at once switch snippet, change page, or quit from the tray | Snippets page | Gate, E2E | Pass (I3a switch snippet, I3b change page, I3c quit from the tray) | 2026-10-03 | `47f31e2` |
 | I4 | MSIX on the same account: repeat I1, and Start with Windows works through the packaged startup task | `pack-msix.ps1 -Certificate`, install, sign out and in | Gate, machine | | | |
-| I5 | Store build data: Open data folder shows the real `%AppData%\Wordwright`; the Start with Windows toggle matches Task Manager → Startup apps after turning it off there | MSIX build | Gate, machine | | | |
+| I5 | Store build data: Open data folder shows the package's `LocalState` with `snippets.json` in it, and a first run copies existing snippets from `%AppData%\Wordwright`; the Start with Windows toggle matches Task Manager → Startup apps after turning it off there | MSIX build | Gate, machine | | | |
 | I6 | Portable zip does not add itself to Start with Windows | unzip, run, check `HKCU\...\Run` | Gate, machine | | | |
 | I7 | Export to a folder you cannot write (e.g. `C:\Windows`) says so and keeps the app running | Settings → Export | Polish, machine | | | |
 

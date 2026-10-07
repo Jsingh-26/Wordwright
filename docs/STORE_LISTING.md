@@ -45,9 +45,7 @@ Upload `Releases/Wordwright-1.0.0.msixbundle`. Device family: **Desktop** only.
 
 > Wordwright is a text expander. It watches the keyboard through a low-level keyboard hook to notice when the user types a snippet shortcut, then pastes the snippet into the active app through the clipboard and SendInput. Both need a full-trust desktop process. Typed text is held only in memory (at most the last 64 characters), is never written to disk or sent anywhere, and the app makes no network connections at all.
 
-`unvirtualizedResources` is also restricted (it turns off file-system write virtualisation). If asked, paste:
-
-> Wordwright keeps the user's snippets and settings in %AppData%\Wordwright, the folder its documentation, About page and "Open data folder" button point to, and the same folder the downloadable installer build uses. Without this capability Windows would redirect the Store build's writes into the package's private store: "Open data folder" would open an empty folder, a user moving between the two builds would lose their snippets, and uninstalling would silently delete them. The app writes only its own two JSON files there.
+`unvirtualizedResources` is no longer declared. Microsoft refused it in the first certification (2026-10-07, policy 10.6.3), so the Store build keeps its data in its own package folder instead (docs/PLAN.md P14.1). Do not paste a justification for it.
 
 ## Store listing (English, United States)
 

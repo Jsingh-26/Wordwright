@@ -334,6 +334,12 @@ The app already follows most of the playbook: Mica base, Fluent type ramp with Z
 - **Added human checks (playbook's verify list):** hovering the Maximise button shows the Windows 11 Snap Layouts flyout (WPF-UI's title bar must answer `HTMAXBUTTON`); 300 % scaling alongside 100/150/200; launch to interactive timed (P13.5).
 
 
+## Phase P14: Store certification fixes (2026-10-07)
+
+- [x] **P14.1 Store build without `unvirtualizedResources`.** The first certification came back "Attention needed": policy 10.6.3 Capabilities, the request to use `unvirtualizedResources` was denied. That capability existed only for P12.2, so the Store build could write the real `%AppData%\Wordwright` and share it with the installer build. Asking again would need new information, and there is none: sharing a folder with a second build is a convenience, not something the app needs to work.
+  *Fix:* remove `unvirtualizedResources` and `FileSystemWriteVirtualization` from `packaging/AppxManifest.xml`. The packaged build keeps its data in its package's own `LocalState` folder (`PackageIdentity.DataFolder`), which Windows never redirects, so "Open data folder" shows the real files. On its first run, if that folder has neither `settings.json` nor `snippets.json`, it copies them from `%AppData%\Wordwright` (`Core/Storage/DataFolderImport`, tested), so a user moving from the installer build keeps their snippets. Accepted consequence: uninstalling the Store app deletes its snippets, as it does for every Store app; Export is the way to keep them.
+  *Done when:* the manifest declares only `runFullTrust`; `dotnet build` 0 warnings, `dotnet test` passes; the rebuilt msixbundle is resubmitted. **Open (human, Store build):** I5 and I2 in the release checklist, re-worded for the new folder.
+
 ## Phase P10: Release (day 13–14)
 - [x] **P10.0** Hero illustration per `brand/HERO_BRIEF.md`, recoloured to the palette, saved as `brand/hero.svg`; used on README, installer and the About page slot from DESIGN.md §9.
 - [ ] **P10.1** README: a GIF of a snippet expanding, install steps, the SmartScreen "unknown publisher" explanation, and a privacy section.

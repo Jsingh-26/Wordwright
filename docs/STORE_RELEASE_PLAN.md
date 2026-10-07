@@ -63,7 +63,7 @@ Partner Center → Wordwright → Start your submission. All text is in STORE_LI
 | Pricing and availability | Markets: all. **Visibility: Private audience.** New known user group "Wordwright testers" with your Microsoft account's email. Price: free. |
 | Properties | Category Productivity. Privacy policy URL `https://github.com/Jsingh-26/Wordwright#privacy`; Claude checks it opens on the pushed README first. Support contact: the GitHub issues URL. System requirements: keyboard required, Windows 11. |
 | Age ratings | The IARC questionnaire answers in STORE_LISTING.md: no violence, no user interaction, no purchases, no data collection. |
-| Packages | Upload `Wordwright-1.0.0.msixbundle`. If asked, paste the restricted-capability notes for `runFullTrust` and `unvirtualizedResources`. |
+| Packages | Upload `Wordwright-1.0.0.msixbundle`. If asked, paste the restricted-capability note for `runFullTrust`. (`unvirtualizedResources` was refused and removed; see Submission 2 below.) |
 | Store listing (English, US) | Description, What's new, features, keywords. The five screenshots from `packaging/store/screenshots/`, light first. |
 | Submission options | Notes for certification: the paragraph in STORE_LISTING.md. It says the app is a tray app, to type `;date` in Notepad, and that it makes no network connections. |
 
@@ -81,13 +81,17 @@ Done when: the submission is *In the Store* for the private audience.
 
 The Partner Center pages were filled through Claude in Chrome. The 75 MB package and the screenshots went through the chrome-devtools browser, because Claude in Chrome caps uploads at 10 MB. **Submit for certification is the maintainer's click.**
 
+*Certification 2026-10-07: Attention needed.* Report: policy 10.6.3 Capabilities, "Your request to use unvirtualizedResources has been reviewed and was denied". Nothing else was flagged. Decision (Claude, P14.1): remove the capability rather than ask again. Its only purpose was to let the Store build share the real `%AppData%\Wordwright` with the installer build; a fuller justification would add nothing new, and the report warns that a repeat request without new information gets the same answer. The Store build now keeps its data in its package's own `LocalState` folder and copies the installer build's snippets on its first run.
+
+**Submission 2 (maintainer):** in the same submission, Packages → remove the old package and upload the rebuilt `Releases/Wordwright-1.0.0.msixbundle`. Partner Center should then stop asking for an `unvirtualizedResources` justification; if the field is still on Submission options, clear it. Leave the `runFullTrust` note. Submit. If Partner Center refuses the upload because version 1.0.0.0 was used before, Claude rebuilds with `scripts/pack-msix.ps1 -Version 1.0.1`.
+
 ## Phase 5: Test the real Store build (Claude, with you clicking Install once)
 
 1. **You:** open the private Store link while signed in with the tester account, and click *Get*. The Store installs it; this is the build users will get.
 2. **Claude:** run the end-to-end suite against it through the alias: `E2E.exe --exe wordwright.exe`. The Store build's own checks are:
    - **I4:** the packaged startup task. Turn "Start Wordwright when I sign in" on, sign out and in. You sign in, then Claude verifies.
-   - **I5:** Open data folder shows the real `%AppData%\Wordwright`. The toggle matches Task Manager → Startup apps after you turn it off there.
-   - **I2:** uninstall and reinstall leave nothing outside `%AppData%\Wordwright`. Claude compares the folders and `HKCU\Software` before and after.
+   - **I5:** Open data folder shows the package's `LocalState`, holding `snippets.json`; snippets made in the installer build appear on the Store build's first run. The toggle matches Task Manager → Startup apps after you turn it off there.
+   - **I2:** uninstall removes the package folder and leaves nothing else; `%AppData%\Wordwright` is untouched. Claude compares the folders and `HKCU\Software` before and after.
 3. Fix anything found, then resubmit to the private audience and repeat until clean.
 
 Done when: every E2E check passes against the Store build, and I2, I4 and I5 are recorded.
