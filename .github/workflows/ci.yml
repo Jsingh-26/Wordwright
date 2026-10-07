@@ -54,11 +54,11 @@ jobs:
 
       - name: Store package (unsigned)
         shell: pwsh
-        run: scripts/pack-msix.ps1 -Version 1.0.0
+        run: scripts/pack-msix.ps1 -Version 1.0.1
 
       - name: Installer and portable zip
         shell: pwsh
-        run: scripts/pack-release.ps1 -Version 1.0.0
+        run: scripts/pack-release.ps1 -Version 1.0.1
 
   # The Windows App Certification Kit on the Store package (docs/STORE_RELEASE_PLAN.md,
   # Phase 3). It installs and launches the package, so the package is signed here with
@@ -92,7 +92,7 @@ jobs:
 
       - name: Store package (signed with the test certificate)
         shell: pwsh
-        run: scripts/pack-msix.ps1 -Version 1.0.0 -Certificate "$env:RUNNER_TEMP\ci.pfx" -CertificatePassword ci-only
+        run: scripts/pack-msix.ps1 -Version 1.0.1 -Certificate "$env:RUNNER_TEMP\ci.pfx" -CertificatePassword ci-only
 
       - name: Windows App Certification Kit
         shell: pwsh
@@ -104,7 +104,7 @@ jobs:
           }
           $report = Join-Path $env:RUNNER_TEMP "wack-report.xml"
           & $appcert.FullName reset
-          & $appcert.FullName test -appxpackagepath (Resolve-Path "Releases/Wordwright-1.0.0-x64.msix") -reportoutputpath $report
+          & $appcert.FullName test -appxpackagepath (Resolve-Path "Releases/Wordwright-1.0.1-x64.msix") -reportoutputpath $report
           if (-not (Test-Path $report)) { throw "the kit wrote no report" }
           $xml = [xml](Get-Content $report)
           $overall = $xml.REPORT.OVERALL_RESULT

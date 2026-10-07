@@ -6,14 +6,14 @@
 # (docs/PLAN.md P12.16): the app never checks for updates, so a delta helps no
 # one, and an empty folder keeps unpublished local builds out of the feed.
 #
-#   scripts/pack-release.ps1                 (1.0.0)
-#   scripts/pack-release.ps1 -Version 1.0.0
+#   scripts/pack-release.ps1                 (1.0.1)
+#   scripts/pack-release.ps1 -Version 1.0.1
 #
 # Publishing is a separate, deliberate step:
 #   vpk upload github --repoUrl https://github.com/Jsingh-26/Wordwright `
 #       --token <token> --publish --releaseName "v0.1.0" --tag v0.1.0
 param(
-    [string]$Version = "1.0.0"
+    [string]$Version = "1.0.1"
 )
 
 $ErrorActionPreference = "Stop"
