@@ -1,6 +1,6 @@
 # Microsoft Store submission kit (P10.4)
 
-Everything Partner Center asks for, ready to paste. The package is `Releases/Wordwright-1.0.0.msixbundle`, built by `scripts/pack-msix.ps1 -Version 1.0.0` (unsigned; the Store signs it).
+Everything Partner Center asks for, ready to paste. The package is `Releases/Wordwright-1.0.1.msixbundle`, built by `scripts/pack-msix.ps1 -Version 1.0.1` (unsigned; the Store signs it).
 
 ## Before the first upload (maintainer, once)
 
@@ -39,7 +39,7 @@ Category **Utility, productivity, communication, or other**. Answers: no violenc
 
 ## Packages
 
-Upload `Releases/Wordwright-1.0.0.msixbundle`. Device family: **Desktop** only.
+Upload `Releases/Wordwright-1.0.1.msixbundle`. Every new upload needs a higher `-Version` than any package uploaded before (1.0.0 is used up). Device family: **Desktop** only.
 
 `runFullTrust` is a restricted capability. If Partner Center asks why it is needed, paste:
 

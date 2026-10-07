@@ -63,7 +63,7 @@ Partner Center → Wordwright → Start your submission. All text is in STORE_LI
 | Pricing and availability | Markets: all. **Visibility: Private audience.** New known user group "Wordwright testers" with your Microsoft account's email. Price: free. |
 | Properties | Category Productivity. Privacy policy URL `https://github.com/Jsingh-26/Wordwright#privacy`; Claude checks it opens on the pushed README first. Support contact: the GitHub issues URL. System requirements: keyboard required, Windows 11. |
 | Age ratings | The IARC questionnaire answers in STORE_LISTING.md: no violence, no user interaction, no purchases, no data collection. |
-| Packages | Upload `Wordwright-1.0.0.msixbundle`. If asked, paste the restricted-capability note for `runFullTrust`. (`unvirtualizedResources` was refused and removed; see Submission 2 below.) |
+| Packages | Upload `Wordwright-1.0.1.msixbundle`. If asked, paste the restricted-capability note for `runFullTrust`. (`unvirtualizedResources` was refused and removed; see Submission 2 below.) |
 | Store listing (English, US) | Description, What's new, features, keywords. The five screenshots from `packaging/store/screenshots/`, light first. |
 | Submission options | Notes for certification: the paragraph in STORE_LISTING.md. It says the app is a tray app, to type `;date` in Notepad, and that it makes no network connections. |
 
@@ -83,7 +83,7 @@ The Partner Center pages were filled through Claude in Chrome. The 75 MB package
 
 *Certification 2026-10-07: Attention needed.* Report: policy 10.6.3 Capabilities, "Your request to use unvirtualizedResources has been reviewed and was denied". Nothing else was flagged. Decision (Claude, P14.1): remove the capability rather than ask again. Its only purpose was to let the Store build share the real `%AppData%\Wordwright` with the installer build; a fuller justification would add nothing new, and the report warns that a repeat request without new information gets the same answer. The Store build now keeps its data in its package's own `LocalState` folder and copies the installer build's snippets on its first run.
 
-**Submission 2 (maintainer):** in the same submission, Packages → remove the old package and upload the rebuilt `Releases/Wordwright-1.0.0.msixbundle`. Partner Center should then stop asking for an `unvirtualizedResources` justification; if the field is still on Submission options, clear it. Leave the `runFullTrust` note. Submit. If Partner Center refuses the upload because version 1.0.0.0 was used before, Claude rebuilds with `scripts/pack-msix.ps1 -Version 1.0.1`.
+**Resubmitted 2026-10-07 (maintainer asked Claude to publish):** Partner Center refused the rebuilt 1.0.0 bundle because its package full name `UnboundKite.Wordwright_1.0.0.0_x64` had already been uploaded with different contents, so it was rebuilt with `scripts/pack-msix.ps1 -Version 1.0.1`. `Wordwright-1.0.1.msixbundle` (75 MB, bundle version 2026.1007.1802.0, declares only `runFullTrust`) was uploaded through the chrome-devtools browser, the 1.0.0 package was removed, and Packages reads **Validated**; its validation warning now names only `runFullTrust`. Submission options lists only `runFullTrust`, with the existing note. Resubmitted for certification: status *In certification*.
 
 ## Phase 5: Test the real Store build (Claude, with you clicking Install once)
 
